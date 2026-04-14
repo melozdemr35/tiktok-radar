@@ -1,52 +1,47 @@
-import asyncio
-from playwright.sync_api import sync_playwright
+import google.generativeai as genai
 import json
 import os
-import google.generativeai as genai
-
-def video_cek():
-    print("TikTok'a bulut üzerinden erişiliyor...")
-    try:
-        with sync_playwright() as p:
-            # GitHub sunucusunda ekran olmadığı için headless=True olmalı
-            browser = p.chromium.launch(headless=True) 
-            page = browser.new_page()
-            # TikTok Keşfet sayfası
-            page.goto("https://www.tiktok.com/explore", wait_until="networkidle")
-            page.wait_for_timeout(5000) 
-            
-            # Sayfayı biraz aşağı kaydırıp videoların yüklenmesini simüle et
-            for i in range(3):
-                page.mouse.wheel(0, 1000)
-                page.wait_for_timeout(2000)
-                
-            print("Keşfet tarandı, veriler güncelleniyor...")
-            browser.close()
-    except Exception as e:
-        print(f"Video çekme sırasında küçük bir aksama oldu: {e}")
 
 def analiz_yap(api_key):
+    # API yapılandırması
     genai.configure(api_key=api_key)
+    
+    # Model ismini en güncel ve kararlı haliyle çağırıyoruz
     model = genai.GenerativeModel('gemini-1.5-flash')
     
-    # Mevcut veritabanını oku
-    with open("trend_veritabani.json", "r", encoding="utf-8") as f:
-        veriler = json.load(f)
+    # Dosya yollarını GitHub sunucusuna göre ayarlıyoruz
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(base_path, "trend_veritabani.json")
     
-    # Gemini'ye en popüler videoları göndererek analiz iste
-    prompt = f"Türkiye TikTok trendlerini şu verilere göre analiz et ve Melih için 3 içerik fikri ver: {str(veriler[:15])}"
+    # 1. Veritabanını oku (Dosya yoksa sistemi durdurma)
+    if os.path.exists(db_path):
+        with open(db_path, "r", encoding="utf-8") as f:
+            veriler = json.load(f)
+    else:
+        veriler = [{"desc": "Veritabanı henüz oluşmadı", "hashtagler": ""}]
+
+    # 2. Gemini'den analiz iste
+    prompt = f"Sen bir sosyal medya uzmanısın. Şu TikTok trend verilerini incele ve Türkiye için 3 viral fikir ver: {str(veriler[:15])}"
     
-    response = model.generate_content(prompt)
-    
-    # Analizi kaydet
-    with open("son_analiz.txt", "w", encoding="utf-8") as f:
-        f.write(response.text)
-    print("Yapay zeka analizi başarıyla tamamlandı.")
+    try:
+        # Analizi gerçekleştir
+        response = model.generate_content(prompt)
+        
+        # 3. Sonucu 'son_analiz.txt' olarak kaydet
+        analiz_dosyasi = os.path.join(base_path, "son_analiz.txt")
+        with open(analiz_dosyasi, "w", encoding="utf-8") as f:
+            f.write(response.text)
+        
+        print("Analiz başarıyla tamamlandı ve dosyaya yazıldı.")
+        
+    except Exception as e:
+        print(f"Gemini Analiz Hatası: {e}")
 
 if __name__ == "__main__":
+    # GitHub Secrets'dan anahtarı çek
     api_key = os.environ.get("GEMINI_API_KEY")
+    
     if api_key:
-        video_cek()
         analiz_yap(api_key)
     else:
-        print("Hata: API Key tanımlanmamış!")
+        print("Hata: GEMINI_API_KEY bulunamadı. Lütfen GitHub Settings -> Secrets kısmını kontrol et.")
