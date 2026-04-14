@@ -2,8 +2,11 @@ name: Tam Otonom TikTok Casusu
 
 on:
   schedule:
-    - cron: '0 * * * *' # Her saat başı
-  workflow_dispatch:
+    - cron: '0 * * * *' # Her saat başı otomatik çalışır
+  workflow_dispatch: # Manuel çalıştırman için buton ekler
+
+permissions:
+  contents: write # Robotun yeni verileri veritabanına kaydedebilmesi için ŞART!
 
 jobs:
   otonom_islem:
