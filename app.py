@@ -61,15 +61,23 @@ if os.path.exists(db_path):
 
     with col_sag:
         st.subheader("🎵 Şu An Patlayan Popüler Sesler")
-        # Robotun topladığı veriden müzik/açıklama analizi yapıp tabloyu basıyoruz
-        # Eğer veri yoksa uyarı veriyoruz
-        if len(df) > 5:
-            # Sadece açıklama metinlerinden popüler olanları çekelim
-            populer_sesler = df['desc'].str.split().str[0].value_counts().head(5).reset_index()
-            populer_sesler.columns = ['Müzik Adı', 'Kullanım']
-            st.table(populer_sesler)
+        if not df.empty:
+            # SADECE ŞARKILARI VE AKIMLARI AL (Hashtagleri Kesinlikle At)
+            # İçinde # işareti olan her şeyi siliyoruz
+            populer_sesler = df['desc'].str.split().explode()
+            populer_sesler = populer_sesler[~populer_sesler.str.contains('#', na=False)]
+            # Çok kısa (1-2 harfli) veya anlamsız bağlaçları da atalım
+            populer_sesler = populer_sesler[populer_sesler.str.len() > 3]
+            
+            populer_df = populer_sesler.value_counts().head(5).reset_index()
+            populer_df.columns = ['Müzik / Akım Adı', 'Kullanım Sayısı']
+            
+            if not populer_df.empty:
+                st.table(populer_df)
+            else:
+                st.info("Trend sesler analiz ediliyor...")
         else:
-            st.info("Yeterli veri toplandığında popüler sesler burada listelenecek.")
+            st.info("Veri bekleniyor...")
 
     st.divider()
 
