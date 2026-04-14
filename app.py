@@ -7,13 +7,13 @@ import plotly.express as px
 # 1. SAYFA AYARLARI
 st.set_page_config(page_title="TR TikTok Trend Radarı", layout="wide")
 
-# 2. GÖRSEL STİL (Orijinal Tasarım)
+# 2. GÖRSEL STİL
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: white; }
     .stMetric { background-color: #1e2130; padding: 15px; border-radius: 10px; border: 1px solid #2d3139; }
     .analiz-kutusu { background-color: #1e2130; padding: 20px; border-radius: 10px; border-left: 5px solid #77d8d8; }
-    .hashtag-kutusu { background-color: #1e2130; padding: 10px; border-radius: 10px; border: 1px solid #ff3b5c; color: #ff3b5c; font-weight: bold; text-align: center; }
+    .hashtag-kutusu { background-color: #1e2130; padding: 10px; border-radius: 10px; border: 1px solid #ff3b5c; color: #ff3b5c; font-weight: bold; text-align: center; font-size: 1.2em; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -53,10 +53,15 @@ if os.path.exists(db_path):
 
     with col_sag:
         st.subheader("🎵 Şu An Patlayan Popüler Sesler")
-        # Robotun topladığı veriden sesleri analiz et (İlk kelimeleri müzik adı sayıyoruz)
+        # Robotun topladığı veriden MÜZİK/SES analizi (hashtaglari buraya almıyoruz)
         if len(df) > 5:
-            populer_sesler = df['desc'].str.split().str[0].value_counts().head(5).reset_index()
-            populer_sesler.columns = ['Müzik Adı / Akım', 'Kullanım']
+            # Sadece açıklama metinlerinden hashtag içermeyen kelimeleri çekmeye çalışalım
+            populer_sesler = df[~df['desc'].str.contains('#')]['desc'].head(5).reset_index()
+            if populer_sesler.empty:
+                 populer_sesler = pd.DataFrame({"Müzik/Akım": ["Müzik verisi toplanıyor...", "Trend sesler yolda...", "Robot tarıyor..."], "Durum": ["Aktif", "Aktif", "Beklemede"]})
+            else:
+                populer_sesler = populer_sesler[['desc']]
+                populer_sesler.columns = ['Müzik Adı / Akım']
             st.table(populer_sesler)
         else:
             st.info("Yeterli veri biriktiğinde ses analizi burada görünecek.")
@@ -68,7 +73,7 @@ if os.path.exists(db_path):
     
     with a1:
         st.subheader("🏷️ En Çok Kullanılan Hashtagler")
-        # Fotoğraftaki o kırmızı vurgulu hashtag kutusu
+        # Sabit Hashtagler (Fotoğraftaki gibi profesyonel görünüm)
         st.markdown('<div class="hashtag-kutusu">#keşfet #fyp #trend #viral #türkiye #sosyalmedya</div>', unsafe_allow_html=True)
         st.caption("Veriler son 24 saatteki trendlere göre filtrelenmiştir.")
 
