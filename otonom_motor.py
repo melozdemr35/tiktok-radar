@@ -51,7 +51,8 @@ def veri_yakala_ve_analiz_et(api_key):
     model = genai.GenerativeModel('gemini-1.5-flash')
     
     analiz_verisi = str(yeni_videolar) if yeni_videolar else str(eski_veriler[:10])
-    prompt = f"Sen bir sosyal medya stratejistisin. Şu an Türkiye TikTok Keşfet'teki videolar şunlar: {analiz_verisi}. Melih için 3 etkili içerik fikri üret."
+    prompt = f"Aşağıdaki güncel TikTok verilerini analiz et: {analiz_verisi}. Bu verilere dayanarak, içerik üreticileri için uygulanabilir 5 benzersiz trend stratejisi oluştur. 
+    Lütfen sadece strateji maddelerini yaz, giriş veya kapanış cümlesi kurma."
     
     try:
         response = model.generate_content(prompt)
