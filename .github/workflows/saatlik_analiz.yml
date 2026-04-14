@@ -1,12 +1,12 @@
-name: Saatlik TikTok Trend Analizi
+name: Tam Otonom TikTok Casusu
 
 on:
   schedule:
-    - cron: '0 * * * *' # Her saat başı çalışır
-  workflow_dispatch: # Manuel çalıştırmak istersen buton ekler
+    - cron: '0 * * * *' # Her saat başı
+  workflow_dispatch:
 
 jobs:
-  analiz_yap:
+  otonom_islem:
     runs-on: ubuntu-latest
     steps:
       - name: Kodları Çek
@@ -17,20 +17,22 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Kütüphaneleri Yükle
+      - name: Tarayıcı ve Sürücüleri Kur
         run: |
-          pip install google-generativeai pandas
+          pip install playwright pandas google-generativeai
+          playwright install chromium
+          playwright install-deps
 
-      - name: Gemini Analizini Tetikle
+      - name: TikTok'tan Video Çek ve Analiz Et
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          python analiz_robotu.py
+          python otonom_motor.py
 
-      - name: Güncel Veriyi Kaydet
+      - name: Değişiklikleri GitHub'a Kaydet
         run: |
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
+          git config --global user.name 'TikTok-Otonom-Bot'
+          git config --global user.email 'bot@github.com'
           git add .
-          git commit -m "Saatlik AI Analizi Güncellendi" || exit 0
+          git commit -m "Otonom Veri ve Analiz Güncellemesi" || exit 0
           git push
