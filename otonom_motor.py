@@ -1,47 +1,69 @@
 import google.generativeai as genai
 import json
 import os
+from playwright.sync_api import sync_playwright
 
-def analiz_yap(api_key):
-    # API yapılandırması
-    genai.configure(api_key=api_key)
+def veri_yakala_ve_analiz_et(api_key):
+    yeni_videolar = []
     
-    # Model ismini en güncel ve kararlı haliyle çağırıyoruz
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    
-    # Dosya yollarını GitHub sunucusuna göre ayarlıyoruz
+    # --- 1. ADIM: TİKTOK'TAN TAZE VERİ ÇEK ---
+    print("TikTok Keşfet'e sızılıyor...")
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            # TikTok Keşfet sayfası
+            page.goto("https://www.tiktok.com/explore", wait_until="networkidle")
+            page.wait_for_timeout(8000) # Sayfanın yüklenmesi için süre
+            
+            # Sayfadaki video açıklamalarını topla
+            # TikTok'un güncel seçicilerini (selector) hedefliyoruz
+            descriptions = page.query_selector_all('div[data-e2e="explore-item-desc"]')
+            
+            for desc in descriptions[:10]: # En taze 10 videoyu al
+                text = desc.inner_text()
+                if text:
+                    yeni_videolar.append({"desc": text, "hashtagler": "Keşfetten Yeni"})
+            
+            browser.close()
+            print(f"{len(yeni_videolar)} adet yeni video yakalandı!")
+    except Exception as e:
+        print(f"Veri çekme hatası: {e}")
+
+    # --- 2. ADIM: VERİTABANINI GÜNCELLE ---
     base_path = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(base_path, "trend_veritabani.json")
     
-    # 1. Veritabanını oku (Dosya yoksa sistemi durdurma)
-    if os.path.exists(db_path):
-        with open(db_path, "r", encoding="utf-8") as f:
-            veriler = json.load(f)
-    else:
-        veriler = [{"desc": "Veritabanı henüz oluşmadı", "hashtagler": ""}]
+    with open(db_path, "r", encoding="utf-8") as f:
+        eski_veriler = json.load(f)
+    
+    # Yeni videoları listenin en başına ekle (Tazeler üstte kalsın)
+    guncel_liste = yeni_videolar + eski_veriler
+    # Listenin çok şişmemesi için son 3000 videoda sabitleyelim
+    guncel_liste = guncel_liste[:3000] 
+    
+    with open(db_path, "w", encoding="utf-8") as f:
+        json.dump(guncel_liste, f, ensure_ascii=False, indent=4)
 
-    # 2. Gemini'den analiz iste
-    prompt = f"Sen bir sosyal medya uzmanısın. Şu TikTok trend verilerini incele ve Türkiye için 3 viral fikir ver: {str(veriler[:15])}"
+    # --- 3. ADIM: GEMINI İLE TAZE ANALİZ YAP ---
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    
+    # Gemini'ye özellikle en yeni verileri vurguluyoruz
+    analiz_verisi = str(yeni_videolar) if yeni_videolar else str(eski_veriler[:10])
+    prompt = f"Şu an TikTok Keşfet'te taze yakaladığım videolar şunlar: {analiz_verisi}. Bu trendlere göre Melih için 3 içerik fikri üret."
     
     try:
-        # Analizi gerçekleştir
         response = model.generate_content(prompt)
-        
-        # 3. Sonucu 'son_analiz.txt' olarak kaydet
-        analiz_dosyasi = os.path.join(base_path, "son_analiz.txt")
-        with open(analiz_dosyasi, "w", encoding="utf-8") as f:
+        with open(os.path.join(base_path, "son_analiz.txt"), "w", encoding="utf-8") as f:
             f.write(response.text)
-        
-        print("Analiz başarıyla tamamlandı ve dosyaya yazıldı.")
-        
+        print("İşlem başarıyla tamamlandı!")
     except Exception as e:
-        print(f"Gemini Analiz Hatası: {e}")
+        print(f"Analiz hatası: {e}")
 
 if __name__ == "__main__":
-    # GitHub Secrets'dan anahtarı çek
     api_key = os.environ.get("GEMINI_API_KEY")
-    
     if api_key:
-        analiz_yap(api_key)
+        veri_yakala_ve_analiz_et(api_key)
     else:
-        print("Hata: GEMINI_API_KEY bulunamadı. Lütfen GitHub Settings -> Secrets kısmını kontrol et.")
+        print("Hata: API Key yok!")
