@@ -1,0 +1,36 @@
+name: Saatlik TikTok Trend Analizi
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Her saat başı çalışır
+  workflow_dispatch: # Manuel çalıştırmak istersen buton ekler
+
+jobs:
+  analiz_yap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodları Çek
+        uses: actions/checkout@v3
+
+      - name: Python Kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Kütüphaneleri Yükle
+        run: |
+          pip install google-generativeai pandas
+
+      - name: Gemini Analizini Tetikle
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python analiz_robotu.py
+
+      - name: Güncel Veriyi Kaydet
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add .
+          git commit -m "Saatlik AI Analizi Güncellendi" || exit 0
+          git push
