@@ -86,26 +86,26 @@ def veri_yakala_ve_analiz_et(api_key):
     else:
         print("⚠️ Uyarı: Hiç video yakalanamadı, veritabanı korunuyor.")
 
-    # --- GEMINI ANALİZ (BYPASS MODU) ---
+    # --- GEMINI ANALİZ (GÜNCEL MODEL SEÇİMİ) ---
     if api_key and yeni_videolar:
         try:
-            # En stabil bağlantı: v1 veya v1beta zorlaması yapmadan direkt bağlanıyoruz
+            # En güncel bağlantı yöntemi
             client = Client(api_key=api_key)
             
             analiz_prompt = f"Aşağıdaki TikTok trendlerini analiz et ve içerik üreticileri için 5 kısa strateji yaz: {str(yeni_videolar[:25])}"
             
-            # MODEL DEĞİŞİKLİĞİ: 'gemini-1.5-flash-8b' (Erişimi en garantili model)
+            # MODEL İSMİNİ SENİN LİSTENDEKİYLE DEĞİŞTİRDİK:
             response = client.models.generate_content(
-                model="gemini-1.5-flash-8b", 
+                model="gemini-3-flash-preview", 
                 contents=analiz_prompt
             )
             
             if response and response.text:
                 with open("son_analiz.txt", "w", encoding="utf-8") as f:
                     f.write(response.text)
-                print("✅ Gemini analizi (8B Modeli) ile başarıyla tamamladı.")
+                print("✅ Gemini 3 Flash ile analiz başarıyla tamamladı.")
             else:
-                print("⚠️ Gemini yanıt döndürdü ancak içerik boş.")
+                print("⚠️ Gemini yanıt döndürdü ancak metin içeriği boş.")
                 
         except Exception as e:
             print(f"❌ Gemini Analiz Hatası: {e}")
