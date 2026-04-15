@@ -2,7 +2,9 @@ name: Tam Otonom TikTok Casusu
 
 on:
   schedule:
-    - cron: '*/10 * * * *' # Her 10 dakikada bir çalışır
+    # Ortalama 75 dakikada bir çalışacak şekilde ayarlandı (Günde 19 kez)
+    - cron: '15 0,2,4,6,8,10,12,14,16,18,20,22 * * *'
+    - cron: '30 1,3,5,7,9,11,13,15,17,19,21,23 * * *'
   workflow_dispatch: # Manuel çalıştırman için buton ekler
 
 permissions:
@@ -24,11 +26,11 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Kütüphaneleri Kur
+      - name: Kütüphaneleri Hızlı Kur
         run: |
-          pip install --upgrade google-genai playwright pandas
-          playwright install chromium
-          playwright install-deps
+          # --no-cache-dir kurulumu hızlandırır, dakika tasarrufu sağlar
+          pip install --no-cache-dir google-genai playwright pandas
+          playwright install --with-deps chromium
 
       - name: TikTok'tan Video Çek ve Analiz Et
         env:
