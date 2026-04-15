@@ -11,28 +11,23 @@ def veri_yakala_ve_analiz_et(api_key):
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            # Gerçek bir bilgisayar tarayıcısı gibi davran (User-Agent ve Screen Size)
             context = browser.new_context(
                 user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
                 viewport={'width': 1280, 'height': 720}
             )
             page = context.new_page()
             
-            # TikTok'a git ve sayfa içeriğinin kabaca oluşmasını bekle
             page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=90000)
             
-            # --- KRİTİK: SAYFAYI DİNLENDİRME ---
             print("Sayfa açıldı, elemanların yüklenmesi için 10 saniye bekleniyor...")
             time.sleep(10) 
             
-            # --- YAVAŞ VE İNSANSI KAYDIRMA ---
             for i in range(10): 
                 page.mouse.wheel(0, 3000)
-                time.sleep(3) # TikTok bot sanmasın diye her kaydırmada 3 sn durakla
+                time.sleep(3)
                 if i % 2 == 0:
                     print(f"Tarama ilerlemesi: %{int(((i+1)/10)*100)}")
             
-            # Eleman seçicileri daha esnek hale getirdik (TikTok güncellemelerine karşı)
             items = page.query_selector_all('div[data-e2e="explore-item"]') or \
                     page.query_selector_all('div[class*="DivItemContainerV2"]')
             
@@ -40,10 +35,7 @@ def veri_yakala_ve_analiz_et(api_key):
             
             for item in items[:200]:
                 try:
-                    # Yazıyı ve müziği daha derinlemesine ara
                     desc_text = item.inner_text().split('\n')[0] if item else ""
-                    
-                    # Şarkı bulucu (daha esnek seçici)
                     music_elem = item.query_selector('h4') or item.query_selector('div[class*="music"]')
                     music_text = music_elem.inner_text() if music_elem else "Trend Müzik"
                     
@@ -77,20 +69,27 @@ def veri_yakala_ve_analiz_et(api_key):
     else:
         print("❌ Dikkat: Yeni veri yakalanamadı, veritabanı aynı kaldı.")
 
-    # --- GEMINI ANALİZ (Hata giderilmiş versiyon) ---
-    if api_key and len(yeni_videolar) > 0:
+    # --- GEMINI ANALİZ (Kritik Düzeltme Burası) ---
+    if api_key:
         try:
             genai.configure(api_key=api_key)
-            # Model ismini v1beta yerine en kararlı sürüme çektik
-            model = genai.GenerativeModel('gemini-1.5-flash-latest')
+            # 'latest' takısını sildik, en stabil model ismini yazdık
+            model = genai.GenerativeModel('gemini-1.5-flash')
             
-            analiz_prompt = f"Şu TikTok trendlerini analiz et ve içerik üreticileri için 5 kısa strateji yaz: {str(yeni_videolar[:20])}"
-            response = model.generate_content(analiz_prompt)
+            # Eğer yeni veri yoksa eskilere bakarak analiz yapmasını sağladık (Hata almamak için)
+            kaynak_veri = yeni_videolar[:20] if yeni_videolar else eski_veriler[:20]
             
-            with open("son_analiz.txt", "w", encoding="utf-8") as f:
-                f.write(response.text)
-            print("Gemini analizi başarıyla tamamladı.")
+            if kaynak_veri:
+                analiz_prompt = f"Şu TikTok trendlerini analiz et ve içerik üreticileri için 5 kısa strateji yaz: {str(kaynak_veri)}"
+                response = model.generate_content(analiz_prompt)
+                
+                with open("son_analiz.txt", "w", encoding="utf-8") as f:
+                    f.write(response.text)
+                print("Gemini analizi başarıyla tamamladı.")
+            else:
+                print("Analiz yapacak veri bulunamadı.")
         except Exception as e:
+            # Buradaki hata raporunu 404'ten kurtarmak için model ismini kontrol et
             print(f"Gemini Analiz Hatası: {e}")
 
 if __name__ == "__main__":
