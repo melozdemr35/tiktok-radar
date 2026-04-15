@@ -2,7 +2,7 @@ name: Tam Otonom TikTok Casusu
 
 on:
   schedule:
-    - cron: '0 * * * *' # Her saat başı otomatik çalışır
+    - cron: '*/10 * * * *' # Her 10 dakikada bir çalışır
   workflow_dispatch: # Manuel çalıştırman için buton ekler
 
 permissions:
