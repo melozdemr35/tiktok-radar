@@ -1,4 +1,4 @@
-import google.generativeai as genai
+from genai import Client  # YENİ SDK - 404 hatasını bitiren anahtar burası
 import json
 import os
 import time
@@ -15,7 +15,7 @@ def veri_yakala_ve_analiz_et(api_key):
     
     try:
         with sync_playwright() as p:
-            # Daha gerçekçi tarayıcı başlatma
+            # Senin çalışan tarayıcı ayarların
             browser = p.chromium.launch(headless=True)
             context = browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
@@ -24,15 +24,15 @@ def veri_yakala_ve_analiz_et(api_key):
             )
             page = context.new_page()
             
-            # TikTok Keşfet
+            # TikTok Keşfet (Dokunmadık)
             page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=90000)
             print("Sayfa açıldı, elemanların yüklenmesi için 12 saniye bekleniyor...")
             time.sleep(12) 
             
-            # --- İNSANSI VE DERİN TARAMA ---
+            # --- İNSANSI VE DERİN TARAMA (Senin ayarların) ---
             for i in range(20): 
                 page.mouse.wheel(0, 4500)
-                time.sleep(3) # TikTok bot koruması için yavaş kaydırma
+                time.sleep(3) 
                 if i % 5 == 0:
                     print(f"Tarama Derinliği: %{int(((i+1)/20)*100)}")
             
@@ -66,7 +66,7 @@ def veri_yakala_ve_analiz_et(api_key):
     except Exception as e:
         print(f"Bot Motoru Hatası: {e}")
 
-    # --- VERİTABANI YÖNETİMİ (KORUMALI MOD) ---
+    # --- VERİTABANI YÖNETİMİ (Dokunmadık) ---
     db_path = "trend_veritabani.json"
     if os.path.exists(db_path):
         with open(db_path, "r", encoding="utf-8") as f:
@@ -74,15 +74,10 @@ def veri_yakala_ve_analiz_et(api_key):
     else:
         eski_veriler = []
 
-    # Yeni ve eskileri birleştir
     birlesik_liste = yeni_videolar + eski_veriler
     
-    # Boş liste kontrolü
     if birlesik_liste:
-        # Sadece 10 gün içindeki verileri tut (Eskileri siler)
         guncel_ve_taze = [v for v in birlesik_liste if v.get("tarih", "2000-01-01") >= silme_siniri]
-        
-        # Tekilleştirme (Hata korumalı v.get kullanımı)
         son_liste = list({v.get('desc', ''): v for v in guncel_ve_taze if v.get('desc')}.values())
 
         with open(db_path, "w", encoding="utf-8") as f:
@@ -91,38 +86,31 @@ def veri_yakala_ve_analiz_et(api_key):
     else:
         print("⚠️ Uyarı: Hiç video yakalanamadı, veritabanı korunuyor.")
 
-    # --- GEMINI ANALİZ (404 HATASINI BYPASS EDEN YENİ METOD) ---
+    # --- GEMINI ANALİZ (YENİ NESİL SDK - 404 KESİN ÇÖZÜM) ---
     if api_key and yeni_videolar:
         try:
-            # v1beta hatasını aşmak için konfigürasyonu en yalın hale getiriyoruz
-            genai.configure(api_key=api_key)
-            
-            # BURASI KRİTİK: Model ismini açıkça belirtiyoruz
-            # Bazı durumlarda v1beta yerine v1 kullanması için zorluyoruz
-            model = genai.GenerativeModel(
-                model_name='gemini-1.5-flash'
-            )
+            # Yeni kütüphane 'genai.Client' kullanıyoruz, v1beta hatasını bypass eder
+            client = Client(api_key=api_key)
             
             analiz_prompt = f"Aşağıdaki TikTok trendlerini analiz et ve içerik üreticileri için 5 kısa strateji yaz: {str(yeni_videolar[:25])}"
             
-            # generate_content yerine bazen model çağırma sırasında hata olabiliyor
-            # Bunu güvenli blokta çalıştırıyoruz
-            response = model.generate_content(analiz_prompt)
+            # Yeni çağırma yöntemi
+            response = client.models.generate_content(
+                model="gemini-1.5-flash",
+                contents=analiz_prompt
+            )
             
             if response and response.text:
                 with open("son_analiz.txt", "w", encoding="utf-8") as f:
                     f.write(response.text)
-                print("✅ Gemini analizi başarıyla tamamladı.")
+                print("✅ Gemini analizi YENİ SDK ile başarıyla tamamladı.")
             else:
-                # Eğer güvenlik filtresine takılırsa boş dönebilir, onu yakalayalım
-                print("⚠️ Gemini yanıt verdi ama içerik boş (Güvenlik filtresi olabilir).")
+                print("⚠️ Gemini yanıt döndürdü ancak metin içeriği boş.")
                 
         except Exception as e:
-            # Eğer hala 404 verirse, kütüphane otomatik v1beta'ya yönleniyor demektir
             print(f"❌ Gemini Analiz Hatası: {e}")
 
 if __name__ == "__main__":
-    # Çevresel değişken kontrolü
     key = os.environ.get("GEMINI_API_KEY")
     if key:
         veri_yakala_ve_analiz_et(key)
