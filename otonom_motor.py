@@ -7,7 +7,7 @@ def veri_yakala_ve_analiz_et(api_key):
     yeni_videolar = []
     
     # --- 1. ADIM: TİKTOK'TAN TAZE VERİ ÇEK ---
-    print("TikTok Keşfet'e sızılıyor...")
+    print("TikTok Keşfet'e sızılıyor... (Müzik Odaklı Tarama)")
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
@@ -15,23 +15,39 @@ def veri_yakala_ve_analiz_et(api_key):
             # TikTok Keşfet sayfası
             page.goto("https://www.tiktok.com/explore", wait_until="networkidle", timeout=60000)
             
-            # --- EKLEME: SAYFAYI AŞAĞI KAYDIRMA (Daha fazla veri için) ---
-            print("Sayfa aşağı kaydırılıyor, daha fazla video toplanıyor...")
-            for _ in range(3): # 3 kez aşağı kaydırarak video sayısını artırıyoruz
-                page.mouse.wheel(0, 2000)
-                page.wait_for_timeout(2000)
+            # --- TURBO KAYDIRMA: Sayı artsın diye 12 kez kaydırıyoruz ---
+            print("Sayfa derinlemesine taranıyor, video ve müzikler toplanıyor...")
+            for i in range(12): 
+                page.mouse.wheel(0, 4000)
+                page.wait_for_timeout(1500)
+                if i % 3 == 0:
+                    print(f"Tarama ilerlemesi: %{int((i/12)*100)}")
             
-            # TikTok'un keşfet yazılarını yakalayalım
-            descriptions = page.query_selector_all('div[data-e2e="explore-item-desc"]')
+            # Tüm video kartlarını yakala
+            items = page.query_selector_all('div[data-e2e="explore-item"]')
             
-            # --- EKLEME: ÜST SINIRI 50'YE ÇIKARDIK ---
-            for desc in descriptions[:50]:
-                text = desc.inner_text()
-                if text:
-                    yeni_videolar.append({"desc": text, "hashtagler": "Keşfetten Yeni"})
+            # --- ÜST SINIRI 300'E ÇIKARDIK (Sayı fırlasın diye) ---
+            for item in items[:300]:
+                try:
+                    # Açıklama Metni
+                    desc_elem = item.query_selector('div[data-e2e="explore-item-desc"]')
+                    desc_text = desc_elem.inner_text() if desc_elem else ""
+                    
+                    # GERÇEK ŞARKI İSMİ (İstediğin yer burası)
+                    music_elem = item.query_selector('h4[data-e2e="explore-item-music"]')
+                    music_text = music_elem.inner_text() if music_elem else "Popüler Akım"
+                    
+                    if desc_text or music_text:
+                        yeni_videolar.append({
+                            "desc": desc_text, 
+                            "music": music_text, # Şarkı ismi artık veritabanında!
+                            "hashtagler": "Keşfetten Yeni"
+                        })
+                except:
+                    continue
             
             browser.close()
-            print(f"{len(yeni_videolar)} adet yeni video yakalandı!")
+            print(f"Mükemmel! {len(yeni_videolar)} adet taze veri yakalandı.")
     except Exception as e:
         print(f"Veri çekme hatası: {e}")
 
@@ -44,19 +60,20 @@ def veri_yakala_ve_analiz_et(api_key):
     else:
         eski_veriler = []
     
-    # Yeni videoları ekle ve kapasiteyi 5000 yaptık
+    # Yeni videoları eskilere ekle ve kapasiteyi 10.000 yaptık (Dev Veritabanı)
     guncel_liste = yeni_videolar + eski_veriler
-    guncel_liste = guncel_liste[:5000] 
+    guncel_liste = guncel_liste[:10000] 
     
     with open(db_path, "w", encoding="utf-8") as f:
         json.dump(guncel_liste, f, ensure_ascii=False, indent=4)
+    print("Veritabanı başarıyla şişirildi ve kaydedildi.")
 
     # --- 3. ADIM: GEMINI İLE TAZE ANALİZ YAP ---
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-1.5-flash')
     
-    # Analiz için en taze 20 veriyi gönderiyoruz
-    analiz_verisi = str(yeni_videolar[:20]) if yeni_videolar else str(eski_veriler[:20])
+    # Analiz için en taze 30 veriyi gönderiyoruz
+    analiz_verisi = str(yeni_videolar[:30]) if yeni_videolar else str(eski_veriler[:30])
     
     prompt = f"""
     Aşağıdaki güncel TikTok verilerini analiz et: {analiz_verisi}. 
@@ -67,16 +84,13 @@ def veri_yakala_ve_analiz_et(api_key):
     
     try:
         response = model.generate_content(prompt)
-        
-        # DOSYA YAZMA GARANTİSİ: Kesin yol kullanımı
         current_dir = os.getcwd()
         output_file = os.path.join(current_dir, "son_analiz.txt")
         
-        # Dosyayı temizleyip yeniden yazar (Noktalar burada silinir)
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(response.text)
             
-        print(f"Analiz raporu başarıyla güncellendi: {output_file}")
+        print(f"Analiz raporu güncellendi.")
     except Exception as e:
         print(f"Analiz hatası: {e}")
 
