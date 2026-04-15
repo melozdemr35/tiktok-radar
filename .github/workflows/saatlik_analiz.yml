@@ -26,7 +26,7 @@ jobs:
 
       - name: Kütüphaneleri Kur
         run: |
-          pip install playwright pandas google-generativeai
+          pip install --upgrade google-genai playwright pandas
           playwright install chromium
           playwright install-deps
 
