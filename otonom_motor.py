@@ -43,26 +43,29 @@ def veri_yakala_ve_analiz_et(api_key):
 
             page = context.new_page()
             
-            # TikTok Keşfet Sayfasına Git
-            page.goto("https://www.tiktok.com/explore", wait_until="networkidle", timeout=120000)
-            time.sleep(12) 
+           # --- VERİ SÖKEN AKILLI DÖNGÜ (YENİ VERSİYON) ---
+            print("Veri hacmi artırılıyor, lütfen bekleyin (Bu işlem zaman alır)...")
             
-            # --- TURBO VE DERİN TARAMA DÖNGÜSÜ (Ortalama 12-14 Dakika) ---
-            # 350 kez kaydırma yaparak yaklaşık 1500-2000 videonun yüklenmesini zorluyoruz
-            for i in range(350): 
-                # İnsansı ve agresif kaydırma (TikTok veri paketlerini açsın diye)
-                scroll_hizi = random.randint(5500, 9500)
-                page.mouse.wheel(0, scroll_hizi)
+            for i in range(120): # 120 kaliteli adım
+                # 1. Sayfanın en altına zıpla (End tuşu simülasyonu)
+                page.keyboard.press("End")
                 
-                # Her 10 kaydırmada bir TikTok'u dinlendir (Ban riskini azaltır)
-                if i % 10 == 0:
-                    time.sleep(2.5)
-                    print(f"Hacim Analiz Derinliği: %{int(((i+1)/350)*100)} | Tahmini {len(yeni_videolar)} video hedefleniyor...")
+                # 2. Rastgele miktar mouse wheel yap
+                page.mouse.wheel(0, random.randint(5000, 8000))
+                
+                # 3. TikTok'un yeni paketleri yüklemesi için bekle
+                if i % 3 == 0:
+                    time.sleep(4) # Paketlerin yüklenme süresi
                 else:
-                    # Hızlı kaydırma beklemesi
-                    time.sleep(0.7)
+                    time.sleep(1.5)
+                
+                # 4. Her 20 adımda bir o anki video sayısını loglara yaz
+                if i % 20 == 0:
+                    gecici_items = page.query_selector_all('div[data-e2e="explore-item"]') or \
+                                   page.query_selector_all('div[class*="DivItemContainerV2"]')
+                    print(f"Hacim Analizi: %{int(((i+1)/120)*100)} | Şu an sayfada yüklenen: {len(gecici_items)} video")
 
-            # Tüm kaydırma bittikten sonra sayfadaki tüm video kutucuklarını bir kerede topla
+            # TÜM KAYDIRMA BİTTİ, ŞİMDİ KESİN LİSTEYİ AL
             items = page.query_selector_all('div[data-e2e="explore-item"]') or \
                     page.query_selector_all('div[class*="DivItemContainerV2"]')
             
