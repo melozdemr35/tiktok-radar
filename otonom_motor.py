@@ -86,31 +86,33 @@ def veri_yakala_ve_analiz_et(api_key):
     else:
         print("⚠️ Uyarı: Hiç video yakalanamadı, veritabanı korunuyor.")
 
-    # --- GEMINI ANALİZ (YENİ NESİL SDK - 404 KESİN ÇÖZÜM) ---
+    # --- GEMINI ANALİZ (KESİN VE NİHAİ ÇÖZÜM) ---
     if api_key and yeni_videolar:
         try:
-            # DİKKAT: Burada 'http_options' ekleyerek v1beta kapısını tamamen iptal ediyoruz
+            # v1 zorlamasına devam ediyoruz ama bağlantıyı daha yalın kuruyoruz
             client = Client(
-                api_key=api_key, 
+                api_key=api_key,
                 http_options={'api_version': 'v1'}
             )
             
             analiz_prompt = f"Aşağıdaki TikTok trendlerini analiz et ve içerik üreticileri için 5 kısa strateji yaz: {str(yeni_videolar[:25])}"
             
-            # Artık v1beta karmaşası yok, doğrudan ana yoldan istiyoruz
+            # MODEL İSMİNİ TAM YOL (models/...) OLARAK YAZIYORUZ
+            # Bu, bazı kütüphane sürümlerindeki isimlendirme hatasını çözer
             response = client.models.generate_content(
-                model="gemini-1.5-flash",
+                model="models/gemini-1.5-flash", 
                 contents=analiz_prompt
             )
             
             if response and response.text:
                 with open("son_analiz.txt", "w", encoding="utf-8") as f:
                     f.write(response.text)
-                print("✅ Gemini analizi V1 OTOYOLU üzerinden başarıyla tamamladı.")
+                print("✅ Gemini analizi TAM YOL üzerinden başarıyla tamamladı.")
             else:
                 print("⚠️ Gemini yanıt döndürdü ancak metin içeriği boş.")
                 
         except Exception as e:
+            # Hata verirse tam mesajı görelim
             print(f"❌ Gemini Analiz Hatası: {e}")
 
 if __name__ == "__main__":
