@@ -2,9 +2,9 @@ name: Tam Otonom TikTok Casusu
 
 on:
   schedule:
-    # Ortalama 75 dakikada bir çalışacak şekilde ayarlandı (Günde 19 kez)
-    - cron: '15 0,2,4,6,8,10,12,14,16,18,20,22 * * *'
-    - cron: '30 1,3,5,7,9,11,13,15,17,19,21,23 * * *'
+    # Günde 12 kez, her 2 saatte bir tam saat başlarında çalışır.
+    # Bu sayede ay sonuna kadar kota sorunu yaşamadan derin tarama yapabiliriz.
+    - cron: '0 0,2,4,6,8,10,12,14,16,18,20,22 * * *'
   workflow_dispatch: # Manuel çalıştırman için buton ekler
 
 permissions:
@@ -35,13 +35,11 @@ jobs:
       - name: TikTok'tan Video Çek ve Analiz Et
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          # --- OTURUM ANAHTARLARI BURADA AKTİF EDİLDİ ---
           TIKTOK_SESSION_1: ${{ secrets.TIKTOK_SESSION_1 }}
           TIKTOK_SESSION_2: ${{ secrets.TIKTOK_SESSION_2 }}
           TIKTOK_SESSION_3: ${{ secrets.TIKTOK_SESSION_3 }}
           TIKTOK_SESSION_4: ${{ secrets.TIKTOK_SESSION_4 }}
           TIKTOK_SESSION_5: ${{ secrets.TIKTOK_SESSION_5 }}
-          # ---------------------------------------------
         run: |
           python otonom_motor.py
 
@@ -50,17 +48,17 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Hata Veren Rebase Yerine: Önce uzak sunucu bağlantısını doğrula
+          # Uzak sunucu bağlantısını doğrula
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           
           # Dosyaları ekle
           git add trend_veritabani.json son_analiz.txt
           
-          # Değişiklikleri kaydet (Hata varsa geç)
+          # Değişiklikleri kaydet
           git commit -m "Otonom Veri Güncellemesi [$(date)]" || echo "Degisiklik yok"
           
-          # Önce uzak sunucuyla senkronize ol, çakışma varsa bizimkini üstün tut
+          # Çakışma varsa uzak sunucuyu baz alarak senkronize ol
           git pull origin main --strategy-option=theirs --no-rebase || echo "Pull atlandı"
           
-          # ZORLA GÖNDER (Kilidi Kırma Hamlesi)
+          # Değişiklikleri gönder
           git push origin main --force
