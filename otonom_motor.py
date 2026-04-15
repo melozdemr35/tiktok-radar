@@ -9,10 +9,10 @@ from playwright.sync_api import sync_playwright
 def veri_yakala_ve_analiz_et(api_key):
     yeni_videolar = []
     su_an = datetime.now()
-    silme_siniri = (su_an - timedelta(days=10)).strftime('%Y-%m-%d')
+    # Veritabanını dengede tutmak için son 7 günü saklıyoruz
+    silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
     # --- OTURUM HAVUZU ---
-    # GitHub Secrets'a eklediğin 5 oturumu topluyoruz
     oturumlar = [
         os.environ.get("TIKTOK_SESSION_1"),
         os.environ.get("TIKTOK_SESSION_2"),
@@ -20,16 +20,11 @@ def veri_yakala_ve_analiz_et(api_key):
         os.environ.get("TIKTOK_SESSION_4"),
         os.environ.get("TIKTOK_SESSION_5")
     ]
-    # Sadece tanımlı olan oturumları ayırıyoruz
     aktif_oturumlar = [o for o in oturumlar if o]
     secilen_oturum = random.choice(aktif_oturumlar) if aktif_oturumlar else None
 
-    print(f"[{su_an.strftime('%H:%M:%S')}] Derin Radar: Çoklu Oturum Analizi Başlatıldı...")
-    
-    if secilen_oturum:
-        print("Sistem Durumu: Oturum Aktif (Rastgele bir hesapla giriş yapılıyor...)")
-    else:
-        print("Sistem Durumu: Anonim Mod (Oturum bilgisi bulunamadı)")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- RADAR TURBO & HACİMLİ MOD AKTİF ---")
+    print(f"Hedef: Günlük 10k+ Veri | Oturum: {'Aktif' if secilen_oturum else 'Anonim'}")
 
     try:
         with sync_playwright() as p:
@@ -40,34 +35,39 @@ def veri_yakala_ve_analiz_et(api_key):
                 locale="tr-TR"
             )
 
-            # --- OTURUM (COOKIE) ENJEKSİYONU ---
             if secilen_oturum:
                 context.add_cookies([{
-                    'name': 'sessionid',
-                    'value': secilen_oturum,
-                    'domain': '.tiktok.com',
-                    'path': '/',
-                    'secure': True,
-                    'httpOnly': True
+                    'name': 'sessionid', 'value': secilen_oturum,
+                    'domain': '.tiktok.com', 'path': '/', 'secure': True, 'httpOnly': True
                 }])
 
             page = context.new_page()
             
             # TikTok Keşfet Sayfasına Git
-            page.goto("https://www.tiktok.com/explore", wait_until="networkidle", timeout=90000)
-            time.sleep(15) 
+            page.goto("https://www.tiktok.com/explore", wait_until="networkidle", timeout=120000)
+            time.sleep(12) 
             
-            # --- GENİŞLETİLMİŞ VE YAVAŞ TARAMA ---
-            # 50 kez kaydırma yaparak daha fazla video yakalıyoruz
-            for i in range(50): 
-                page.mouse.wheel(0, 4500)
-                time.sleep(2) 
+            # --- TURBO VE DERİN TARAMA DÖNGÜSÜ (Ortalama 12-14 Dakika) ---
+            # 350 kez kaydırma yaparak yaklaşık 1500-2000 videonun yüklenmesini zorluyoruz
+            for i in range(350): 
+                # İnsansı ve agresif kaydırma (TikTok veri paketlerini açsın diye)
+                scroll_hizi = random.randint(5500, 9500)
+                page.mouse.wheel(0, scroll_hizi)
+                
+                # Her 10 kaydırmada bir TikTok'u dinlendir (Ban riskini azaltır)
                 if i % 10 == 0:
-                    print(f"Keşfet Tarama Derinliği: %{int(((i+1)/50)*100)}")
-            
+                    time.sleep(2.5)
+                    print(f"Hacim Analiz Derinliği: %{int(((i+1)/350)*100)} | Tahmini {len(yeni_videolar)} video hedefleniyor...")
+                else:
+                    # Hızlı kaydırma beklemesi
+                    time.sleep(0.7)
+
+            # Tüm kaydırma bittikten sonra sayfadaki tüm video kutucuklarını bir kerede topla
             items = page.query_selector_all('div[data-e2e="explore-item"]') or \
                     page.query_selector_all('div[class*="DivItemContainerV2"]')
             
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] Tarama Bitti. {len(items)} element veriye dönüştürülüyor...")
+
             for item in items:
                 try:
                     # 1. Video Linki
@@ -117,7 +117,7 @@ def veri_yakala_ve_analiz_et(api_key):
             
             browser.close()
     except Exception as e:
-        print(f"Bot Motoru Hatası: {e}")
+        print(f"Sistem Hatası: {e}")
 
     # --- VERİTABANI YÖNETİMİ ---
     db_path = "trend_veritabani.json"
@@ -129,34 +129,25 @@ def veri_yakala_ve_analiz_et(api_key):
 
     birlesik = yeni_videolar + eski_veriler
     taze = [v for v in birlesik if v.get("tarih", "2000-01-01") >= silme_siniri]
-    
-    # Link bazlı tekilleştirme (Aynı videoyu tekrar eklemiyoruz)
     son_liste = list({v.get('link', ''): v for v in taze if v.get('link')}.values())
 
     with open(db_path, "w", encoding="utf-8") as f:
         json.dump(son_liste, f, ensure_ascii=False, indent=4)
     
-    print(f"İşlem Başarılı! {len(yeni_videolar)} video işlendi. Toplam eşsiz kayıt: {len(son_liste)}")
+    print(f"🏁 SONUÇ: Bu taramada {len(yeni_videolar)} video yakalandı.")
+    print(f"📦 TOPLAM: Veritabanında {len(son_liste)} adet eşsiz trend video var.")
 
     # --- GEMINI 3 STRATEJİ RAPORU ---
     if api_key and yeni_videolar:
         try:
             client = Client(api_key=api_key)
-            analiz_prompt = f"""
-            TikTok Türkiye Keşfet Raporu (Oturumlu Analiz):
-            Veriler: {str(yeni_videolar[:30])}
-            
-            1. Haftanın Popüler İçerik Tarzı (En çok tutan konsept).
-            2. Neden Tutuyor? (Psikolojik analiz).
-            3. Örnek Video Linki ve Kullanılan Ses İsmi.
-            4. En Verimli Paylaşım Saat Aralığı (Verilerdeki paylasim_saati değerlerine göre).
-            5. İçerik üreticileri için 3 Altın Taktik.
-            """
+            # Analiz kalitesi için en güncel/popüler ilk 40 videoyu gönderiyoruz
+            analiz_prompt = f"TikTok TR Derin Keşfet Raporu:\nVeriler: {str(yeni_videolar[:40])}\n\n1. Popüler Konsept\n2. Neden Tutuyor?\n3. Örnek Link ve Ses\n4. Altın Paylaşım Saati\n5. 3 Taktik"
             response = client.models.generate_content(model="gemini-3-flash-preview", contents=analiz_prompt)
             if response and response.text:
                 with open("son_analiz.txt", "w", encoding="utf-8") as f:
                     f.write(response.text)
-                print("✅ Gemini 3 analizi tamamladı.")
+                print("✅ Gemini 3 analizi devasa veri setine göre tamamladı.")
         except Exception as e: print(f"❌ Analiz Hatası: {e}")
 
 if __name__ == "__main__":
