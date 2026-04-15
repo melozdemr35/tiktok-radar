@@ -2,17 +2,21 @@ name: Tam Otonom TikTok Casusu
 
 on:
   schedule:
-    # Günde 12 kez, her 2 saatte bir tam saat başlarında çalışır.
-    # Bu sayede ay sonuna kadar kota sorunu yaşamadan derin tarama yapabiliriz.
+    # Günde 12 kez, her 2 saatte bir çalışır.
+    # (00:00, 02:00, 04:00... şeklinde)
+    # Her çalışma 60 dakika (1 saat) sürdüğü için ay sonuna kadar dakikalarını korur.
     - cron: '0 0,2,4,6,8,10,12,14,16,18,20,22 * * *'
   workflow_dispatch: # Manuel çalıştırman için buton ekler
 
 permissions:
-  contents: write # Robotun yeni verileri kaydedebilmesi için ŞART!
+  contents: write # Robotun çektiği binlerce veriyi veritabanına kaydedebilmesi için ŞART!
 
 jobs:
   otonom_islem:
     runs-on: ubuntu-latest
+    # GitHub Actions varsayılan süresi 360 dakikadır, bizim 60 dakikalık işimiz için fazlasıyla yeterli.
+    timeout-minutes: 90 
+    
     steps:
       - name: Kodları Çek
         uses: actions/checkout@v3
@@ -28,7 +32,6 @@ jobs:
 
       - name: Kütüphaneleri Hızlı Kur
         run: |
-          # --no-cache-dir kurulumu hızlandırır, dakika tasarrufu sağlar
           pip install --no-cache-dir google-genai playwright pandas
           playwright install --with-deps chromium
 
@@ -41,6 +44,7 @@ jobs:
           TIKTOK_SESSION_4: ${{ secrets.TIKTOK_SESSION_4 }}
           TIKTOK_SESSION_5: ${{ secrets.TIKTOK_SESSION_5 }}
         run: |
+          # Bu komut otonom_motor.py içindeki 60 dakikalık döngüyü başlatır
           python otonom_motor.py
 
       - name: Değişiklikleri GitHub'a Kaydet
@@ -48,17 +52,13 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Uzak sunucu bağlantısını doğrula
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           
-          # Dosyaları ekle
           git add trend_veritabani.json son_analiz.txt
           
-          # Değişiklikleri kaydet
           git commit -m "Otonom Veri Güncellemesi [$(date)]" || echo "Degisiklik yok"
           
-          # Çakışma varsa uzak sunucuyu baz alarak senkronize ol
+          # Veritabanı şişerken çakışma olmaması için 'theirs' stratejisiyle pull yap
           git pull origin main --strategy-option=theirs --no-rebase || echo "Pull atlandı"
           
-          # Değişiklikleri gönder
           git push origin main --force
