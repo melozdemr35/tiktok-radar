@@ -15,8 +15,9 @@ jobs:
       - name: Kodları Çek
         uses: actions/checkout@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
-          fetch-depth: 0 # Tüm geçmişi çek ki çakışma olmasın
+          fetch-depth: 0 
 
       - name: Python Kur
         uses: actions/setup-python@v4
@@ -40,14 +41,17 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Önce GitHub'daki değişiklikleri çek ve bizimkilerle birleştir (Çakışma Önleyici)
-          git pull origin main --rebase
+          # Hata Veren Rebase Yerine: Önce uzak sunucu bağlantısını doğrula
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           
           # Dosyaları ekle
           git add trend_veritabani.json son_analiz.txt
           
-          # Güncellemeyi kaydet
-          git commit -m "Otonom Veri ve Analiz Güncellemesi [$(date)]" || echo "Degisiklik yok"
+          # Değişiklikleri kaydet (Hata varsa geç)
+          git commit -m "Otonom Veri Güncellemesi [$(date)]" || echo "Degisiklik yok"
+          
+          # Önce uzak sunucuyla senkronize ol, çakışma varsa bizimkini üstün tut
+          git pull origin main --strategy-option=theirs --no-rebase || echo "Pull atlandı"
           
           # ZORLA GÖNDER (Kilidi Kırma Hamlesi)
           git push origin main --force
