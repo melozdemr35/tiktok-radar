@@ -15,7 +15,8 @@ jobs:
       - name: Kodları Çek
         uses: actions/checkout@v3
         with:
-          persist-credentials: true # Kimlik bilgilerini sakla (Push için önemli)
+          persist-credentials: true
+          fetch-depth: 0 # Tüm geçmişi çek ki çakışma olmasın
 
       - name: Python Kur
         uses: actions/setup-python@v4
@@ -38,6 +39,15 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Önce GitHub'daki değişiklikleri çek ve bizimkilerle birleştir (Çakışma Önleyici)
+          git pull origin main --rebase
+          
+          # Dosyaları ekle
           git add trend_veritabani.json son_analiz.txt
-          git commit -m "Otonom Veri ve Analiz Güncellemesi [$(date)]" || echo "Değişiklik yok"
-          git push origin main
+          
+          # Güncellemeyi kaydet
+          git commit -m "Otonom Veri ve Analiz Güncellemesi [$(date)]" || echo "Degisiklik yok"
+          
+          # ZORLA GÖNDER (Kilidi Kırma Hamlesi)
+          git push origin main --force
