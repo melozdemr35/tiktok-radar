@@ -1,4 +1,4 @@
-from genai import Client  # YENİ SDK - 404 hatasını bitiren anahtar burası
+from google.genai import Client 
 import json
 import os
 import time
