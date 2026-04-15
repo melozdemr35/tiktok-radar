@@ -89,12 +89,15 @@ def veri_yakala_ve_analiz_et(api_key):
     # --- GEMINI ANALİZ (YENİ NESİL SDK - 404 KESİN ÇÖZÜM) ---
     if api_key and yeni_videolar:
         try:
-            # Yeni kütüphane 'genai.Client' kullanıyoruz, v1beta hatasını bypass eder
-            client = Client(api_key=api_key)
+            # DİKKAT: Burada 'http_options' ekleyerek v1beta kapısını tamamen iptal ediyoruz
+            client = Client(
+                api_key=api_key, 
+                http_options={'api_version': 'v1'}
+            )
             
             analiz_prompt = f"Aşağıdaki TikTok trendlerini analiz et ve içerik üreticileri için 5 kısa strateji yaz: {str(yeni_videolar[:25])}"
             
-            # Yeni çağırma yöntemi
+            # Artık v1beta karmaşası yok, doğrudan ana yoldan istiyoruz
             response = client.models.generate_content(
                 model="gemini-1.5-flash",
                 contents=analiz_prompt
@@ -103,7 +106,7 @@ def veri_yakala_ve_analiz_et(api_key):
             if response and response.text:
                 with open("son_analiz.txt", "w", encoding="utf-8") as f:
                     f.write(response.text)
-                print("✅ Gemini analizi YENİ SDK ile başarıyla tamamladı.")
+                print("✅ Gemini analizi V1 OTOYOLU üzerinden başarıyla tamamladı.")
             else:
                 print("⚠️ Gemini yanıt döndürdü ancak metin içeriği boş.")
                 
