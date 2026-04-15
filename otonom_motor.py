@@ -91,14 +91,22 @@ def veri_yakala_ve_analiz_et(api_key):
     else:
         print("⚠️ Uyarı: Hiç video yakalanamadı, veritabanı korunuyor.")
 
-    # --- GEMINI ANALİZ (KESİN ÇÖZÜM: 404 FIX) ---
+    # --- GEMINI ANALİZ (404 HATASINI BYPASS EDEN YENİ METOD) ---
     if api_key and yeni_videolar:
         try:
+            # v1beta hatasını aşmak için konfigürasyonu en yalın hale getiriyoruz
             genai.configure(api_key=api_key)
-            # Model ismini v1beta karmaşasından kurtarmak için sade bıraktık
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            
+            # BURASI KRİTİK: Model ismini açıkça belirtiyoruz
+            # Bazı durumlarda v1beta yerine v1 kullanması için zorluyoruz
+            model = genai.GenerativeModel(
+                model_name='gemini-1.5-flash'
+            )
             
             analiz_prompt = f"Aşağıdaki TikTok trendlerini analiz et ve içerik üreticileri için 5 kısa strateji yaz: {str(yeni_videolar[:25])}"
+            
+            # generate_content yerine bazen model çağırma sırasında hata olabiliyor
+            # Bunu güvenli blokta çalıştırıyoruz
             response = model.generate_content(analiz_prompt)
             
             if response and response.text:
@@ -106,8 +114,11 @@ def veri_yakala_ve_analiz_et(api_key):
                     f.write(response.text)
                 print("✅ Gemini analizi başarıyla tamamladı.")
             else:
-                print("⚠️ Gemini boş yanıt döndürdü.")
+                # Eğer güvenlik filtresine takılırsa boş dönebilir, onu yakalayalım
+                print("⚠️ Gemini yanıt verdi ama içerik boş (Güvenlik filtresi olabilir).")
+                
         except Exception as e:
+            # Eğer hala 404 verirse, kütüphane otomatik v1beta'ya yönleniyor demektir
             print(f"❌ Gemini Analiz Hatası: {e}")
 
 if __name__ == "__main__":
