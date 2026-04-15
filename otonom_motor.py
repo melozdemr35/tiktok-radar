@@ -8,6 +8,7 @@ from playwright.sync_api import sync_playwright
 
 def veri_yakala_ve_analiz_et(api_key):
     yeni_videolar = []
+    yakalanan_linkler = set() # Çift kaydı anında engellemek için hızlı hafıza
     su_an = datetime.now()
     # 7 Günlük Hafıza: Sadece 7 günden eski veriler temizlenir
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
@@ -16,11 +17,12 @@ def veri_yakala_ve_analiz_et(api_key):
     oturumlar = [os.environ.get(f"TIKTOK_SESSION_{i}") for i in range(1, 6)]
     aktif_oturumlar = [o for o in oturumlar if o]
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- RADAR DERİN TARAMA (1000+ HEDEF) BAŞLATILDI ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- RADAR DERİN TARAMA (CANLI HASAT MODU) BAŞLATILDI ---")
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            # Playwright'ın "Ben Botum" ibaresini gizleyen ek argüman
+            browser = p.chromium.launch(args=["--disable-blink-features=AutomationControlled"], headless=True)
             
             # --- 60 DAKİKAYI 6 TURDA (HER TUR 10 DK) İŞLEME PLANI ---
             for tur in range(6):
@@ -35,6 +37,9 @@ def veri_yakala_ve_analiz_et(api_key):
                     locale="tr-TR"
                 )
 
+                # Webdriver izini tamamen sil (Anti-Bot Güvenliği)
+                context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
                 if secilen_oturum:
                     context.add_cookies([{
                         'name': 'sessionid', 'value': secilen_oturum,
@@ -45,7 +50,7 @@ def veri_yakala_ve_analiz_et(api_key):
                 page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=120000)
                 time.sleep(12) 
 
-                # Tur içi agresif kazıma
+                # --- TUR İÇİ AGRESİF KAZIMA VE ANLIK TOPLAMA ---
                 while (time.time() - start_tur) < 540: 
                     page.keyboard.press("End")
                     page.mouse.wheel(0, random.randint(5000, 9000))
@@ -56,46 +61,54 @@ def veri_yakala_ve_analiz_et(api_key):
                         time.sleep(1)
                         page.keyboard.press("End")
 
-                # --- TUR SONU VERİ TOPLAMA ---
-                items = page.query_selector_all('div[data-e2e="explore-item"]') or \
-                        page.query_selector_all('div[class*="DivItemContainerV2"]')
-                
-                print(f"Tur {tur+1} bitti. {len(items)} element analiz ediliyor...")
+                    # TİKTOK VİDEOLARI SİLMEDEN BİZ ÇEKİYORUZ!
+                    items = page.query_selector_all('div[data-e2e="explore-item"]') or \
+                            page.query_selector_all('div[class*="DivItemContainerV2"]')
+                    
+                    eklenen_bu_dongu = 0
+                    for item in items:
+                        try:
+                            link_elem = item.query_selector('a[href*="/video/"]')
+                            v_link = link_elem.get_attribute('href') if link_elem else None
+                            
+                            # Link yoksa veya O ANKİ KASAMIZDA ZATEN VARSA atla
+                            if not v_link or v_link in yakalanan_linkler: 
+                                continue
 
-                for item in items:
-                    try:
-                        link_elem = item.query_selector('a[href*="/video/"]')
-                        v_link = link_elem.get_attribute('href') if link_elem else None
-                        
-                        if not v_link or any(v['link'] == v_link for v in yeni_videolar): 
+                            # Linki kasaya ekle ki bir dahaki kaydırmada tekrar çekmesin
+                            yakalanan_linkler.add(v_link)
+
+                            music_elem = item.query_selector('h4') or \
+                                         item.query_selector('a[href*="/music/"]') or \
+                                         item.query_selector('div[class*="music"]')
+                            music_text = music_elem.inner_text().strip() if music_elem else "Popüler Akım"
+                            
+                            views_elem = item.query_selector('strong[data-e2e="video-views"]') or \
+                                         item.query_selector('div[class*="DivCount"]')
+                            views_text = views_elem.inner_text() if views_elem else "0"
+
+                            desc_elem = item.query_selector('div[data-e2e="explore-item-desc"]') or item
+                            desc_text = desc_elem.inner_text().split('\n')[0]
+                            
+                            if len(desc_text) > 1:
+                                yeni_videolar.append({
+                                    "desc": desc_text[:120], 
+                                    "music": music_text,
+                                    "link": v_link,
+                                    "views": views_text,
+                                    "paylasim_saati": su_an.strftime('%H:00'),
+                                    "tarih": su_an.strftime('%Y-%m-%d'),
+                                    "timestamp": time.time()
+                                })
+                                eklenen_bu_dongu += 1
+                        except Exception:
                             continue
+                    
+                    # Sayıları canlı canlı görmek için loga yazdır
+                    if eklenen_bu_dongu > 0:
+                        print(f"   [Anlık Hasat] +{eklenen_bu_dongu} yeni -> Toplam Kasa: {len(yeni_videolar)}")
 
-                        music_elem = item.query_selector('h4') or \
-                                     item.query_selector('a[href*="/music/"]') or \
-                                     item.query_selector('div[class*="music"]')
-                        music_text = music_elem.inner_text().strip() if music_elem else "Popüler Akım"
-                        
-                        views_elem = item.query_selector('strong[data-e2e="video-views"]') or \
-                                     item.query_selector('div[class*="DivCount"]')
-                        views_text = views_elem.inner_text() if views_elem else "0"
-
-                        desc_elem = item.query_selector('div[data-e2e="explore-item-desc"]') or item
-                        desc_text = desc_elem.inner_text().split('\n')[0]
-                        
-                        if len(desc_text) > 1:
-                            yeni_videolar.append({
-                                "desc": desc_text[:120], 
-                                "music": music_text,
-                                "link": v_link,
-                                "views": views_text,
-                                "paylasim_saati": su_an.strftime('%H:00'),
-                                "tarih": su_an.strftime('%Y-%m-%d'),
-                                "timestamp": time.time()
-                            })
-                    except Exception:
-                        continue
-                
-                print(f"Mevcut toplam yeni video: {len(yeni_videolar)}")
+                print(f"Tur {tur+1} bitti. Tur kapanış toplamı: {len(yeni_videolar)}")
                 context.close()
 
             browser.close()
@@ -114,12 +127,13 @@ def veri_yakala_ve_analiz_et(api_key):
 
     birlesik = yeni_videolar + eski_veriler
     taze = [v for v in birlesik if v.get("tarih", "2000-01-01") >= silme_siniri]
+    # Link bazlı ekstra güvenlik tekilleştirmesi
     son_liste = list({v.get('link', ''): v for v in taze if v.get('link')}.values())
 
     with open(db_path, "w", encoding="utf-8") as f:
         json.dump(son_liste, f, ensure_ascii=False, indent=4)
     
-    print(f"🏁 FİNAL: {len(yeni_videolar)} video çekildi. Havuzda {len(son_liste)} video var.")
+    print(f"\n🏁 FİNAL: {len(yeni_videolar)} video çekildi. Havuzda {len(son_liste)} video var.")
 
     if api_key and yeni_videolar:
         try:
