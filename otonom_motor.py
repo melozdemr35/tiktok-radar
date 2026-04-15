@@ -1,113 +1,98 @@
 import google.generativeai as genai
 import json
 import os
+import time
 from playwright.sync_api import sync_playwright
 
 def veri_yakala_ve_analiz_et(api_key):
     yeni_videolar = []
     
-    # --- 1. ADIM: TİKTOK'TAN TAZE VERİ ÇEK ---
-    print("TikTok Keşfet'e 'Görünmezlik Modu' ile sızılıyor...")
+    print("TikTok Keşfet'e 'Ultra Görünmezlik' ile sızılıyor...")
     try:
         with sync_playwright() as p:
-            # TikTok'un bot olduğunu anlamaması için gerçek bir tarayıcı kimliği tanımlıyoruz
             browser = p.chromium.launch(headless=True)
-            
-            # KRİTİK EKLEME: Gerçek kullanıcı kimliği (User-Agent)
+            # Gerçek bir bilgisayar tarayıcısı gibi davran (User-Agent ve Screen Size)
             context = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                viewport={'width': 1920, 'height': 1080}
+                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                viewport={'width': 1280, 'height': 720}
             )
             page = context.new_page()
             
-            # TikTok Keşfet sayfası
-            page.goto("https://www.tiktok.com/explore", wait_until="networkidle", timeout=60000)
+            # TikTok'a git ve sayfa içeriğinin kabaca oluşmasını bekle
+            page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=90000)
             
-            # --- TURBO KAYDIRMA VE BEKLEME ---
-            print("Sayfa derinlemesine taranıyor... (Beklemeli Mod)")
-            for i in range(12): 
-                page.mouse.wheel(0, 4000)
-                # TikTok şüphelenmesin diye rastgele küçük beklemeler
-                page.wait_for_timeout(2000) 
-                if i % 3 == 0:
-                    print(f"Tarama ilerlemesi: %{int((i/12)*100)}")
+            # --- KRİTİK: SAYFAYI DİNLENDİRME ---
+            print("Sayfa açıldı, elemanların yüklenmesi için 10 saniye bekleniyor...")
+            time.sleep(10) 
             
-            # Tüm video kartlarını yakala
-            items = page.query_selector_all('div[data-e2e="explore-item"]')
+            # --- YAVAŞ VE İNSANSI KAYDIRMA ---
+            for i in range(10): 
+                page.mouse.wheel(0, 3000)
+                time.sleep(3) # TikTok bot sanmasın diye her kaydırmada 3 sn durakla
+                if i % 2 == 0:
+                    print(f"Tarama ilerlemesi: %{int(((i+1)/10)*100)}")
             
-            if len(items) == 0:
-                print("⚠️ UYARI: TikTok video listesini boş döndürdü. Muhtemelen bot kontrolüne takıldık.")
+            # Eleman seçicileri daha esnek hale getirdik (TikTok güncellemelerine karşı)
+            items = page.query_selector_all('div[data-e2e="explore-item"]') or \
+                    page.query_selector_all('div[class*="DivItemContainerV2"]')
             
-            for item in items[:300]:
+            print(f"Sistemde bulunan ham element sayısı: {len(items)}")
+            
+            for item in items[:200]:
                 try:
-                    desc_elem = item.query_selector('div[data-e2e="explore-item-desc"]')
-                    desc_text = desc_elem.inner_text() if desc_elem else ""
+                    # Yazıyı ve müziği daha derinlemesine ara
+                    desc_text = item.inner_text().split('\n')[0] if item else ""
                     
-                    music_elem = item.query_selector('h4[data-e2e="explore-item-music"]')
-                    music_text = music_elem.inner_text() if music_elem else "Popüler Akım"
+                    # Şarkı bulucu (daha esnek seçici)
+                    music_elem = item.query_selector('h4') or item.query_selector('div[class*="music"]')
+                    music_text = music_elem.inner_text() if music_elem else "Trend Müzik"
                     
-                    if desc_text or music_text:
+                    if len(desc_text) > 3:
                         yeni_videolar.append({
                             "desc": desc_text, 
                             "music": music_text,
-                            "hashtagler": "Keşfetten Yeni"
+                            "hashtagler": "Canlı Keşfet"
                         })
                 except:
                     continue
             
             browser.close()
-            print(f"Bitti! Toplam {len(yeni_videolar)} adet taze veri yakalandı.")
+            print(f"İşlem Tamam! {len(yeni_videolar)} taze veri toplandı.")
     except Exception as e:
-        print(f"Veri çekme hatası: {e}")
+        print(f"Veri çekme sırasında hata: {e}")
 
-    # --- 2. ADIM: VERİTABANINI GÜNCELLE ---
+    # --- VERİTABANI GÜNCELLEME ---
     db_path = "trend_veritabani.json"
-    
     if os.path.exists(db_path):
         with open(db_path, "r", encoding="utf-8") as f:
             eski_veriler = json.load(f)
     else:
         eski_veriler = []
     
-    # Sadece yeni video varsa dosya yazma işlemini yap (Boş veriyle dosyayı bozma)
     if len(yeni_videolar) > 0:
         guncel_liste = yeni_videolar + eski_veriler
-        guncel_liste = guncel_liste[:10000] 
-        
         with open(db_path, "w", encoding="utf-8") as f:
-            json.dump(guncel_liste, f, ensure_ascii=False, indent=4)
-        print(f"Veritabanı başarıyla güncellendi. Mevcut toplam video: {len(guncel_liste)}")
+            json.dump(guncel_liste[:10000], f, ensure_ascii=False, indent=4)
+        print(f"Veritabanı güncellendi. Toplam kayıt: {len(guncel_liste)}")
     else:
-        print("❌ Yeni veri yakalanamadığı için veritabanı dosyası güncellenmedi.")
+        print("❌ Dikkat: Yeni veri yakalanamadı, veritabanı aynı kaldı.")
 
-    # --- 3. ADIM: GEMINI İLE TAZE ANALİZ YAP ---
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    
-    analiz_verisi = str(yeni_videolar[:30]) if yeni_videolar else str(eski_veriler[:30])
-    
-    prompt = f"""
-    Aşağıdaki güncel TikTok verilerini analiz et: {analiz_verisi}. 
-    Bu verilere dayanarak, içerik üreticileri için uygulanabilir 5 benzersiz trend stratejisi oluştur.
-    Lütfen her madde için akımın ne olduğunu ve nasıl uygulanması gerektiğini profesyonelce açıkla.
-    Sadece strateji maddelerini yaz; isim, hitap, giriş veya kapanış cümlesi kurma.
-    """
-    
-    try:
-        response = model.generate_content(prompt)
-        current_dir = os.getcwd()
-        output_file = os.path.join(current_dir, "son_analiz.txt")
-        
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(response.text)
+    # --- GEMINI ANALİZ (Hata giderilmiş versiyon) ---
+    if api_key and len(yeni_videolar) > 0:
+        try:
+            genai.configure(api_key=api_key)
+            # Model ismini v1beta yerine en kararlı sürüme çektik
+            model = genai.GenerativeModel('gemini-1.5-flash-latest')
             
-        print(f"Analiz raporu güncellendi.")
-    except Exception as e:
-        print(f"Analiz hatası: {e}")
+            analiz_prompt = f"Şu TikTok trendlerini analiz et ve içerik üreticileri için 5 kısa strateji yaz: {str(yeni_videolar[:20])}"
+            response = model.generate_content(analiz_prompt)
+            
+            with open("son_analiz.txt", "w", encoding="utf-8") as f:
+                f.write(response.text)
+            print("Gemini analizi başarıyla tamamladı.")
+        except Exception as e:
+            print(f"Gemini Analiz Hatası: {e}")
 
 if __name__ == "__main__":
     api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key:
-        veri_yakala_ve_analiz_et(api_key)
-    else:
-        print("Hata: API Key bulunamadı!")
+    veri_yakala_ve_analiz_et(api_key)
