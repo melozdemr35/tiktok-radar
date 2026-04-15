@@ -35,6 +35,13 @@ jobs:
       - name: TikTok'tan Video Çek ve Analiz Et
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # --- OTURUM ANAHTARLARI BURADA AKTİF EDİLDİ ---
+          TIKTOK_SESSION_1: ${{ secrets.TIKTOK_SESSION_1 }}
+          TIKTOK_SESSION_2: ${{ secrets.TIKTOK_SESSION_2 }}
+          TIKTOK_SESSION_3: ${{ secrets.TIKTOK_SESSION_3 }}
+          TIKTOK_SESSION_4: ${{ secrets.TIKTOK_SESSION_4 }}
+          TIKTOK_SESSION_5: ${{ secrets.TIKTOK_SESSION_5 }}
+          # ---------------------------------------------
         run: |
           python otonom_motor.py
 
