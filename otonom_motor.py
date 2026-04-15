@@ -2,6 +2,7 @@ from google.genai import Client
 import json
 import os
 import time
+import random
 from datetime import datetime, timedelta
 from playwright.sync_api import sync_playwright
 
@@ -10,8 +11,26 @@ def veri_yakala_ve_analiz_et(api_key):
     su_an = datetime.now()
     silme_siniri = (su_an - timedelta(days=10)).strftime('%Y-%m-%d')
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] Derin Radar: Saat ve Link Analizi Başlatıldı...")
+    # --- OTURUM HAVUZU ---
+    # GitHub Secrets'a eklediğin 5 oturumu topluyoruz
+    oturumlar = [
+        os.environ.get("TIKTOK_SESSION_1"),
+        os.environ.get("TIKTOK_SESSION_2"),
+        os.environ.get("TIKTOK_SESSION_3"),
+        os.environ.get("TIKTOK_SESSION_4"),
+        os.environ.get("TIKTOK_SESSION_5")
+    ]
+    # Sadece tanımlı olan oturumları ayırıyoruz
+    aktif_oturumlar = [o for o in oturumlar if o]
+    secilen_oturum = random.choice(aktif_oturumlar) if aktif_oturumlar else None
+
+    print(f"[{su_an.strftime('%H:%M:%S')}] Derin Radar: Çoklu Oturum Analizi Başlatıldı...")
     
+    if secilen_oturum:
+        print("Sistem Durumu: Oturum Aktif (Rastgele bir hesapla giriş yapılıyor...)")
+    else:
+        print("Sistem Durumu: Anonim Mod (Oturum bilgisi bulunamadı)")
+
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
@@ -20,17 +39,31 @@ def veri_yakala_ve_analiz_et(api_key):
                 viewport={'width': 1920, 'height': 1080},
                 locale="tr-TR"
             )
+
+            # --- OTURUM (COOKIE) ENJEKSİYONU ---
+            if secilen_oturum:
+                context.add_cookies([{
+                    'name': 'sessionid',
+                    'value': secilen_oturum,
+                    'domain': '.tiktok.com',
+                    'path': '/',
+                    'secure': True,
+                    'httpOnly': True
+                }])
+
             page = context.new_page()
             
+            # TikTok Keşfet Sayfasına Git
             page.goto("https://www.tiktok.com/explore", wait_until="networkidle", timeout=90000)
-            time.sleep(12) 
+            time.sleep(15) 
             
-            # --- YAVAŞ VE DERİN TARAMA ---
-            for i in range(35): 
-                page.mouse.wheel(0, 4000)
-                time.sleep(2.5) 
+            # --- GENİŞLETİLMİŞ VE YAVAŞ TARAMA ---
+            # 50 kez kaydırma yaparak daha fazla video yakalıyoruz
+            for i in range(50): 
+                page.mouse.wheel(0, 4500)
+                time.sleep(2) 
                 if i % 10 == 0:
-                    print(f"Tarama Derinliği: %{int(((i+1)/35)*100)}")
+                    print(f"Keşfet Tarama Derinliği: %{int(((i+1)/50)*100)}")
             
             items = page.query_selector_all('div[data-e2e="explore-item"]') or \
                     page.query_selector_all('div[class*="DivItemContainerV2"]')
@@ -53,7 +86,7 @@ def veri_yakala_ve_analiz_et(api_key):
                                  item.query_selector('div[class*="DivCount"]')
                     views_text = views_elem.inner_text() if views_elem else "0"
 
-                    # 4. PAYLAŞIM SAATİ TAHMİNİ (Grafik İçin Kritik)
+                    # 4. PAYLAŞIM SAATİ TAHMİNİ
                     time_tag = item.query_selector('div[class*="DivTimeTag"]') or \
                                item.query_selector('span[class*="Time"]')
                     raw_time = time_tag.inner_text() if time_tag else "1h ago"
@@ -76,7 +109,7 @@ def veri_yakala_ve_analiz_et(api_key):
                             "music": music_text,
                             "link": v_link,
                             "views": views_text,
-                            "paylasim_saati": tahmini_saat, # Grafik bu veriyi kullanacak
+                            "paylasim_saati": tahmini_saat,
                             "timestamp": su_an.strftime('%Y-%m-%d %H:%M:%S'),
                             "tarih": su_an.strftime('%Y-%m-%d')
                         })
@@ -96,18 +129,22 @@ def veri_yakala_ve_analiz_et(api_key):
 
     birlesik = yeni_videolar + eski_veriler
     taze = [v for v in birlesik if v.get("tarih", "2000-01-01") >= silme_siniri]
+    
+    # Link bazlı tekilleştirme (Aynı videoyu tekrar eklemiyoruz)
     son_liste = list({v.get('link', ''): v for v in taze if v.get('link')}.values())
 
     with open(db_path, "w", encoding="utf-8") as f:
         json.dump(son_liste, f, ensure_ascii=False, indent=4)
+    
+    print(f"İşlem Başarılı! {len(yeni_videolar)} video işlendi. Toplam eşsiz kayıt: {len(son_liste)}")
 
     # --- GEMINI 3 STRATEJİ RAPORU ---
     if api_key and yeni_videolar:
         try:
             client = Client(api_key=api_key)
             analiz_prompt = f"""
-            TikTok Trend Raporu Hazırla:
-            Veriler: {str(yeni_videolar[:25])}
+            TikTok Türkiye Keşfet Raporu (Oturumlu Analiz):
+            Veriler: {str(yeni_videolar[:30])}
             
             1. Haftanın Popüler İçerik Tarzı (En çok tutan konsept).
             2. Neden Tutuyor? (Psikolojik analiz).
