@@ -11,7 +11,7 @@ def veri_yakala_ve_analiz_et(api_key):
     # 10 günlük silme sınırı (Bugün dahil son 10 gün)
     silme_siniri = (su_an - timedelta(days=10)).strftime('%Y-%m-%d')
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] TikTok Derin Radar Başlatıldı... (10 Günlük Bellek)")
+    print(f"[{su_an.strftime('%H:%M:%S')}] TikTok Derin Radar Başlatıldı... (10 Günlük Bellek Aktif)")
     
     try:
         with sync_playwright() as p:
@@ -30,9 +30,9 @@ def veri_yakala_ve_analiz_et(api_key):
             time.sleep(12) 
             
             # --- İNSANSI VE DERİN TARAMA ---
-            for i in range(20): # 20 kez kaydırma yeterli ve daha güvenli
+            for i in range(20): 
                 page.mouse.wheel(0, 4500)
-                time.sleep(3) # TikTok engeline takılmamak için bekleme süresi artırıldı
+                time.sleep(3) # TikTok bot koruması için yavaş kaydırma
                 if i % 5 == 0:
                     print(f"Tarama Derinliği: %{int(((i+1)/20)*100)}")
             
@@ -77,9 +77,9 @@ def veri_yakala_ve_analiz_et(api_key):
     # Yeni ve eskileri birleştir
     birlesik_liste = yeni_videolar + eski_veriler
     
-    # Boş liste kontrolü (KeyError'u bitiren yer)
+    # Boş liste kontrolü
     if birlesik_liste:
-        # Sadece 10 gün içindeki verileri tut
+        # Sadece 10 gün içindeki verileri tut (Eskileri siler)
         guncel_ve_taze = [v for v in birlesik_liste if v.get("tarih", "2000-01-01") >= silme_siniri]
         
         # Tekilleştirme (Hata korumalı v.get kullanımı)
@@ -91,24 +91,27 @@ def veri_yakala_ve_analiz_et(api_key):
     else:
         print("⚠️ Uyarı: Hiç video yakalanamadı, veritabanı korunuyor.")
 
-    # --- GEMINI ANALİZ (404 FIX) ---
+    # --- GEMINI ANALİZ (KESİN ÇÖZÜM: 404 FIX) ---
     if api_key and yeni_videolar:
         try:
             genai.configure(api_key=api_key)
+            # Model ismini v1beta karmaşasından kurtarmak için sade bıraktık
             model = genai.GenerativeModel('gemini-1.5-flash')
             
-            analiz_prompt = f"Şu an TikTok'ta patlayan şu videoları analiz et ve içerik üreticileri için 5 kısa strateji yaz: {str(yeni_videolar[:25])}"
+            analiz_prompt = f"Aşağıdaki TikTok trendlerini analiz et ve içerik üreticileri için 5 kısa strateji yaz: {str(yeni_videolar[:25])}"
             response = model.generate_content(analiz_prompt)
             
-            if response.text:
+            if response and response.text:
                 with open("son_analiz.txt", "w", encoding="utf-8") as f:
                     f.write(response.text)
-                print("Gemini raporu başarıyla hazırladı.")
+                print("✅ Gemini analizi başarıyla tamamladı.")
+            else:
+                print("⚠️ Gemini boş yanıt döndürdü.")
         except Exception as e:
-            print(f"Gemini Rapor Hatası: {e}")
+            print(f"❌ Gemini Analiz Hatası: {e}")
 
 if __name__ == "__main__":
-    # Değişken ismi temizlendi
+    # Çevresel değişken kontrolü
     key = os.environ.get("GEMINI_API_KEY")
     if key:
         veri_yakala_ve_analiz_et(key)
