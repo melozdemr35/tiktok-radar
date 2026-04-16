@@ -16,7 +16,7 @@ def veri_yakala_ve_analiz_et(api_key):
     oturumlar = [os.environ.get(f"TIKTOK_SESSION_{i}") for i in range(1, 6)]
     aktif_oturumlar = [o for o in oturumlar if o]
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: İSTANBUL/TR LOKASYONLU SAF KEŞFET ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: İSTANBUL/TR LOKASYONLU VE DİL KORUMALI KEŞFET ---")
 
     try:
         with sync_playwright() as p:
@@ -31,7 +31,7 @@ def veri_yakala_ve_analiz_et(api_key):
                 context = browser.new_context(
                     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
                     viewport={'width': 1280, 'height': 800},
-                    # --- DEĞİŞTİRİLEN KISIM: İSTANBUL LOKASYON MÜHÜRLEMESİ ---
+                    # --- İSTANBUL LOKASYON MÜHÜRLEMESİ DURUYOR ---
                     locale="tr-TR",
                     timezone_id="Europe/Istanbul",
                     geolocation={"longitude": 28.9784, "latitude": 41.0082}, # İstanbul koordinatları
@@ -45,13 +45,15 @@ def veri_yakala_ve_analiz_et(api_key):
                 page = context.new_page()
 
                 try:
-                    # SİSTEM GİRİŞİ: Saf Keşfet (Arama yapmadan, İstanbul IP'si gibi giriş)
-                    page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=60000)
+                    # --- DEĞİŞTİRİLEN KISIM: URL HİLESİ EKLENDİ ---
+                    # TikTok'a zorla TR dili ve TR lokasyonu parametrelerini gönderiyoruz.
+                    hedef_url = "https://www.tiktok.com/explore?lang=tr-TR&is_copy_url=1&is_from_webapp=v1"
+                    page.goto(hedef_url, wait_until="domcontentloaded", timeout=60000)
                     time.sleep(10) # Algoritmanın lokasyonu anlaması için bekliyoruz
 
                     # İlk videoya tıkla ve tam ekran oynatıcıyı aç
                     page.locator('div[data-e2e="explore-item"]').first.click()
-                    print("   [Oynatıcı] İstanbul kimliğiyle yerel hasat başlıyor...")
+                    print("   [Oynatıcı] Zorunlu TR Keşfeti hasadı başlıyor...")
                     time.sleep(5)
 
                     hatali_kaydirma = 0 
