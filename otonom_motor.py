@@ -16,7 +16,7 @@ def veri_yakala_ve_analiz_et(api_key):
     oturumlar = [os.environ.get(f"TIKTOK_SESSION_{i}") for i in range(1, 6)]
     aktif_oturumlar = [o for o in oturumlar if o]
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: İSTANBUL/TR LOKASYONLU VE DİL KORUMALI KEŞFET ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: İSTANBUL LOKASYONLU VE DİRENÇLİ KEŞFET ---")
 
     try:
         with sync_playwright() as p:
@@ -31,11 +31,10 @@ def veri_yakala_ve_analiz_et(api_key):
                 context = browser.new_context(
                     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
                     viewport={'width': 1280, 'height': 800},
-                    # --- İSTANBUL LOKASYON MÜHÜRLEMESİ DURUYOR ---
                     locale="tr-TR",
                     timezone_id="Europe/Istanbul",
-                    geolocation={"longitude": 28.9784, "latitude": 41.0082}, # İstanbul koordinatları
-                    permissions=["geolocation"] # TikTok lokasyon sormayı denerse "İzin Ver"
+                    geolocation={"longitude": 28.9784, "latitude": 41.0082}, 
+                    permissions=["geolocation"] 
                 )
                 context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
@@ -45,13 +44,10 @@ def veri_yakala_ve_analiz_et(api_key):
                 page = context.new_page()
 
                 try:
-                    # --- DEĞİŞTİRİLEN KISIM: URL HİLESİ EKLENDİ ---
-                    # TikTok'a zorla TR dili ve TR lokasyonu parametrelerini gönderiyoruz.
                     hedef_url = "https://www.tiktok.com/explore?lang=tr-TR&is_copy_url=1&is_from_webapp=v1"
                     page.goto(hedef_url, wait_until="domcontentloaded", timeout=60000)
-                    time.sleep(10) # Algoritmanın lokasyonu anlaması için bekliyoruz
+                    time.sleep(10) 
 
-                    # İlk videoya tıkla ve tam ekran oynatıcıyı aç
                     page.locator('div[data-e2e="explore-item"]').first.click()
                     print("   [Oynatıcı] Zorunlu TR Keşfeti hasadı başlıyor...")
                     time.sleep(5)
@@ -105,7 +101,8 @@ def veri_yakala_ve_analiz_et(api_key):
                         page.mouse.click(640, 400) 
                         time.sleep(0.5)
                         page.keyboard.press("ArrowDown")
-                        time.sleep(random.uniform(2.0, 3.5)) 
+                        # Algoritmayı daha az tetiklemek için bekleme süresi çok hafif uzatıldı
+                        time.sleep(random.uniform(3.0, 5.0)) 
                         
                         if page.url == v_link:
                              hatali_kaydirma += 1
@@ -113,8 +110,22 @@ def veri_yakala_ve_analiz_et(api_key):
                              time.sleep(2)
                              
                              if hatali_kaydirma >= 3:
-                                 print("      [Sistem Uyarı] Bu oturum kilitlendi. Hemen diğer tura geçiliyor...")
-                                 break 
+                                 # --- YENİ EKLENTİ: TAKTİKSEL RESET MANTIĞI ---
+                                 print("      [Taktiksel Reset] TikTok kalkanı algılandı! Hafıza silinip ava devam ediliyor...")
+                                 try:
+                                     # Mevcut engelli çerezleri temizle ve sayfayı yenile
+                                     context.clear_cookies() 
+                                     page.goto(hedef_url, wait_until="domcontentloaded", timeout=60000)
+                                     time.sleep(8)
+                                     
+                                     # İlk videoyu tekrar aç ve döngüyü turu bitirmeden başa sar
+                                     page.locator('div[data-e2e="explore-item"]').first.click()
+                                     time.sleep(5)
+                                     hatali_kaydirma = 0
+                                     continue # KESİNLİKLE turu bitirme, kaldığın yerden sömür!
+                                 except Exception as reset_hata:
+                                     print(f"      [Hata] Reset sonrası video açılamadı: {reset_hata}. Diğer tura geçiliyor.")
+                                     break 
 
                 except Exception as e:
                     print(f"   [Uyarı] Tur içinde aksama: {e}")
