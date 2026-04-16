@@ -12,7 +12,7 @@ def veri_yakala_ve_analiz_et(api_key):
     su_an = datetime.now()
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v2: TR KIMLIKLI HASAT BASLADI ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v2.2: ZIRHLI & TAMIRLI HASAT ---")
 
     try:
         with sync_playwright() as p:
@@ -28,35 +28,44 @@ def veri_yakala_ve_analiz_et(api_key):
                 permissions=["geolocation"]
             )
 
-            # --- COOKIES KONTROLÜ VE YÜKLEME ---
+            # --- COOKIES TAMİR VE YÜKLEME ---
             if os.path.exists("cookies.json"):
                 try:
                     with open("cookies.json", "r", encoding="utf-8") as f:
-                        cookies = json.load(f)
-                        context.add_cookies(cookies)
-                    print("✅ TR Kimlik Kartı (Cookies) başarıyla yüklendi. Gerçek kullanıcı modu aktif!")
+                        raw_cookies = json.load(f)
+                        fixed_cookies = []
+                        for c in raw_cookies:
+                            if 'sameSite' in c and c['sameSite'] not in ["Strict", "Lax", "None"]:
+                                c['sameSite'] = "None"
+                            fixed_cookies.append(c)
+                        context.add_cookies(fixed_cookies)
+                    print("✅ TR Kimlik Kartı başarıyla tamir edildi ve yüklendi!")
                 except Exception as e:
-                    print(f"❌ Cookies dosyası okunamadı, format hatalı olabilir: {e}")
+                    print(f"❌ Cookies yükleme hatası: {e}")
             else:
-                print("⚠️ Uyarı: cookies.json bulunamadı! Anonim modda devam ediliyor.")
+                print("⚠️ Uyarı: cookies.json bulunamadı!")
 
             page = context.new_page()
 
             try:
                 # TR Keşfeti için doğrudan link
-                hedef_url = "https://www.tiktok.com/explore?lang=tr-TR"
-                page.goto(hedef_url, wait_until="networkidle", timeout=60000)
-                time.sleep(10)
+                print("🌐 TikTok Keşfet'e bağlanılıyor...")
+                page.goto("https://www.tiktok.com/explore?lang=tr-TR", wait_until="networkidle", timeout=60000)
+                time.sleep(12)
 
-                # İlk videoya tıklayıp akışı başlatma
-                page.locator('div[data-e2e="explore-item"]').first.click()
-                print("🚀 TR Keşfeti üzerinden derin hasat başladı...")
+                # İlk videoyu bul ve tıkla
+                try:
+                    page.locator('div[data-e2e="explore-item"]').first.click()
+                except:
+                    page.keyboard.press("ArrowDown")
+                
+                print("🚀 Derin hasat başladı... Takılmalar otomatik aşılacak.")
                 time.sleep(5)
 
                 hatali_kaydirma = 0 
                 start_time = time.time()
 
-                # Yaklaşık 45-50 dakika (2800 saniye) boyunca çalışır
+                # Yaklaşık 45-50 dakika boyunca çalışır
                 while (time.time() - start_time) < 2800:
                     v_link = page.url
                     
@@ -64,18 +73,13 @@ def veri_yakala_ve_analiz_et(api_key):
                         yakalanan_linkler.add(v_link)
                         hatali_kaydirma = 0 
 
-                        # Video detaylarını çekme (JavaScript tarafında)
+                        # Veri Çekme
                         detaylar = page.evaluate('''() => {
-                            let likesEl = document.querySelector('[data-e2e="browse-like-count"]');
-                            let commentsEl = document.querySelector('[data-e2e="browse-comment-count"]');
-                            let descEl = document.querySelector('[data-e2e="browse-video-desc"]');
-                            let musicEl = document.querySelector('h4[data-e2e="browse-music"]');
-                            
                             return {
-                                likes: likesEl ? likesEl.innerText.trim() : "0",
-                                comments: commentsEl ? commentsEl.innerText.trim() : "0",
-                                desc: descEl ? descEl.innerText : "",
-                                music: musicEl ? musicEl.innerText.trim() : "Orijinal Ses"
+                                likes: document.querySelector('[data-e2e="browse-like-count"]')?.innerText || "0",
+                                comments: document.querySelector('[data-e2e="browse-comment-count"]')?.innerText || "0",
+                                desc: document.querySelector('[data-e2e="browse-video-desc"]')?.innerText || "",
+                                music: document.querySelector('h4[data-e2e="browse-music"]')?.innerText || "Orijinal Ses"
                             }
                         }''')
 
@@ -93,15 +97,27 @@ def veri_yakala_ve_analiz_et(api_key):
                         if len(yeni_videolar) % 20 == 0:
                             print(f"📊 Mevcut Durum: {len(yeni_videolar)} video toplandı...")
 
-                    # Rastgele bekleme süresiyle aşağı kaydırma
+                    # --- AKILLI KAYDIRMA (ZIRHLI MOD) ---
+                    # Hem tuşla hem mouse tekerleğiyle kaydırıyoruz
                     page.keyboard.press("ArrowDown")
-                    time.sleep(random.uniform(4.0, 7.5)) 
+                    page.mouse.wheel(0, 600) 
+                    
+                    # İzleme simülasyonu için rastgele bekleme
+                    time.sleep(random.uniform(5.0, 9.5)) 
                     
                     if page.url == v_link:
-                         hatali_kaydirma += 1
-                         if hatali_kaydirma >= 5:
-                             print("🛑 Akış durdu veya takıldı, işlem sonlandırılıyor...")
-                             break 
+                        hatali_kaydirma += 1
+                        if hatali_kaydirma >= 3:
+                            print("🔄 Akış takıldı, sayfa yenileniyor (Auto-Refresh)...")
+                            page.reload()
+                            time.sleep(10)
+                            hatali_kaydirma = 0
+                            # Yenileme sonrası ilk videoya tekrar odaklan
+                            try: page.locator('div[data-e2e="explore-item"]').first.click()
+                            except: pass
+
+                if len(yeni_videolar) >= 600:
+                    print("🎯 Hedeflenen hasat miktarına ulaşıldı.")
 
             except Exception as e:
                 print(f"❌ Tarayıcı hatası: {e}")
@@ -116,15 +132,11 @@ def veri_yakala_ve_analiz_et(api_key):
     eski_veriler = []
     if os.path.exists(db_path):
         with open(db_path, "r", encoding="utf-8") as f:
-            try:
-                eski_veriler = json.load(f)
-            except:
-                eski_veriler = []
+            try: eski_veriler = json.load(f)
+            except: eski_veriler = []
 
     birlesik = yeni_videolar + eski_veriler
-    # Sadece son 7 günü tutar
     taze = [v for v in birlesik if v.get("tarih", "2000-01-01") >= silme_siniri]
-    # Linkleri tekilleştirir
     son_liste = list({v.get('link', ''): v for v in taze if v.get('link')}.values())
 
     with open(db_path, "w", encoding="utf-8") as f:
