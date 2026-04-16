@@ -60,19 +60,23 @@ def veri_yakala_ve_analiz_et(api_key):
                             yakalanan_linkler.add(v_link)
                             hatali_kaydirma = 0 # Video başarıyla açıldıysa sayacı sıfırla
 
-                            # JAVASCRIPT İLE DERİN VERİ SÖKÜMÜ
+                            # JAVASCRIPT İLE DERİN VERİ SÖKÜMÜ (GÜNCELLENDİ)
                             detaylar = page.evaluate('''() => {
-                                // Müzik ismini bul, bulamazsa senin istediğin gibi direkt "Orijinal Ses" yazıp geç
+                                // Müzik İsmi Mantığı
                                 let musicEl = document.querySelector('h4[data-e2e="browse-music"]') || 
                                               document.querySelector('a[href*="/music/"]') || 
                                               document.querySelector('div[class*="music"]');
                                 
                                 let musicName = musicEl ? musicEl.innerText.trim().replace(/\\n/g, '') : "Orijinal Ses";
-                                if (musicName.match(/^[\d\.]+[KM]?$/)) { musicName = "Orijinal Ses"; } // Hatalı sayı gelirse ez
+                                if (musicName.match(/^[\d\.]+[KM]?$/)) { musicName = "Orijinal Ses"; }
+
+                                // BEĞENİ VE YORUM İÇİN ÇİFT GÜVENLİK (Hem Vitrin Hem Tam Ekran Etiketlerini Tarar)
+                                let likesEl = document.querySelector('[data-e2e="browse-like-count"]') || document.querySelector('[data-e2e="like-count"]');
+                                let commentsEl = document.querySelector('[data-e2e="browse-comment-count"]') || document.querySelector('[data-e2e="comment-count"]');
 
                                 return {
-                                    likes: document.querySelector('[data-e2e="like-count"]')?.innerText || "0",
-                                    comments: document.querySelector('[data-e2e="comment-count"]')?.innerText || "0",
+                                    likes: likesEl ? likesEl.innerText.trim() : "0",
+                                    comments: commentsEl ? commentsEl.innerText.trim() : "0",
                                     music: musicName,
                                     musicUsage: document.querySelector('[data-e2e="browse-music-usage"]')?.innerText || "Bilinmiyor",
                                     desc: document.querySelector('[data-e2e="browse-video-desc"]')?.innerText || "",
