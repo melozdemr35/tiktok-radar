@@ -3,7 +3,7 @@ import json
 import os
 import time
 import random
-import re # Hashtag yakalamak için eklendi
+import re
 from datetime import datetime, timedelta
 from playwright.sync_api import sync_playwright
 
@@ -13,10 +13,12 @@ def veri_yakala_ve_analiz_et(api_key):
     su_an = datetime.now()
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
+    # 1. GÜVENLİK KONTROLÜ: Oturumları çek
     oturumlar = [os.environ.get(f"TIKTOK_SESSION_{i}") for i in range(1, 6)]
     aktif_oturumlar = [o for o in oturumlar if o]
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- RADAR: DERİN HASAT & SAAT ANALİZİ BAŞLATILDI ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: OPERASYON BAŞLIYOR ---")
+    print(f"Aktif Oturum Sayısı: {len(aktif_oturumlar)}")
 
     try:
         with sync_playwright() as p:
@@ -26,7 +28,7 @@ def veri_yakala_ve_analiz_et(api_key):
                 start_tur = time.time()
                 secilen_oturum = random.choice(aktif_oturumlar) if aktif_oturumlar else None
                 
-                print(f"\n>> Tur {tur+1} Başlıyor | Oturum: {'Aktif' if secilen_oturum else 'Anonim'}")
+                print(f"\n>> Tur {tur+1} Başlatılıyor...")
                 
                 context = browser.new_context(
                     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -40,18 +42,18 @@ def veri_yakala_ve_analiz_et(api_key):
 
                 page = context.new_page()
 
+                # 2. ANA DÖNGÜ: Sayfa Yenileme ve Derin Hasat
                 while (time.time() - start_tur) < 540:
                     try:
-                        page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=60000)
-                        time.sleep(8)
+                        print(f"   [F5] Keşfet yenileniyor: {datetime.now().strftime('%H:%M:%S')}")
+                        page.goto("https://www.tiktok.com/explore", wait_until="networkidle", timeout=90000)
+                        time.sleep(10)
 
-                        # Vitrini görünür kılmak için hafif kaydırma
-                        for _ in range(2):
-                            page.keyboard.press("End")
-                            time.sleep(2)
+                        # Vitrin hasadı için hafif kaydır
+                        page.keyboard.press("End")
+                        time.sleep(3)
 
-                        items = page.query_selector_all('div[data-e2e="explore-item"]') or \
-                                page.query_selector_all('div[class*="DivItemContainerV2"]')
+                        items = page.query_selector_all('div[data-e2e="explore-item"]')
                         
                         for item in items:
                             try:
@@ -63,11 +65,11 @@ def veri_yakala_ve_analiz_et(api_key):
 
                                 yakalanan_linkler.add(v_link)
 
-                                # --- DERİN HASAT MODÜLÜ (Javascript Enjeksiyonu) ---
-                                # İstediğin: Beğeni, Yorum, Hashtag, Müzik Hacmi ve PAYLAŞIM SAATİ
-                                page.goto(v_link, wait_until="domcontentloaded", timeout=30000)
-                                time.sleep(3)
+                                # VİDEO İÇİNE GİRİŞ (DERİN ANALİZ)
+                                page.goto(v_link, wait_until="domcontentloaded", timeout=45000)
+                                time.sleep(4)
 
+                                # Verileri sök
                                 detaylar = page.evaluate('''() => {
                                     return {
                                         likes: document.querySelector('[data-e2e="like-count"]')?.innerText || "0",
@@ -75,41 +77,38 @@ def veri_yakala_ve_analiz_et(api_key):
                                         music: document.querySelector('[data-e2e="browse-music"]')?.innerText.trim() || "Popüler Akım",
                                         musicUsage: document.querySelector('[data-e2e="browse-music-usage"]')?.innerText || "Az Kullanım",
                                         desc: document.querySelector('[data-e2e="browse-video-desc"]')?.innerText || "",
-                                        // Paylaşım Saati tespiti (Nickname yanındaki 3. span genellikle saattir)
-                                        videoTime: document.querySelector('span[data-e2e="browser-nickname"] + span + span')?.innerText || "Belirsiz"
+                                        vTime: document.querySelector('span[data-e2e="browser-nickname"] + span + span')?.innerText || "Yeni"
                                     }
                                 }''')
 
-                                # Hashtag Ayıklama (# ile başlayan kelimeler)
-                                found_hashtags = re.findall(r'#\w+', detaylar['desc'])
-
                                 yeni_videolar.append({
                                     "desc": detaylar['desc'][:120],
-                                    "hashtags": found_hashtags,
+                                    "hashtags": re.findall(r'#\w+', detaylar['desc']),
                                     "music": detaylar['music'],
                                     "music_usage": detaylar['musicUsage'],
                                     "link": v_link,
                                     "likes": detaylar['likes'],
                                     "comments": detaylar['comments'],
-                                    "paylasim_saati_detay": detaylar['videoTime'], # "2s önce" veya "10-24" gibi
-                                    "kayit_saati": su_an.strftime('%H:00'),
-                                    "tarih": su_an.strftime('%Y-%m-%d'),
-                                    "timestamp": time.time()
+                                    "paylasim_saati": detaylar['vTime'],
+                                    "kayit_saati": datetime.now().strftime('%H:%M'),
+                                    "tarih": su_an.strftime('%Y-%m-%d')
                                 })
-                                print(f"   [Hasat] Video Yakalandı: {detaylar['videoTime']} | Beğeni: {detaylar['likes']}")
+                                print(f"      [Hasat Başarılı] Saat: {detaylar['vTime']} | Beğeni: {detaylar['likes']}")
+                                
+                                # Ana sayfaya geri dönmek yerine diğer yenilemeyi bekle
+                                if len(yeni_videolar) % 10 == 0: break 
 
-                            except Exception:
-                                continue
+                            except: continue
 
-                        time.sleep(random.uniform(5, 10))
-
-                    except Exception:
-                        time.sleep(5)
+                        time.sleep(random.uniform(5, 8))
+                    except:
+                        print("   [Uyarı] Döngüde anlık aksama, yeniden deneniyor...")
+                        time.sleep(10)
 
                 context.close()
             browser.close()
     except Exception as e:
-        print(f"Sistem Hatası: {e}")
+        print(f"!!! KRİTİK HATA: {e}")
 
     # --- VERİTABANI YÖNETİMİ ---
     db_path = "trend_veritabani.json"
@@ -126,4 +125,8 @@ def veri_yakala_ve_analiz_et(api_key):
     with open(db_path, "w", encoding="utf-8") as f:
         json.dump(son_liste, f, ensure_ascii=False, indent=4)
     
-    print(f"\n🏁 FİNAL: {len(yeni_videolar)} derin analizli video çekildi.")
+    print(f"\n🏁 FİNAL: {len(yeni_videolar)} video detaylıca işlendi. Havuz: {len(son_liste)}")
+
+if __name__ == "__main__":
+    key = os.environ.get("GEMINI_API_KEY")
+    if key: veri_yakala_ve_analiz_et(key)
