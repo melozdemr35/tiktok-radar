@@ -1,4 +1,3 @@
-from google.genai import Client 
 import json
 import os
 import time
@@ -13,144 +12,127 @@ def veri_yakala_ve_analiz_et(api_key):
     su_an = datetime.now()
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
-    oturumlar = [os.environ.get(f"TIKTOK_SESSION_{i}") for i in range(1, 6)]
-    aktif_oturumlar = [o for o in oturumlar if o]
-    
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: İSTANBUL LOKASYONLU VE DİRENÇLİ KEŞFET ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v2: TR KIMLIKLI HASAT BASLADI ---")
 
     try:
         with sync_playwright() as p:
+            # Otomasyon tespitini engellemek için özel argümanlar
             browser = p.chromium.launch(args=["--disable-blink-features=AutomationControlled"], headless=True)
             
-            for tur in range(6):
-                start_tur = time.time()
-                secilen_oturum = random.choice(aktif_oturumlar) if aktif_oturumlar else None
-                
-                print(f"\n>> Tur {tur+1} Başlatılıyor...")
-                
-                context = browser.new_context(
-                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                    viewport={'width': 1280, 'height': 800},
-                    locale="tr-TR",
-                    timezone_id="Europe/Istanbul",
-                    geolocation={"longitude": 28.9784, "latitude": 41.0082}, 
-                    permissions=["geolocation"] 
-                )
-                context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                viewport={'width': 1280, 'height': 800},
+                locale="tr-TR",
+                timezone_id="Europe/Istanbul",
+                geolocation={"longitude": 34.9537, "latitude": 40.5506}, 
+                permissions=["geolocation"]
+            )
 
-                if secilen_oturum:
-                    context.add_cookies([{'name': 'sessionid', 'value': secilen_oturum, 'domain': '.tiktok.com', 'path': '/', 'secure': True, 'httpOnly': True}])
-
-                page = context.new_page()
-
+            # --- COOKIES KONTROLÜ VE YÜKLEME ---
+            if os.path.exists("cookies.json"):
                 try:
-                    hedef_url = "https://www.tiktok.com/explore?lang=tr-TR&is_copy_url=1&is_from_webapp=v1"
-                    page.goto(hedef_url, wait_until="domcontentloaded", timeout=60000)
-                    time.sleep(10) 
-
-                    page.locator('div[data-e2e="explore-item"]').first.click()
-                    print("   [Oynatıcı] Zorunlu TR Keşfeti hasadı başlıyor...")
-                    time.sleep(5)
-
-                    hatali_kaydirma = 0 
-
-                    while (time.time() - start_tur) < 540:
-                        v_link = page.url
-                        
-                        if "/video/" in v_link and v_link not in yakalanan_linkler:
-                            yakalanan_linkler.add(v_link)
-                            hatali_kaydirma = 0 
-
-                            detaylar = page.evaluate('''() => {
-                                let musicEl = document.querySelector('h4[data-e2e="browse-music"]') || 
-                                              document.querySelector('a[href*="/music/"]') || 
-                                              document.querySelector('div[class*="music"]');
-                                
-                                let musicName = musicEl ? musicEl.innerText.trim().replace(/\\n/g, '') : "Orijinal Ses";
-                                if (musicName.match(/^[\d\.]+[KM]?$/)) { musicName = "Orijinal Ses"; }
-
-                                let likesEl = document.querySelector('[data-e2e="browse-like-count"]') || document.querySelector('[data-e2e="like-count"]');
-                                let commentsEl = document.querySelector('[data-e2e="browse-comment-count"]') || document.querySelector('[data-e2e="comment-count"]');
-
-                                return {
-                                    likes: likesEl ? likesEl.innerText.trim() : "0",
-                                    comments: commentsEl ? commentsEl.innerText.trim() : "0",
-                                    music: musicName,
-                                    musicUsage: document.querySelector('[data-e2e="browse-music-usage"]')?.innerText || "Bilinmiyor",
-                                    desc: document.querySelector('[data-e2e="browse-video-desc"]')?.innerText || "",
-                                    vTime: document.querySelector('span[data-e2e="browser-nickname"] + span + span')?.innerText || "Yeni"
-                                }
-                            }''')
-
-                            yeni_videolar.append({
-                                "desc": detaylar['desc'][:120],
-                                "hashtags": re.findall(r'#\w+', detaylar['desc']),
-                                "music": detaylar['music'],
-                                "music_usage": detaylar['musicUsage'],
-                                "link": v_link,
-                                "likes": detaylar['likes'],
-                                "comments": detaylar['comments'],
-                                "paylasim_saati": detaylar['vTime'],
-                                "kayit_saati": datetime.now().strftime('%H:00'),
-                                "tarih": su_an.strftime('%Y-%m-%d')
-                            })
-                            
-                            if len(yeni_videolar) % 20 == 0:
-                                print(f"      [Hızlı Swipe] Toplanan: {len(yeni_videolar)} video...")
-
-                        page.mouse.click(640, 400) 
-                        time.sleep(0.5)
-                        page.keyboard.press("ArrowDown")
-                        # Algoritmayı daha az tetiklemek için bekleme süresi çok hafif uzatıldı
-                        time.sleep(random.uniform(3.0, 5.0)) 
-                        
-                        if page.url == v_link:
-                             hatali_kaydirma += 1
-                             page.mouse.wheel(0, 1000) 
-                             time.sleep(2)
-                             
-                             if hatali_kaydirma >= 3:
-                                 # --- YENİ EKLENTİ: TAKTİKSEL RESET MANTIĞI ---
-                                 print("      [Taktiksel Reset] TikTok kalkanı algılandı! Hafıza silinip ava devam ediliyor...")
-                                 try:
-                                     # Mevcut engelli çerezleri temizle ve sayfayı yenile
-                                     context.clear_cookies() 
-                                     page.goto(hedef_url, wait_until="domcontentloaded", timeout=60000)
-                                     time.sleep(8)
-                                     
-                                     # İlk videoyu tekrar aç ve döngüyü turu bitirmeden başa sar
-                                     page.locator('div[data-e2e="explore-item"]').first.click()
-                                     time.sleep(5)
-                                     hatali_kaydirma = 0
-                                     continue # KESİNLİKLE turu bitirme, kaldığın yerden sömür!
-                                 except Exception as reset_hata:
-                                     print(f"      [Hata] Reset sonrası video açılamadı: {reset_hata}. Diğer tura geçiliyor.")
-                                     break 
-
+                    with open("cookies.json", "r", encoding="utf-8") as f:
+                        cookies = json.load(f)
+                        context.add_cookies(cookies)
+                    print("✅ TR Kimlik Kartı (Cookies) başarıyla yüklendi. Gerçek kullanıcı modu aktif!")
                 except Exception as e:
-                    print(f"   [Uyarı] Tur içinde aksama: {e}")
+                    print(f"❌ Cookies dosyası okunamadı, format hatalı olabilir: {e}")
+            else:
+                print("⚠️ Uyarı: cookies.json bulunamadı! Anonim modda devam ediliyor.")
 
-                context.close()
+            page = context.new_page()
+
+            try:
+                # TR Keşfeti için doğrudan link
+                hedef_url = "https://www.tiktok.com/explore?lang=tr-TR"
+                page.goto(hedef_url, wait_until="networkidle", timeout=60000)
+                time.sleep(10)
+
+                # İlk videoya tıklayıp akışı başlatma
+                page.locator('div[data-e2e="explore-item"]').first.click()
+                print("🚀 TR Keşfeti üzerinden derin hasat başladı...")
+                time.sleep(5)
+
+                hatali_kaydirma = 0 
+                start_time = time.time()
+
+                # Yaklaşık 45-50 dakika (2800 saniye) boyunca çalışır
+                while (time.time() - start_time) < 2800:
+                    v_link = page.url
+                    
+                    if "/video/" in v_link and v_link not in yakalanan_linkler:
+                        yakalanan_linkler.add(v_link)
+                        hatali_kaydirma = 0 
+
+                        # Video detaylarını çekme (JavaScript tarafında)
+                        detaylar = page.evaluate('''() => {
+                            let likesEl = document.querySelector('[data-e2e="browse-like-count"]');
+                            let commentsEl = document.querySelector('[data-e2e="browse-comment-count"]');
+                            let descEl = document.querySelector('[data-e2e="browse-video-desc"]');
+                            let musicEl = document.querySelector('h4[data-e2e="browse-music"]');
+                            
+                            return {
+                                likes: likesEl ? likesEl.innerText.trim() : "0",
+                                comments: commentsEl ? commentsEl.innerText.trim() : "0",
+                                desc: descEl ? descEl.innerText : "",
+                                music: musicEl ? musicEl.innerText.trim() : "Orijinal Ses"
+                            }
+                        }''')
+
+                        yeni_videolar.append({
+                            "desc": detaylar['desc'][:120],
+                            "hashtags": re.findall(r'#\w+', detaylar['desc']),
+                            "music": detaylar['music'],
+                            "link": v_link,
+                            "likes": detaylar['likes'],
+                            "comments": detaylar['comments'],
+                            "kayit_saati": datetime.now().strftime('%H:00'),
+                            "tarih": datetime.now().strftime('%Y-%m-%d')
+                        })
+                        
+                        if len(yeni_videolar) % 20 == 0:
+                            print(f"📊 Mevcut Durum: {len(yeni_videolar)} video toplandı...")
+
+                    # Rastgele bekleme süresiyle aşağı kaydırma
+                    page.keyboard.press("ArrowDown")
+                    time.sleep(random.uniform(4.0, 7.5)) 
+                    
+                    if page.url == v_link:
+                         hatali_kaydirma += 1
+                         if hatali_kaydirma >= 5:
+                             print("🛑 Akış durdu veya takıldı, işlem sonlandırılıyor...")
+                             break 
+
+            except Exception as e:
+                print(f"❌ Tarayıcı hatası: {e}")
+
+            context.close()
             browser.close()
     except Exception as e:
-        print(f"!!! KRİTİK HATA: {e}")
+        print(f"!!! KRITIK HATA: {e}")
 
+    # --- VERİLERİ VERİTABANINA YAZ ---
     db_path = "trend_veritabani.json"
     eski_veriler = []
     if os.path.exists(db_path):
         with open(db_path, "r", encoding="utf-8") as f:
-            try: eski_veriler = json.load(f)
-            except: eski_veriler = []
+            try:
+                eski_veriler = json.load(f)
+            except:
+                eski_veriler = []
 
     birlesik = yeni_videolar + eski_veriler
+    # Sadece son 7 günü tutar
     taze = [v for v in birlesik if v.get("tarih", "2000-01-01") >= silme_siniri]
+    # Linkleri tekilleştirir
     son_liste = list({v.get('link', ''): v for v in taze if v.get('link')}.values())
 
     with open(db_path, "w", encoding="utf-8") as f:
         json.dump(son_liste, f, ensure_ascii=False, indent=4)
     
-    print(f"\n🏁 FİNAL: {len(yeni_videolar)} video hızla çekildi. Havuz: {len(son_liste)}")
+    print(f"\n🏁 İŞLEM TAMAMLANDI: {len(yeni_videolar)} yeni video eklendi!")
+    print(f"📂 Toplam Havuz Büyüklüğü: {len(son_liste)}")
 
 if __name__ == "__main__":
     key = os.environ.get("GEMINI_API_KEY")
-    if key: veri_yakala_ve_analiz_et(key)
+    veri_yakala_ve_analiz_et(key)
