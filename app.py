@@ -21,13 +21,11 @@ st.markdown("""
 # Gelişmiş Sayısal Dönüştürücü (Regex Kalkanlı)
 def parse_number(val):
     if pd.isna(val): return 0
-    # Sayının içindeki gizli boşlukları ve karakterleri temizler
     val_str = str(val).upper().replace(',', '.').strip()
     multiplier = 1
     if 'M' in val_str: multiplier = 1_000_000
     elif 'K' in val_str: multiplier = 1_000
     
-    # Sadece sayısal kısmı çek (Regex)
     num_match = re.search(r'[\d\.]+', val_str)
     if num_match:
         try: return float(num_match.group()) * multiplier
@@ -51,7 +49,6 @@ if os.path.exists(db_path):
         data = json.load(f)
     df = pd.DataFrame(data)
     
-    # Sayıları arka planda matematiksel hale getiriyoruz
     df['n_likes'] = df['likes'].apply(parse_number)
     df['n_comments'] = df['comments'].apply(parse_number)
 
@@ -95,7 +92,6 @@ if os.path.exists(db_path):
     # --- TOP 10 ETKİLEŞİM ARENASI (GLOBAL) ---
     st.subheader("🏆 En Yüksek Etkileşimli Top 10 Video (Global)")
     
-    # n_likes üzerinden gerçek sıralama yapıyoruz
     top_10 = df.sort_values(by='n_likes', ascending=False).head(10).copy()
     top_10_display = top_10[['desc', 'likes', 'comments', 'link']]
     top_10_display.columns = ['Videonun Açıklaması', 'Beğeni', 'Yorum', 'Video Linki']
@@ -113,20 +109,38 @@ if os.path.exists(db_path):
 
     st.divider()
 
-    # --- YENİ EKLENTİ: TOP 10 TÜRKİYE ARENASI (YEREL) ---
+    # --- YENİ EKLENTİ: TOP 10 TÜRKİYE ARENASI (AKILLI TR FİLTRESİ) ---
     st.subheader("🇹🇷 Türkiye Etkileşim Arenası (Top 10 Yerel)")
 
-    # İstanbul kimliğiyle toplanan videolardan Türkçe harf içerenleri ayıklar (Kısıtlamasız filtre)
-    def tr_filtre_genis(row):
-        taranacak = f"{str(row['desc'])} {str(row['music'])}".lower()
-        return any(h in taranacak for h in "ğüşıöç")
+    def gercek_tr_radari(row):
+        metin_orijinal = f" {str(row['desc'])} {str(row['music'])} "
+        metin_kucuk = metin_orijinal.lower()
+        etiketler = [str(t).lower().replace('#', '') for t in row.get('hashtags', [])]
+        
+        # 1. KARA LİSTE (Fransızca "ça" veya İngilizce bariz kelimeleri eler)
+        kara_liste = [' the ', ' is ', ' to ', ' you ', ' and ', ' a ', ' je ', ' ça ', ' que ']
+        if any(k in metin_kucuk for k in kara_liste):
+            return False 
+            
+        # 2. NET TÜRKÇE HARFLER (İngilizce/Fransızcada bulunmayan ğ ve noktasız ı)
+        if any(h in metin_orijinal for h in "ğĞıİ"):
+            return True
+            
+        # 3. YEREL ETİKETLER
+        tr_etiketler = ['keşfet', 'kesfet', 'türkiye', 'turkiye', 'istanbul', 'ankara', 'izmir', 'çorum', 'mizah', 'komik', 'akım']
+        if any(e in tr_etiketler for e in etiketler):
+            return True
+            
+        # 4. YUMUŞAK KARAKTER KONTROLÜ (Kara listeyi geçtiyse güvenlidir)
+        if any(h in metin_kucuk for h in "şöüç") or "orijinal ses" in metin_kucuk:
+            return True
+            
+        return False
 
-    df_tr = df[df.apply(tr_filtre_genis, axis=1)].copy()
+    df_tr = df[df.apply(gercek_tr_radari, axis=1)].copy()
 
     if not df_tr.empty:
-        # Türkiye şampiyonlarını sırala
         top_10_tr = df_tr.sort_values(by='n_likes', ascending=False).head(10)
-        
         st.dataframe(
             top_10_tr[['desc', 'likes', 'comments', 'link']],
             column_config={
@@ -138,7 +152,7 @@ if os.path.exists(db_path):
             use_container_width=True, hide_index=True
         )
     else:
-        st.info("Yerel radar şu an tarama yapıyor... Türkçe karakterli içerikler bulunduğunda burada listelenecek.")
+        st.info("Yerel içerikler taranıyor...")
 
     st.divider()
 
