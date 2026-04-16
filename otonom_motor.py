@@ -16,7 +16,7 @@ def veri_yakala_ve_analiz_et(api_key):
     oturumlar = [os.environ.get(f"TIKTOK_SESSION_{i}") for i in range(1, 6)]
     aktif_oturumlar = [o for o in oturumlar if o]
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: AKILLI KAÇIŞ VE SWIPE MODU ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: İSTANBUL/TR LOKASYONLU SAF KEŞFET ---")
 
     try:
         with sync_playwright() as p:
@@ -31,7 +31,11 @@ def veri_yakala_ve_analiz_et(api_key):
                 context = browser.new_context(
                     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
                     viewport={'width': 1280, 'height': 800},
-                    locale="tr-TR"
+                    # --- DEĞİŞTİRİLEN KISIM: İSTANBUL LOKASYON MÜHÜRLEMESİ ---
+                    locale="tr-TR",
+                    timezone_id="Europe/Istanbul",
+                    geolocation={"longitude": 28.9784, "latitude": 41.0082}, # İstanbul koordinatları
+                    permissions=["geolocation"] # TikTok lokasyon sormayı denerse "İzin Ver"
                 )
                 context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
@@ -41,28 +45,25 @@ def veri_yakala_ve_analiz_et(api_key):
                 page = context.new_page()
 
                 try:
-                    # SİSTEM GİRİŞİ
+                    # SİSTEM GİRİŞİ: Saf Keşfet (Arama yapmadan, İstanbul IP'si gibi giriş)
                     page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=60000)
-                    time.sleep(8)
+                    time.sleep(10) # Algoritmanın lokasyonu anlaması için bekliyoruz
 
                     # İlk videoya tıkla ve tam ekran oynatıcıyı aç
                     page.locator('div[data-e2e="explore-item"]').first.click()
-                    print("   [Oynatıcı] Video açıldı, kaydırma (swipe) başlıyor...")
+                    print("   [Oynatıcı] İstanbul kimliğiyle yerel hasat başlıyor...")
                     time.sleep(5)
 
-                    hatali_kaydirma = 0 # Engel sayacı eklendi
+                    hatali_kaydirma = 0 
 
-                    # 9 DAKİKALIK ANA DÖNGÜ
                     while (time.time() - start_tur) < 540:
                         v_link = page.url
                         
                         if "/video/" in v_link and v_link not in yakalanan_linkler:
                             yakalanan_linkler.add(v_link)
-                            hatali_kaydirma = 0 # Video başarıyla açıldıysa sayacı sıfırla
+                            hatali_kaydirma = 0 
 
-                            # JAVASCRIPT İLE DERİN VERİ SÖKÜMÜ (GÜNCELLENDİ)
                             detaylar = page.evaluate('''() => {
-                                // Müzik İsmi Mantığı
                                 let musicEl = document.querySelector('h4[data-e2e="browse-music"]') || 
                                               document.querySelector('a[href*="/music/"]') || 
                                               document.querySelector('div[class*="music"]');
@@ -70,7 +71,6 @@ def veri_yakala_ve_analiz_et(api_key):
                                 let musicName = musicEl ? musicEl.innerText.trim().replace(/\\n/g, '') : "Orijinal Ses";
                                 if (musicName.match(/^[\d\.]+[KM]?$/)) { musicName = "Orijinal Ses"; }
 
-                                // BEĞENİ VE YORUM İÇİN ÇİFT GÜVENLİK (Hem Vitrin Hem Tam Ekran Etiketlerini Tarar)
                                 let likesEl = document.querySelector('[data-e2e="browse-like-count"]') || document.querySelector('[data-e2e="like-count"]');
                                 let commentsEl = document.querySelector('[data-e2e="browse-comment-count"]') || document.querySelector('[data-e2e="comment-count"]');
 
@@ -100,21 +100,19 @@ def veri_yakala_ve_analiz_et(api_key):
                             if len(yeni_videolar) % 20 == 0:
                                 print(f"      [Hızlı Swipe] Toplanan: {len(yeni_videolar)} video...")
 
-                        # Sıradaki videoya geç
-                        page.mouse.click(640, 400) # Ekranın ortasına tıkla (Popup çıkarsa kapatır)
+                        page.mouse.click(640, 400) 
                         time.sleep(0.5)
                         page.keyboard.press("ArrowDown")
                         time.sleep(random.uniform(2.0, 3.5)) 
                         
-                        # --- TAKILMA VE AKILLI KAÇIŞ KONTROLÜ ---
                         if page.url == v_link:
                              hatali_kaydirma += 1
-                             page.mouse.wheel(0, 1000) # Tekerlek ile zorla kaydırmayı dene
+                             page.mouse.wheel(0, 1000) 
                              time.sleep(2)
                              
                              if hatali_kaydirma >= 3:
-                                 print("      [Sistem Uyarı] Bu oturum kilitlendi (Giriş engeli). Hemen diğer tura geçiliyor...")
-                                 break # Döngüyü kırar ve direkt sonraki Tura geçer. Zaman kaybını önler!
+                                 print("      [Sistem Uyarı] Bu oturum kilitlendi. Hemen diğer tura geçiliyor...")
+                                 break 
 
                 except Exception as e:
                     print(f"   [Uyarı] Tur içinde aksama: {e}")
@@ -124,7 +122,6 @@ def veri_yakala_ve_analiz_et(api_key):
     except Exception as e:
         print(f"!!! KRİTİK HATA: {e}")
 
-    # --- VERİTABANI YÖNETİMİ ---
     db_path = "trend_veritabani.json"
     eski_veriler = []
     if os.path.exists(db_path):
