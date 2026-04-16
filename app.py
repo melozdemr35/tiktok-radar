@@ -4,35 +4,21 @@ import json
 import os
 import re
 import plotly.express as px
-from datetime import datetime
 
-# --- PERFORMANS İÇİN CACHE ---
-@st.cache_data
-def load_data(path):
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            df = pd.DataFrame(data)
-            # Tarih ve Saat birleştirme
-            if not df.empty and 'tarih' in df.columns and 'kayit_saati' in df.columns:
-                df['datetime'] = pd.to_datetime(df['tarih'] + " " + df['kayit_saati'], errors='coerce')
-            return df
-    return pd.DataFrame()
+# 1. SAYFA YAPILANDIRMASI (Senin Orijinal Tasarımın)
+st.set_page_config(page_title="TR TikTok Trend Radarı", layout="wide")
 
-# 1. SAYFA YAPILANDIRMASI
-st.set_page_config(page_title="Ultimate TR Trend Radarı v2", layout="wide")
-
-# 2. ÖZEL STİL (Tasarım Odaklı Siyah Tema)
+# 2. GÖRSEL STİL (Senin Siyah Teman Birebir Aynı)
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: white; }
     .stMetric { background-color: #1e2130; padding: 15px; border-radius: 10px; border: 1px solid #2d3139; }
-    .stDataFrame { background-color: #1e2130; border-radius: 10px; }
-    .akam-box { background-color: #1e2130; padding: 20px; border-radius: 10px; border-left: 5px solid #00f2ea; }
+    .analiz-kutusu { background-color: #1e2130; padding: 20px; border-radius: 10px; border-left: 5px solid #77d8d8; }
+    .stTable { background-color: #1e2130; color: white; }
     </style>
     """, unsafe_allow_html=True)
 
-# Sayısal Dönüştürücü
+# Gelişmiş Sayısal Dönüştürücü
 def parse_number(val):
     if pd.isna(val): return 0
     val_str = str(val).upper().replace(',', '.').strip()
@@ -40,89 +26,123 @@ def parse_number(val):
     if 'M' in val_str: multiplier = 1_000_000
     elif 'K' in val_str: multiplier = 1_000
     num_match = re.search(r'[\d\.]+', val_str)
-    return float(num_match.group()) * multiplier if num_match else 0
+    if num_match:
+        try: return float(num_match.group()) * multiplier
+        except: return 0
+    return 0
 
-# --- AKIM TESPİT SİSTEMİ (Yeni!) ---
+# Rakamları Panelde Şık Gösterme
+def format_milyon(val):
+    if val >= 1_000_000: return f"{val / 1_000_000:.1f} Milyon"
+    elif val >= 1_000: return f"{val / 1_000:.1f} Bin"
+    return f"{val:,.0f}"
+
+# Arka Planda Akım Türü Belirleme (Gizli çalışır, listeye ekler)
 def concept_detect(text):
     text = str(text).lower()
-    if "pov" in text: return "POV / Kurgu"
-    if any(x in text for x in ["röportaj", "sorduk", "mikrofon"]): return "Sokak Röportajı"
-    if any(x in text for x in ["şaka", "prank", "kamera şakası"]): return "Mizah / Şaka"
-    if any(x in text for x in ["edit", "capcut", "alight"]): return "Visual Edit"
-    if any(x in text for x in ["tarif", "yemek", "sunum"]): return "Mutfak / Sunum"
-    return "Genel İçerik"
+    if "pov" in text: return "POV"
+    if any(x in text for x in ["röportaj", "sorduk"]): return "Röportaj"
+    if "edit" in text: return "Edit"
+    return "Genel"
 
-st.title("🚀 Ultimate TR TikTok Strateji Paneli v2")
-st.caption("TR Kimlikli Robot Verileri. Viral potansiyeli yüksek akımlar ve gerçek zamanlı analiz.")
+st.title("TR Türkiye TikTok Trend ve Strateji Radarı")
+st.caption("Otonom robot verileri analiz ediliyor. Veriler gerçek etkileşimlere göre sıralanmıştır.")
 
-df = load_data("trend_veritabani.json")
+db_path = "trend_veritabani.json"
+analiz_path = "son_analiz.txt"
 
-if not df.empty:
-    # Arka Plan Hazırlığı
+if os.path.exists(db_path):
+    with open(db_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    df = pd.DataFrame(data)
+    
     df['n_likes'] = df['likes'].apply(parse_number)
     df['n_comments'] = df['comments'].apply(parse_number)
-    df['concept'] = df['desc'].apply(concept_detect)
+    df['İçerik Türü'] = df['desc'].apply(concept_detect) # Yeni zeka katmanı
 
-    # --- ÜST METRİKLER ---
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Toplam Video", len(df))
-    m2.metric("Ort. Beğeni", f"{int(df['n_likes'].mean()):,}")
-    m3.metric("En Popüler Akım", df['concept'].mode()[0])
-    m4.metric("Aktif TR Hesabı", "✅ Bağlı")
+    # --- ÜST METRİKLER (Birebir Aynı) ---
+    col1, col2, col3 = st.columns(3)
+    toplam_video = len(df)
+    toplam_begeni = df['n_likes'].sum()
+    
+    col1.metric("Toplam Taranan Video", toplam_video)
+    col2.metric("Toplam Tahmini İzlenme", format_milyon(toplam_begeni * 25)) 
+    col3.metric("Toplam Beğeni Hacmi", format_milyon(toplam_begeni))
 
     st.divider()
 
-    # --- ANA ANALİZ PANELİ ---
-    col_sol, col_sag = st.columns([2, 1])
+    # --- ORTA PANEL (Birebir Aynı) ---
+    col_sol, col_sag = st.columns(2)
 
     with col_sol:
-        st.subheader("🇹🇷 Türkiye Etkileşim Arenası (Top 10)")
-        
-        # Kesin TR Filtresi (Daha önce konuştuğumuz Akıllı Kara Liste)
-        def tr_filtre(row):
-            txt = f"{row['desc']} {row['music']}".lower()
-            kara_liste = [' the ', ' is ', ' to ', ' you ', ' and ', ' je ', ' ça ']
-            if any(k in txt for k in kara_liste): return False
-            return any(h in txt for h in "ğüşıöç") or "orijinal ses" in txt
+        st.subheader("⏰ Etkileşim Yoğunluk Saatleri")
+        if 'kayit_saati' in df.columns:
+            saat_ozet = df['kayit_saati'].value_counts().sort_index().reset_index()
+            saat_ozet.columns = ['Saat', 'Video Sayısı']
+            fig = px.bar(saat_ozet, x='Saat', y='Video Sayısı', color_discrete_sequence=['#77d8d8'])
+            fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="white")
+            st.plotly_chart(fig, use_container_width=True)
 
-        df_tr = df[df.apply(tr_filtre, axis=1)].copy()
-        top_tr = df_tr.sort_values(by='n_likes', ascending=False).head(10)
+    with col_sag:
+        st.subheader("🎵 Şu An Patlayan Gerçek Sesler")
+        if 'music' in df.columns:
+            populer_sesler = df[df['music'] != "Orijinal Ses"]['music'].value_counts().head(5).reset_index()
+            populer_sesler.columns = ['Müzik Adı', 'Kullanım']
+            if not populer_sesler.empty:
+                st.table(populer_sesler)
+            else:
+                st.info("Şu an popüler bir dış müzik akımı yok.")
 
+    st.divider()
+
+    # --- TOP 10 TÜRKİYE ARENASI (Senin Sevdiğin TR Filtresi) ---
+    st.subheader("🇹🇷 Türkiye Etkileşim Arenası (Top 10 Yerel)")
+
+    def gercek_tr_radari(row):
+        metin_orijinal = f" {str(row['desc'])} {str(row['music'])} "
+        metin_kucuk = metin_orijinal.lower()
+        etiketler = [str(t).lower().replace('#', '') for t in row.get('hashtags', [])]
+        kara_liste = [' the ', ' is ', ' to ', ' you ', ' and ', ' a ', ' je ', ' ça ', ' que ']
+        if any(k in metin_kucuk for k in kara_liste): return False 
+        if any(h in metin_orijinal for h in "ğĞıİ"): return True
+        tr_etiketler = ['keşfet', 'kesfet', 'türkiye', 'turkiye', 'istanbul', 'ankara', 'izmir', 'çorum', 'mizah', 'komik', 'akım']
+        if any(e in tr_etiketler for e in etiketler): return True
+        if any(h in metin_kucuk for h in "şöüç") or "orijinal ses" in metin_kucuk: return True
+        return False
+
+    df_tr = df[df.apply(gercek_tr_radari, axis=1)].copy()
+
+    if not df_tr.empty:
+        top_10_tr = df_tr.sort_values(by='n_likes', ascending=False).head(10)
+        # Sadece İçerik Türü sütununu ekledim, gerisi aynı
         st.dataframe(
-            top_tr[['desc', 'likes', 'comments', 'link']],
+            top_10_tr[['desc', 'İçerik Türü', 'likes', 'comments', 'link']],
             column_config={
-                "link": st.column_config.LinkColumn("İzle", display_text="🔗 Aç"),
-                "desc": "Açıklama"
+                "link": st.column_config.LinkColumn("Videoyu İzle", display_text="🔗 TR Videoyu Aç"),
+                "likes": "❤️ Beğeni",
+                "comments": "💬 Yorum",
+                "desc": "Videonun Açıklaması"
             },
             use_container_width=True, hide_index=True
         )
 
-    with col_sag:
-        st.subheader("🧠 Akım Dağılımı")
-        akım_fig = px.pie(df, names='concept', hole=.4, color_discrete_sequence=px.colors.qualitative.Pastel)
-        akım_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color="white", showlegend=False)
-        st.plotly_chart(akım_fig, use_container_width=True)
-
     st.divider()
 
-    # --- ZAMAN VE HASHTAG ANALİZİ ---
-    c1, c2 = st.columns(2)
+    # --- ALT PANEL (Hashtagler ve Gemini Analizi - Birebir Geri Geldi) ---
+    a1, a2 = st.columns(2)
+    with a1:
+        st.subheader("🏷️ Popüler Hashtagler")
+        if 'hashtags' in df.columns:
+            all_tags = df['hashtags'].explode().value_counts().head(10).index.tolist()
+            st.info(" ".join(all_tags) if all_tags else "#keşfet #fyp #trend")
 
-    with c1:
-        st.subheader("🔥 Son 24 Saatte Yükselenler")
-        if 'datetime' in df.columns:
-            last_24h = df[df['datetime'] > pd.Timestamp.now() - pd.Timedelta(hours=24)]
-            if not last_24h.empty:
-                h_tags = last_24h['hashtags'].explode().value_counts().head(8)
-                st.bar_chart(h_tags)
-            else:
-                st.info("Son 24 saatte yeni veri girişi yok.")
-
-    with c2:
-        st.subheader("⏰ En İyi Paylaşım Saatleri")
-        saat_fig = px.line(df['kayit_saati'].value_counts().sort_index(), markers=True)
-        saat_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="white")
-        st.plotly_chart(saat_fig, use_container_width=True)
+    with a2:
+        st.subheader("💎 Gemini Trend Analizi")
+        if os.path.exists(analiz_path):
+            with open(analiz_path, "r", encoding="utf-8") as f:
+                st.markdown(f'<div class="analiz-kutusu">{f.read()}</div>', unsafe_allow_html=True)
+        else:
+            st.info("Analiz raporu hazırlanıyor...")
 
 else:
-    st.warning("Veritabanı henüz boş. Robotu çalıştırdıktan sonra veriler burada görünecek.")
+    st.error("⚠️ Veritabanı bulunamadı. Lütfen robotu çalıştırın.")
