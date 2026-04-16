@@ -8,7 +8,7 @@ from playwright.sync_api import sync_playwright
 
 def veri_yakala_ve_analiz_et(api_key):
     yeni_videolar = []
-    yakalanan_linkler = set() # Çift kaydı anında engellemek için hızlı hafıza
+    yakalanan_linkler = set() # Çift kaydı engellemek için hızlı hafıza
     su_an = datetime.now()
     # 7 Günlük Hafıza: Sadece 7 günden eski veriler temizlenir
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
@@ -17,7 +17,7 @@ def veri_yakala_ve_analiz_et(api_key):
     oturumlar = [os.environ.get(f"TIKTOK_SESSION_{i}") for i in range(1, 6)]
     aktif_oturumlar = [o for o in oturumlar if o]
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- RADAR DERİN TARAMA (CANLI HASAT MODU) BAŞLATILDI ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- RADAR: F5 YENİLE VE TOPLA MODU BAŞLATILDI ---")
 
     try:
         with sync_playwright() as p:
@@ -29,7 +29,7 @@ def veri_yakala_ve_analiz_et(api_key):
                 start_tur = time.time()
                 secilen_oturum = random.choice(aktif_oturumlar) if aktif_oturumlar else None
                 
-                print(f">> Tur {tur+1} Başlıyor | Oturum: {'Aktif' if secilen_oturum else 'Anonim'}")
+                print(f"\n>> Tur {tur+1} Başlıyor | Oturum: {'Aktif' if secilen_oturum else 'Anonim'}")
                 
                 context = browser.new_context(
                     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -47,66 +47,74 @@ def veri_yakala_ve_analiz_et(api_key):
                     }])
 
                 page = context.new_page()
-                page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=120000)
-                time.sleep(12) 
 
-                # --- TUR İÇİ AGRESİF KAZIMA VE ANLIK TOPLAMA ---
-                while (time.time() - start_tur) < 540: 
-                    page.keyboard.press("End")
-                    page.mouse.wheel(0, random.randint(5000, 9000))
-                    time.sleep(random.uniform(4, 7))
-                    
-                    if random.random() > 0.8:
-                        page.mouse.wheel(0, -2000)
-                        time.sleep(1)
-                        page.keyboard.press("End")
+                # --- TUR İÇİ DÖNGÜ: YENİLE VE VİTRİNİ TOPLA ---
+                while (time.time() - start_tur) < 540: # 9 Dakika boyunca sayfa yenileyerek çekecek
+                    try:
+                        # 1. Sayfaya Taze Giriş (F5 Atma İşlemi)
+                        page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=60000)
+                        time.sleep(6) # Videoların dom üzerine oturmasını bekle
 
-                    # TİKTOK VİDEOLARI SİLMEDEN BİZ ÇEKİYORUZ!
-                    items = page.query_selector_all('div[data-e2e="explore-item"]') or \
-                            page.query_selector_all('div[class*="DivItemContainerV2"]')
-                    
-                    eklenen_bu_dongu = 0
-                    for item in items:
-                        try:
-                            link_elem = item.query_selector('a[href*="/video/"]')
-                            v_link = link_elem.get_attribute('href') if link_elem else None
-                            
-                            # Link yoksa veya O ANKİ KASAMIZDA ZATEN VARSA atla
-                            if not v_link or v_link in yakalanan_linkler: 
+                        # 2. Vitrindeki ~50 videonun tamamının görünmesi için sadece 3 kez kaydır
+                        for _ in range(3):
+                            page.keyboard.press("End")
+                            time.sleep(2.5)
+
+                        # 3. Ekranda ne var ne yoksa topla
+                        items = page.query_selector_all('div[data-e2e="explore-item"]') or \
+                                page.query_selector_all('div[class*="DivItemContainerV2"]')
+                        
+                        eklenen_bu_dongu = 0
+                        for item in items:
+                            try:
+                                link_elem = item.query_selector('a[href*="/video/"]')
+                                v_link = link_elem.get_attribute('href') if link_elem else None
+                                
+                                # Link yoksa veya KASAMIZDA ZATEN VARSA es geç
+                                if not v_link or v_link in yakalanan_linkler: 
+                                    continue
+
+                                # Linki kasaya ekle (Bir sonraki yenilemede aynı video gelirse pas geçer)
+                                yakalanan_linkler.add(v_link)
+
+                                music_elem = item.query_selector('h4') or \
+                                             item.query_selector('a[href*="/music/"]') or \
+                                             item.query_selector('div[class*="music"]')
+                                music_text = music_elem.inner_text().strip() if music_elem else "Popüler Akım"
+                                
+                                views_elem = item.query_selector('strong[data-e2e="video-views"]') or \
+                                             item.query_selector('div[class*="DivCount"]')
+                                views_text = views_elem.inner_text() if views_elem else "0"
+
+                                desc_elem = item.query_selector('div[data-e2e="explore-item-desc"]') or item
+                                desc_text = desc_elem.inner_text().split('\n')[0]
+                                
+                                if len(desc_text) > 1:
+                                    yeni_videolar.append({
+                                        "desc": desc_text[:120], 
+                                        "music": music_text,
+                                        "link": v_link,
+                                        "views": views_text,
+                                        "paylasim_saati": su_an.strftime('%H:00'),
+                                        "tarih": su_an.strftime('%Y-%m-%d'),
+                                        "timestamp": time.time()
+                                    })
+                                    eklenen_bu_dongu += 1
+                            except Exception:
                                 continue
+                        
+                        # Canlı Takip Logu
+                        if eklenen_bu_dongu > 0:
+                            print(f"   [F5 Yenileme] Vitrin hasadı: +{eklenen_bu_dongu} yeni -> Toplam Kasa: {len(yeni_videolar)}")
+                        else:
+                            print(f"   [F5 Yenileme] Yeni video düşmedi, sayfa tekrar yenileniyor...")
 
-                            # Linki kasaya ekle ki bir dahaki kaydırmada tekrar çekmesin
-                            yakalanan_linkler.add(v_link)
+                        # Bot sistemine takılmamak için bir sonraki F5'ten önce rastgele bekle
+                        time.sleep(random.uniform(4, 7))
 
-                            music_elem = item.query_selector('h4') or \
-                                         item.query_selector('a[href*="/music/"]') or \
-                                         item.query_selector('div[class*="music"]')
-                            music_text = music_elem.inner_text().strip() if music_elem else "Popüler Akım"
-                            
-                            views_elem = item.query_selector('strong[data-e2e="video-views"]') or \
-                                         item.query_selector('div[class*="DivCount"]')
-                            views_text = views_elem.inner_text() if views_elem else "0"
-
-                            desc_elem = item.query_selector('div[data-e2e="explore-item-desc"]') or item
-                            desc_text = desc_elem.inner_text().split('\n')[0]
-                            
-                            if len(desc_text) > 1:
-                                yeni_videolar.append({
-                                    "desc": desc_text[:120], 
-                                    "music": music_text,
-                                    "link": v_link,
-                                    "views": views_text,
-                                    "paylasim_saati": su_an.strftime('%H:00'),
-                                    "tarih": su_an.strftime('%Y-%m-%d'),
-                                    "timestamp": time.time()
-                                })
-                                eklenen_bu_dongu += 1
-                        except Exception:
-                            continue
-                    
-                    # Sayıları canlı canlı görmek için loga yazdır
-                    if eklenen_bu_dongu > 0:
-                        print(f"   [Anlık Hasat] +{eklenen_bu_dongu} yeni -> Toplam Kasa: {len(yeni_videolar)}")
+                    except Exception as e:
+                        print(f"   [Uyarı] Yenileme sırasında anlık takılma, devam ediliyor...")
+                        time.sleep(5)
 
                 print(f"Tur {tur+1} bitti. Tur kapanış toplamı: {len(yeni_videolar)}")
                 context.close()
