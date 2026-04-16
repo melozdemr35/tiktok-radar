@@ -16,7 +16,7 @@ def veri_yakala_ve_analiz_et(api_key):
     oturumlar = [os.environ.get(f"TIKTOK_SESSION_{i}") for i in range(1, 6)]
     aktif_oturumlar = [o for o in oturumlar if o]
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: YÜKSEK HIZLI SWIPE VE ANTI-STUCK MODU ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: AKILLI KAÇIŞ VE SWIPE MODU ---")
 
     try:
         with sync_playwright() as p:
@@ -50,12 +50,15 @@ def veri_yakala_ve_analiz_et(api_key):
                     print("   [Oynatıcı] Video açıldı, kaydırma (swipe) başlıyor...")
                     time.sleep(5)
 
+                    hatali_kaydirma = 0 # Engel sayacı eklendi
+
                     # 9 DAKİKALIK ANA DÖNGÜ
                     while (time.time() - start_tur) < 540:
                         v_link = page.url
                         
                         if "/video/" in v_link and v_link not in yakalanan_linkler:
                             yakalanan_linkler.add(v_link)
+                            hatali_kaydirma = 0 # Video başarıyla açıldıysa sayacı sıfırla
 
                             # JAVASCRIPT İLE DERİN VERİ SÖKÜMÜ
                             detaylar = page.evaluate('''() => {
@@ -94,21 +97,20 @@ def veri_yakala_ve_analiz_et(api_key):
                                 print(f"      [Hızlı Swipe] Toplanan: {len(yeni_videolar)} video...")
 
                         # Sıradaki videoya geç
+                        page.mouse.click(640, 400) # Ekranın ortasına tıkla (Popup çıkarsa kapatır)
+                        time.sleep(0.5)
                         page.keyboard.press("ArrowDown")
                         time.sleep(random.uniform(2.0, 3.5)) 
                         
-                        # --- TAKILMA (ANTI-STUCK) KONTROLÜ ---
-                        # Eğer aşağı bastığımız halde link değişmediyse video takılmış demektir
+                        # --- TAKILMA VE AKILLI KAÇIŞ KONTROLÜ ---
                         if page.url == v_link:
-                             print("      [Sistem] Akış takıldı! Keşfet sayfası yenilenip yeni vitrine giriliyor...")
-                             # Senin taktiğin: Sayfayı yenile ve tekrar vitrinden içeri dal
-                             page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=60000)
-                             time.sleep(6)
-                             try:
-                                 page.locator('div[data-e2e="explore-item"]').first.click()
-                                 time.sleep(4)
-                             except:
-                                 pass # Eğer tıklayamazsa döngü devam edip tekrar dener
+                             hatali_kaydirma += 1
+                             page.mouse.wheel(0, 1000) # Tekerlek ile zorla kaydırmayı dene
+                             time.sleep(2)
+                             
+                             if hatali_kaydirma >= 3:
+                                 print("      [Sistem Uyarı] Bu oturum kilitlendi (Giriş engeli). Hemen diğer tura geçiliyor...")
+                                 break # Döngüyü kırar ve direkt sonraki Tura geçer. Zaman kaybını önler!
 
                 except Exception as e:
                     print(f"   [Uyarı] Tur içinde aksama: {e}")
