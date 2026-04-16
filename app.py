@@ -18,7 +18,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# GÜNCELLENEN: Gelişmiş Sayısal Dönüştürücü (Regex Kalkanlı)
+# Gelişmiş Sayısal Dönüştürücü (Regex Kalkanlı)
 def parse_number(val):
     if pd.isna(val): return 0
     # Sayının içindeki gizli boşlukları ve karakterleri temizler
@@ -34,7 +34,7 @@ def parse_number(val):
         except: return 0
     return 0
 
-# YENİ: Rakamları Panelde Şık Gösterme Fonksiyonu (Örn: 12.5 Milyon)
+# Rakamları Panelde Şık Gösterme Fonksiyonu
 def format_milyon(val):
     if val >= 1_000_000: return f"{val / 1_000_000:.1f} Milyon"
     elif val >= 1_000: return f"{val / 1_000:.1f} Bin"
@@ -55,19 +55,18 @@ if os.path.exists(db_path):
     df['n_likes'] = df['likes'].apply(parse_number)
     df['n_comments'] = df['comments'].apply(parse_number)
 
-    # --- ÜST METRİKLER (Görünüm İyileştirildi) ---
+    # --- ÜST METRİKLER ---
     col1, col2, col3 = st.columns(3)
     toplam_video = len(df)
     toplam_begeni = df['n_likes'].sum()
     
     col1.metric("Toplam Taranan Video", toplam_video)
-    # Tahmini izlenmeyi daha şık formatta yazdırıyoruz
     col2.metric("Toplam Tahmini İzlenme", format_milyon(toplam_begeni * 25)) 
     col3.metric("Toplam Beğeni Hacmi", format_milyon(toplam_begeni))
 
     st.divider()
 
-    # --- ORTA PANEL (Orijinal Düzen) ---
+    # --- ORTA PANEL ---
     col_sol, col_sag = st.columns(2)
 
     with col_sol:
@@ -93,8 +92,8 @@ if os.path.exists(db_path):
 
     st.divider()
 
-    # --- TOP 10 ETKİLEŞİM ARENASI (Düzeltildi) ---
-    st.subheader("🏆 En Yüksek Etkileşimli Top 10 Video (Tıklanabilir)")
+    # --- TOP 10 ETKİLEŞİM ARENASI (GLOBAL) ---
+    st.subheader("🏆 En Yüksek Etkileşimli Top 10 Video (Global)")
     
     # n_likes üzerinden gerçek sıralama yapıyoruz
     top_10 = df.sort_values(by='n_likes', ascending=False).head(10).copy()
@@ -114,7 +113,36 @@ if os.path.exists(db_path):
 
     st.divider()
 
-    # --- ALT PANEL (Orijinal Düzen) ---
+    # --- YENİ EKLENTİ: TOP 10 TÜRKİYE ARENASI (YEREL) ---
+    st.subheader("🇹🇷 Türkiye Etkileşim Arenası (Top 10 Yerel)")
+
+    # İstanbul kimliğiyle toplanan videolardan Türkçe harf içerenleri ayıklar (Kısıtlamasız filtre)
+    def tr_filtre_genis(row):
+        taranacak = f"{str(row['desc'])} {str(row['music'])}".lower()
+        return any(h in taranacak for h in "ğüşıöç")
+
+    df_tr = df[df.apply(tr_filtre_genis, axis=1)].copy()
+
+    if not df_tr.empty:
+        # Türkiye şampiyonlarını sırala
+        top_10_tr = df_tr.sort_values(by='n_likes', ascending=False).head(10)
+        
+        st.dataframe(
+            top_10_tr[['desc', 'likes', 'comments', 'link']],
+            column_config={
+                "link": st.column_config.LinkColumn("Videoyu İzle", display_text="🔗 TR Videoyu Aç"),
+                "likes": "❤️ Beğeni",
+                "comments": "💬 Yorum",
+                "desc": "Videonun Açıklaması"
+            },
+            use_container_width=True, hide_index=True
+        )
+    else:
+        st.info("Yerel radar şu an tarama yapıyor... Türkçe karakterli içerikler bulunduğunda burada listelenecek.")
+
+    st.divider()
+
+    # --- ALT PANEL (Hashtagler ve Gemini) ---
     a1, a2 = st.columns(2)
     with a1:
         st.subheader("🏷️ Popüler Hashtagler")
