@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import json
 import os
+import re
 import plotly.express as px
 
 # 1. SAYFA YAPILANDIRMASI (Orijinal Tasarım Korundu)
@@ -17,15 +18,27 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# YENİ EKLENTİ: Sayısal Dönüştürücü (13.5M -> 13500000 yapar, sıralamayı düzeltir)
+# GÜNCELLENEN: Gelişmiş Sayısal Dönüştürücü (Regex Kalkanlı)
 def parse_number(val):
-    if not isinstance(val, str): return 0
-    val = val.upper().replace(',', '.')
-    try:
-        if 'M' in val: return float(val.replace('M', '')) * 1_000_000
-        if 'K' in val: return float(val.replace('K', '')) * 1_000
-        return float(val)
-    except: return 0
+    if pd.isna(val): return 0
+    # Sayının içindeki gizli boşlukları ve karakterleri temizler
+    val_str = str(val).upper().replace(',', '.').strip()
+    multiplier = 1
+    if 'M' in val_str: multiplier = 1_000_000
+    elif 'K' in val_str: multiplier = 1_000
+    
+    # Sadece sayısal kısmı çek (Regex)
+    num_match = re.search(r'[\d\.]+', val_str)
+    if num_match:
+        try: return float(num_match.group()) * multiplier
+        except: return 0
+    return 0
+
+# YENİ: Rakamları Panelde Şık Gösterme Fonksiyonu (Örn: 12.5 Milyon)
+def format_milyon(val):
+    if val >= 1_000_000: return f"{val / 1_000_000:.1f} Milyon"
+    elif val >= 1_000: return f"{val / 1_000:.1f} Bin"
+    return f"{val:,.0f}"
 
 st.title("TR Türkiye TikTok Trend ve Strateji Radarı")
 st.caption("Otonom robot verileri analiz ediliyor. Veriler gerçek etkileşimlere göre sıralanmıştır.")
@@ -38,18 +51,19 @@ if os.path.exists(db_path):
         data = json.load(f)
     df = pd.DataFrame(data)
     
-    # Sayıları sıralama için hazırlıyoruz
+    # Sayıları arka planda matematiksel hale getiriyoruz
     df['n_likes'] = df['likes'].apply(parse_number)
     df['n_comments'] = df['comments'].apply(parse_number)
 
-    # --- ÜST METRİKLER (Orijinal Düzen) ---
+    # --- ÜST METRİKLER (Görünüm İyileştirildi) ---
     col1, col2, col3 = st.columns(3)
     toplam_video = len(df)
     toplam_begeni = df['n_likes'].sum()
     
     col1.metric("Toplam Taranan Video", toplam_video)
-    col2.metric("Toplam Tahmini İzlenme", f"{toplam_begeni * 25:,.0f}") 
-    col3.metric("Toplam Beğeni Hacmi", f"{toplam_begeni:,.0f}")
+    # Tahmini izlenmeyi daha şık formatta yazdırıyoruz
+    col2.metric("Toplam Tahmini İzlenme", format_milyon(toplam_begeni * 25)) 
+    col3.metric("Toplam Beğeni Hacmi", format_milyon(toplam_begeni))
 
     st.divider()
 
@@ -58,30 +72,31 @@ if os.path.exists(db_path):
 
     with col_sol:
         st.subheader("⏰ Etkileşim Yoğunluk Saatleri")
-        saat_ozet = df['kayit_saati'].value_counts().sort_index().reset_index()
-        saat_ozet.columns = ['Saat', 'Video Sayısı']
-        fig = px.bar(saat_ozet, x='Saat', y='Video Sayısı', color_discrete_sequence=['#77d8d8'])
-        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="white")
-        st.plotly_chart(fig, use_container_width=True)
+        if 'kayit_saati' in df.columns:
+            saat_ozet = df['kayit_saati'].value_counts().sort_index().reset_index()
+            saat_ozet.columns = ['Saat', 'Video Sayısı']
+            fig = px.bar(saat_ozet, x='Saat', y='Video Sayısı', color_discrete_sequence=['#77d8d8'])
+            fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="white")
+            st.plotly_chart(fig, use_container_width=True)
 
     with col_sag:
         st.subheader("🎵 Şu An Patlayan Gerçek Sesler")
-        # DÜZELTME: Artık this/that kelimelerini değil, GERÇEK müzik isimlerini çeker.
         if 'music' in df.columns:
             populer_sesler = df[df['music'] != "Orijinal Ses"]['music'].value_counts().head(5).reset_index()
             populer_sesler.columns = ['Müzik Adı', 'Kullanım']
             if not populer_sesler.empty:
                 st.table(populer_sesler)
             else:
-                st.info("Şu an popüler bir dış müzik akımı yok, herkes orijinal ses kullanıyor.")
+                st.info("Şu an popüler bir dış müzik akımı yok.")
         else:
             st.warning("Müzik verisi henüz işlenmedi.")
 
     st.divider()
 
-    # --- YENİ EKLENTİ: TOP 10 ETKİLEŞİM ARENASI ---
+    # --- TOP 10 ETKİLEŞİM ARENASI (Düzeltildi) ---
     st.subheader("🏆 En Yüksek Etkileşimli Top 10 Video (Tıklanabilir)")
     
+    # n_likes üzerinden gerçek sıralama yapıyoruz
     top_10 = df.sort_values(by='n_likes', ascending=False).head(10).copy()
     top_10_display = top_10[['desc', 'likes', 'comments', 'link']]
     top_10_display.columns = ['Videonun Açıklaması', 'Beğeni', 'Yorum', 'Video Linki']
@@ -103,8 +118,9 @@ if os.path.exists(db_path):
     a1, a2 = st.columns(2)
     with a1:
         st.subheader("🏷️ Popüler Hashtagler")
-        all_tags = df['hashtags'].explode().value_counts().head(10).index.tolist()
-        st.info(" ".join(all_tags) if all_tags else "#keşfet #fyp #trend")
+        if 'hashtags' in df.columns:
+            all_tags = df['hashtags'].explode().value_counts().head(10).index.tolist()
+            st.info(" ".join(all_tags) if all_tags else "#keşfet #fyp #trend")
 
     with a2:
         st.subheader("💎 Gemini Trend Analizi")
