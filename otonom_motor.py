@@ -13,12 +13,10 @@ def veri_yakala_ve_analiz_et(api_key):
     su_an = datetime.now()
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
-    # 1. GÜVENLİK KONTROLÜ: Oturumları çek
     oturumlar = [os.environ.get(f"TIKTOK_SESSION_{i}") for i in range(1, 6)]
     aktif_oturumlar = [o for o in oturumlar if o]
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: OPERASYON BAŞLIYOR ---")
-    print(f"Aktif Oturum Sayısı: {len(aktif_oturumlar)}")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- MOTOR ATEŞLENDİ: YÜKSEK HIZLI SWIPE VE ANTI-STUCK MODU ---")
 
     try:
         with sync_playwright() as p:
@@ -42,68 +40,78 @@ def veri_yakala_ve_analiz_et(api_key):
 
                 page = context.new_page()
 
-                # 2. ANA DÖNGÜ: Sayfa Yenileme ve Derin Hasat
-                while (time.time() - start_tur) < 540:
-                    try:
-                        print(f"   [F5] Keşfet yenileniyor: {datetime.now().strftime('%H:%M:%S')}")
-                        page.goto("https://www.tiktok.com/explore", wait_until="networkidle", timeout=90000)
-                        time.sleep(10)
+                try:
+                    # SİSTEM GİRİŞİ
+                    page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=60000)
+                    time.sleep(8)
 
-                        # Vitrin hasadı için hafif kaydır
-                        page.keyboard.press("End")
-                        time.sleep(3)
+                    # İlk videoya tıkla ve tam ekran oynatıcıyı aç
+                    page.locator('div[data-e2e="explore-item"]').first.click()
+                    print("   [Oynatıcı] Video açıldı, kaydırma (swipe) başlıyor...")
+                    time.sleep(5)
 
-                        items = page.query_selector_all('div[data-e2e="explore-item"]')
+                    # 9 DAKİKALIK ANA DÖNGÜ
+                    while (time.time() - start_tur) < 540:
+                        v_link = page.url
                         
-                        for item in items:
-                            try:
-                                link_elem = item.query_selector('a[href*="/video/"]')
-                                v_link = link_elem.get_attribute('href') if link_elem else None
+                        if "/video/" in v_link and v_link not in yakalanan_linkler:
+                            yakalanan_linkler.add(v_link)
+
+                            # JAVASCRIPT İLE DERİN VERİ SÖKÜMÜ
+                            detaylar = page.evaluate('''() => {
+                                // Müzik ismini bul, bulamazsa senin istediğin gibi direkt "Orijinal Ses" yazıp geç
+                                let musicEl = document.querySelector('h4[data-e2e="browse-music"]') || 
+                                              document.querySelector('a[href*="/music/"]') || 
+                                              document.querySelector('div[class*="music"]');
                                 
-                                if not v_link or v_link in yakalanan_linkler: 
-                                    continue
+                                let musicName = musicEl ? musicEl.innerText.trim().replace(/\\n/g, '') : "Orijinal Ses";
+                                if (musicName.match(/^[\d\.]+[KM]?$/)) { musicName = "Orijinal Ses"; } // Hatalı sayı gelirse ez
 
-                                yakalanan_linkler.add(v_link)
+                                return {
+                                    likes: document.querySelector('[data-e2e="like-count"]')?.innerText || "0",
+                                    comments: document.querySelector('[data-e2e="comment-count"]')?.innerText || "0",
+                                    music: musicName,
+                                    musicUsage: document.querySelector('[data-e2e="browse-music-usage"]')?.innerText || "Bilinmiyor",
+                                    desc: document.querySelector('[data-e2e="browse-video-desc"]')?.innerText || "",
+                                    vTime: document.querySelector('span[data-e2e="browser-nickname"] + span + span')?.innerText || "Yeni"
+                                }
+                            }''')
 
-                                # VİDEO İÇİNE GİRİŞ (DERİN ANALİZ)
-                                page.goto(v_link, wait_until="domcontentloaded", timeout=45000)
-                                time.sleep(4)
+                            yeni_videolar.append({
+                                "desc": detaylar['desc'][:120],
+                                "hashtags": re.findall(r'#\w+', detaylar['desc']),
+                                "music": detaylar['music'],
+                                "music_usage": detaylar['musicUsage'],
+                                "link": v_link,
+                                "likes": detaylar['likes'],
+                                "comments": detaylar['comments'],
+                                "paylasim_saati": detaylar['vTime'],
+                                "kayit_saati": datetime.now().strftime('%H:00'),
+                                "tarih": su_an.strftime('%Y-%m-%d')
+                            })
+                            
+                            if len(yeni_videolar) % 20 == 0:
+                                print(f"      [Hızlı Swipe] Toplanan: {len(yeni_videolar)} video...")
 
-                                # Verileri sök
-                                detaylar = page.evaluate('''() => {
-                                    return {
-                                        likes: document.querySelector('[data-e2e="like-count"]')?.innerText || "0",
-                                        comments: document.querySelector('[data-e2e="comment-count"]')?.innerText || "0",
-                                        music: document.querySelector('[data-e2e="browse-music"]')?.innerText.trim() || "Popüler Akım",
-                                        musicUsage: document.querySelector('[data-e2e="browse-music-usage"]')?.innerText || "Az Kullanım",
-                                        desc: document.querySelector('[data-e2e="browse-video-desc"]')?.innerText || "",
-                                        vTime: document.querySelector('span[data-e2e="browser-nickname"] + span + span')?.innerText || "Yeni"
-                                    }
-                                }''')
+                        # Sıradaki videoya geç
+                        page.keyboard.press("ArrowDown")
+                        time.sleep(random.uniform(2.0, 3.5)) 
+                        
+                        # --- TAKILMA (ANTI-STUCK) KONTROLÜ ---
+                        # Eğer aşağı bastığımız halde link değişmediyse video takılmış demektir
+                        if page.url == v_link:
+                             print("      [Sistem] Akış takıldı! Keşfet sayfası yenilenip yeni vitrine giriliyor...")
+                             # Senin taktiğin: Sayfayı yenile ve tekrar vitrinden içeri dal
+                             page.goto("https://www.tiktok.com/explore", wait_until="domcontentloaded", timeout=60000)
+                             time.sleep(6)
+                             try:
+                                 page.locator('div[data-e2e="explore-item"]').first.click()
+                                 time.sleep(4)
+                             except:
+                                 pass # Eğer tıklayamazsa döngü devam edip tekrar dener
 
-                                yeni_videolar.append({
-                                    "desc": detaylar['desc'][:120],
-                                    "hashtags": re.findall(r'#\w+', detaylar['desc']),
-                                    "music": detaylar['music'],
-                                    "music_usage": detaylar['musicUsage'],
-                                    "link": v_link,
-                                    "likes": detaylar['likes'],
-                                    "comments": detaylar['comments'],
-                                    "paylasim_saati": detaylar['vTime'],
-                                    "kayit_saati": datetime.now().strftime('%H:%M'),
-                                    "tarih": su_an.strftime('%Y-%m-%d')
-                                })
-                                print(f"      [Hasat Başarılı] Saat: {detaylar['vTime']} | Beğeni: {detaylar['likes']}")
-                                
-                                # Ana sayfaya geri dönmek yerine diğer yenilemeyi bekle
-                                if len(yeni_videolar) % 10 == 0: break 
-
-                            except: continue
-
-                        time.sleep(random.uniform(5, 8))
-                    except:
-                        print("   [Uyarı] Döngüde anlık aksama, yeniden deneniyor...")
-                        time.sleep(10)
+                except Exception as e:
+                    print(f"   [Uyarı] Tur içinde aksama: {e}")
 
                 context.close()
             browser.close()
@@ -125,7 +133,7 @@ def veri_yakala_ve_analiz_et(api_key):
     with open(db_path, "w", encoding="utf-8") as f:
         json.dump(son_liste, f, ensure_ascii=False, indent=4)
     
-    print(f"\n🏁 FİNAL: {len(yeni_videolar)} video detaylıca işlendi. Havuz: {len(son_liste)}")
+    print(f"\n🏁 FİNAL: {len(yeni_videolar)} video hızla çekildi. Havuz: {len(son_liste)}")
 
 if __name__ == "__main__":
     key = os.environ.get("GEMINI_API_KEY")
