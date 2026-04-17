@@ -12,11 +12,10 @@ def veri_yakala_ve_analiz_et(api_key):
     su_an = datetime.now()
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v2.2: ZIRHLI & TAMIRLI HASAT ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v3.0: 1000+ HEDEF MARATONU ---")
 
     try:
         with sync_playwright() as p:
-            # Otomasyon tespitini engellemek için özel argümanlar
             browser = p.chromium.launch(args=["--disable-blink-features=AutomationControlled"], headless=True)
             
             context = browser.new_context(
@@ -39,7 +38,7 @@ def veri_yakala_ve_analiz_et(api_key):
                                 c['sameSite'] = "None"
                             fixed_cookies.append(c)
                         context.add_cookies(fixed_cookies)
-                    print("✅ TR Kimlik Kartı başarıyla tamir edildi ve yüklendi!")
+                    print("✅ TR Kimlik Kartı başarıyla yüklendi! 75 Dakikalık hasat başlıyor...")
                 except Exception as e:
                     print(f"❌ Cookies yükleme hatası: {e}")
             else:
@@ -48,24 +47,22 @@ def veri_yakala_ve_analiz_et(api_key):
             page = context.new_page()
 
             try:
-                # TR Keşfeti için doğrudan link
                 print("🌐 TikTok Keşfet'e bağlanılıyor...")
                 page.goto("https://www.tiktok.com/explore?lang=tr-TR", wait_until="networkidle", timeout=60000)
                 time.sleep(12)
 
-                # İlk videoyu bul ve tıkla
                 try:
                     page.locator('div[data-e2e="explore-item"]').first.click()
                 except:
                     page.keyboard.press("ArrowDown")
                 
-                print("🚀 Derin hasat başladı... Takılmalar otomatik aşılacak.")
+                print("🚀 Derin hasat başladı... Vites artırıldı.")
                 time.sleep(5)
 
                 hatali_kaydirma = 0 
                 start_time = time.time()
 
-                # Yaklaşık 45-50 dakika boyunca çalışır
+                # --- SÜRE: 75 DAKİKA (4500 SANİYE) ---
                 while (time.time() - start_time) < 4500:
                     v_link = page.url
                     
@@ -94,32 +91,30 @@ def veri_yakala_ve_analiz_et(api_key):
                             "tarih": datetime.now().strftime('%Y-%m-%d')
                         })
                         
-                        if len(yeni_videolar) % 20 == 0:
+                        if len(yeni_videolar) % 50 == 0:
                             print(f"📊 Mevcut Durum: {len(yeni_videolar)} video toplandı...")
 
-                    # --- AKILLI KAYDIRMA (ZIRHLI MOD) ---
-                    # Hem tuşla hem mouse tekerleğiyle kaydırıyoruz
+                    # --- HIZLANDIRILMIŞ KAYDIRMA (Senin İstediğin Çift Vuruş) ---
                     page.keyboard.press("ArrowDown")
-time.sleep(0.5)
-page.keyboard.press("ArrowDown")
-page.mouse.wheel(0, 1000) 
+                    time.sleep(0.4)
+                    page.keyboard.press("ArrowDown")
+                    page.mouse.wheel(0, 1000) 
                     
-                    # İzleme simülasyonu için rastgele bekleme
+                    # BEKLEME SÜRESİ: 3 - 6 SANİYE
                     time.sleep(random.uniform(3.0, 6.0)) 
                     
                     if page.url == v_link:
                         hatali_kaydirma += 1
-                        if hatali_kaydirma >= 3:
-                            print("🔄 Akış takıldı, sayfa yenileniyor (Auto-Refresh)...")
+                        if hatali_kaydirma >= 2:
+                            print("🔄 Akış takıldı, anlık Refresh!")
                             page.reload()
                             time.sleep(10)
                             hatali_kaydirma = 0
-                            # Yenileme sonrası ilk videoya tekrar odaklan
                             try: page.locator('div[data-e2e="explore-item"]').first.click()
                             except: pass
 
-                if len(yeni_videolar) >= 600:
-                    print("🎯 Hedeflenen hasat miktarına ulaşıldı.")
+                if len(yeni_videolar) >= 1500:
+                    print("🎯 Hedeflenen dev hasat miktarına ulaşıldı.")
 
             except Exception as e:
                 print(f"❌ Tarayıcı hatası: {e}")
@@ -129,7 +124,7 @@ page.mouse.wheel(0, 1000)
     except Exception as e:
         print(f"!!! KRITIK HATA: {e}")
 
-    # --- VERİLERİ VERİTABANINA YAZ ---
+    # --- VERİTABANI KAYIT ---
     db_path = "trend_veritabani.json"
     eski_veriler = []
     if os.path.exists(db_path):
@@ -149,4 +144,4 @@ page.mouse.wheel(0, 1000)
 
 if __name__ == "__main__":
     key = os.environ.get("GEMINI_API_KEY")
-    veri_yakala_ve_analiz_et(key)
+    if key: veri_yakala_ve_analiz_et(key)
