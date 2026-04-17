@@ -12,7 +12,7 @@ def veri_yakala_ve_analiz_et(api_key):
     su_an = datetime.now()
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v3.1: STABIL HASAT MODU ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v3.2: 1000+ HEDEF MODU ---")
 
     try:
         with sync_playwright() as p:
@@ -27,7 +27,6 @@ def veri_yakala_ve_analiz_et(api_key):
                 permissions=["geolocation"]
             )
 
-            # --- COOKIES TAMİR VE YÜKLEME ---
             if os.path.exists("cookies.json"):
                 try:
                     with open("cookies.json", "r", encoding="utf-8") as f:
@@ -38,25 +37,22 @@ def veri_yakala_ve_analiz_et(api_key):
                                 c['sameSite'] = "None"
                             fixed_cookies.append(c)
                         context.add_cookies(fixed_cookies)
-                    print("✅ TR Kimlik Kartı yüklendi. Güvenli maraton başlıyor...")
+                    print("✅ Kimlik Yüklendi. 75 Dakikalık Hasat Maratonu Başlıyor...")
                 except Exception as e:
-                    print(f"❌ Cookies yükleme hatası: {e}")
-            else:
-                print("⚠️ Uyarı: cookies.json bulunamadı!")
+                    print(f"❌ Cookies hatası: {e}")
 
             page = context.new_page()
 
             try:
-                print("🌐 TikTok Keşfet'e bağlanılıyor...")
                 page.goto("https://www.tiktok.com/explore?lang=tr-TR", wait_until="networkidle", timeout=60000)
-                time.sleep(15)
+                time.sleep(12)
 
                 try:
                     page.locator('div[data-e2e="explore-item"]').first.click()
                 except:
                     page.keyboard.press("ArrowDown")
                 
-                print("🚀 Hasat başladı. İnsan temposunda ilerleniyor...")
+                print("🚀 Hasat başladı. Hedef: 1000 Video.")
                 time.sleep(5)
 
                 hatali_kaydirma = 0 
@@ -90,28 +86,28 @@ def veri_yakala_ve_analiz_et(api_key):
                             "tarih": datetime.now().strftime('%Y-%m-%d')
                         })
                         
-                        if len(yeni_videolar) % 20 == 0:
-                            print(f"📊 Mevcut Durum: {len(yeni_videolar)} video toplandı...")
+                        if len(yeni_videolar) % 50 == 0:
+                            print(f"📊 Mevcut Durum: {len(yeni_videolar)} video depolandı...")
 
-                    # --- DOĞAL KAYDIRMA ---
+                    # --- OPTİMİZE KAYDIRMA (1000 VİDEO İÇİN) ---
                     page.keyboard.press("ArrowDown")
-                    page.mouse.wheel(0, 800) 
+                    page.mouse.wheel(0, 900) 
                     
-                    # BEKLEME SÜRESİ: 6 - 12 SANİYE (Güvenli Alan)
-                    time.sleep(random.uniform(6.0, 12.0)) 
+                    # BEKLEME SÜRESİ: 4 - 7 SANİYE (Hızlandırıldı ama hala güvenli)
+                    time.sleep(random.uniform(4.0, 7.0)) 
                     
                     if page.url == v_link:
                         hatali_kaydirma += 1
-                        if hatali_kaydirma >= 4: # Hemen yenileme, 4 kere zorla
-                            print("🔄 Gerçek takılma algılandı, güvenli Refresh...")
+                        if hatali_kaydirma >= 3: # 3. denemede Refresh
+                            print("🔄 Akış takıldı, seri Refresh!")
                             page.reload()
-                            time.sleep(15)
+                            time.sleep(12)
                             hatali_kaydirma = 0
                             try: page.locator('div[data-e2e="explore-item"]').first.click()
                             except: pass
 
-                if len(yeni_videolar) >= 1000:
-                    print("🎯 Hedeflenen hasat tamamlandı.")
+                if len(yeni_videolar) >= 1500: # Üst limit
+                    print("🎯 Hedeflenen dev hasat tamamlandı.")
 
             except Exception as e:
                 print(f"❌ Tarayıcı hatası: {e}")
