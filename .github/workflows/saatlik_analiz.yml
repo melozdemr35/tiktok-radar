@@ -2,11 +2,10 @@ name: Tam Otonom TikTok Casusu
 
 on:
   schedule:
-    # Günde 12 kez, her 2 saatte bir çalışır.
-    # (00:00, 02:00, 04:00... şeklinde)
-    # Her çalışma 60 dakika (1 saat) sürdüğü için ay sonuna kadar dakikalarını korur.
-    - cron: '0 0,2,4,6,8,10,12,14,16,18,20,22 * * *'
-  workflow_dispatch: # Manuel çalıştırman için buton ekler
+    # UTC saatine göre ayarlanır (TR saati için 3 saat çıkarıyoruz)
+    - cron: '30 7 * * *'   # TR saatiyle 10:30
+    - cron: '30 16 * * *'  # TR saatiyle 19:30
+  workflow_dispatch:        # Bu da senin "Manuel" başlatmanı sağlar
 
 permissions:
   contents: write # Robotun çektiği binlerce veriyi veritabanına kaydedebilmesi için ŞART!
