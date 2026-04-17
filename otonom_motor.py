@@ -103,7 +103,7 @@ def veri_yakala_ve_analiz_et(api_key):
                     page.mouse.wheel(0, 600) 
                     
                     # İzleme simülasyonu için rastgele bekleme
-                    time.sleep(random.uniform(5.0, 9.5)) 
+                    time.sleep(random.uniform(3.0, 6.0)) 
                     
                     if page.url == v_link:
                         hatali_kaydirma += 1
