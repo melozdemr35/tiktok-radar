@@ -12,7 +12,7 @@ def veri_yakala_ve_analiz_et(api_key):
     su_an = datetime.now()
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v3.2: 1000+ HEDEF MODU ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v3.3: AKILLI KACIS & 1000+ HEDEF ---")
 
     try:
         with sync_playwright() as p:
@@ -37,7 +37,7 @@ def veri_yakala_ve_analiz_et(api_key):
                                 c['sameSite'] = "None"
                             fixed_cookies.append(c)
                         context.add_cookies(fixed_cookies)
-                    print("✅ Kimlik Yüklendi. 75 Dakikalık Hasat Maratonu Başlıyor...")
+                    print("✅ TR Kimlik Aktif. Akıllı kaçış modu devrede.")
                 except Exception as e:
                     print(f"❌ Cookies hatası: {e}")
 
@@ -87,27 +87,32 @@ def veri_yakala_ve_analiz_et(api_key):
                         })
                         
                         if len(yeni_videolar) % 50 == 0:
-                            print(f"📊 Mevcut Durum: {len(yeni_videolar)} video depolandı...")
+                            print(f"📊 Mevcut Durum: {len(yeni_videolar)} video toplandı...")
 
-                    # --- OPTİMİZE KAYDIRMA (1000 VİDEO İÇİN) ---
+                    # --- DOĞAL VE ETKİLİ KAYDIRMA ---
                     page.keyboard.press("ArrowDown")
-                    page.mouse.wheel(0, 900) 
+                    page.mouse.wheel(0, 850) 
                     
-                    # BEKLEME SÜRESİ: 4 - 7 SANİYE (Hızlandırıldı ama hala güvenli)
-                    time.sleep(random.uniform(4.0, 7.0)) 
+                    # BEKLEME SÜRESİ: 4.5 - 7.5 SANİYE
+                    time.sleep(random.uniform(4.5, 7.5)) 
                     
                     if page.url == v_link:
                         hatali_kaydirma += 1
-                        if hatali_kaydirma >= 3: # 3. denemede Refresh
-                            print("🔄 Akış takıldı, seri Refresh!")
-                            page.reload()
-                            time.sleep(12)
+                        if hatali_kaydirma >= 3: 
+                            # SERİ REFRESH YERİNE AKILLI ROTASYON
+                            print(f"🔄 Akış tıkandı! Keşfet'e reset atılarak yeni tünel açılıyor...")
+                            try:
+                                page.goto("https://www.tiktok.com/explore?lang=tr-TR", wait_until="networkidle", timeout=30000)
+                                time.sleep(10)
+                                page.locator('div[data-e2e="explore-item"]').first.click()
+                                print("✨ Yeni akış başarıyla başlatıldı.")
+                                time.sleep(5)
+                            except:
+                                page.reload()
                             hatali_kaydirma = 0
-                            try: page.locator('div[data-e2e="explore-item"]').first.click()
-                            except: pass
 
-                if len(yeni_videolar) >= 1500: # Üst limit
-                    print("🎯 Hedeflenen dev hasat tamamlandı.")
+                if len(yeni_videolar) >= 1500:
+                    print("🎯 Üst limit hasat tamamlandı.")
 
             except Exception as e:
                 print(f"❌ Tarayıcı hatası: {e}")
@@ -125,9 +130,7 @@ def veri_yakala_ve_analiz_et(api_key):
             try: eski_veriler = json.load(f)
             except: eski_veriler = []
 
-    birlesik = yeni_videolar + eski_veriler
-    taze = [v for v in birlesik if v.get("tarih", "2000-01-01") >= silme_siniri]
-    son_liste = list({v.get('link', ''): v for v in taze if v.get('link')}.values())
+    son_liste = list({v.get('link', ''): v for v in (yeni_videolar + eski_veriler) if v.get('link')}.values())
 
     with open(db_path, "w", encoding="utf-8") as f:
         json.dump(son_liste, f, ensure_ascii=False, indent=4)
