@@ -12,7 +12,7 @@ def veri_yakala_ve_analiz_et(api_key):
     su_an = datetime.now()
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v3.0: 1000+ HEDEF MARATONU ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v3.1: STABIL HASAT MODU ---")
 
     try:
         with sync_playwright() as p:
@@ -38,7 +38,7 @@ def veri_yakala_ve_analiz_et(api_key):
                                 c['sameSite'] = "None"
                             fixed_cookies.append(c)
                         context.add_cookies(fixed_cookies)
-                    print("✅ TR Kimlik Kartı başarıyla yüklendi! 75 Dakikalık hasat başlıyor...")
+                    print("✅ TR Kimlik Kartı yüklendi. Güvenli maraton başlıyor...")
                 except Exception as e:
                     print(f"❌ Cookies yükleme hatası: {e}")
             else:
@@ -49,14 +49,14 @@ def veri_yakala_ve_analiz_et(api_key):
             try:
                 print("🌐 TikTok Keşfet'e bağlanılıyor...")
                 page.goto("https://www.tiktok.com/explore?lang=tr-TR", wait_until="networkidle", timeout=60000)
-                time.sleep(12)
+                time.sleep(15)
 
                 try:
                     page.locator('div[data-e2e="explore-item"]').first.click()
                 except:
                     page.keyboard.press("ArrowDown")
                 
-                print("🚀 Derin hasat başladı... Vites artırıldı.")
+                print("🚀 Hasat başladı. İnsan temposunda ilerleniyor...")
                 time.sleep(5)
 
                 hatali_kaydirma = 0 
@@ -70,7 +70,6 @@ def veri_yakala_ve_analiz_et(api_key):
                         yakalanan_linkler.add(v_link)
                         hatali_kaydirma = 0 
 
-                        # Veri Çekme
                         detaylar = page.evaluate('''() => {
                             return {
                                 likes: document.querySelector('[data-e2e="browse-like-count"]')?.innerText || "0",
@@ -91,30 +90,28 @@ def veri_yakala_ve_analiz_et(api_key):
                             "tarih": datetime.now().strftime('%Y-%m-%d')
                         })
                         
-                        if len(yeni_videolar) % 50 == 0:
+                        if len(yeni_videolar) % 20 == 0:
                             print(f"📊 Mevcut Durum: {len(yeni_videolar)} video toplandı...")
 
-                    # --- HIZLANDIRILMIŞ KAYDIRMA (Senin İstediğin Çift Vuruş) ---
+                    # --- DOĞAL KAYDIRMA ---
                     page.keyboard.press("ArrowDown")
-                    time.sleep(0.4)
-                    page.keyboard.press("ArrowDown")
-                    page.mouse.wheel(0, 1000) 
+                    page.mouse.wheel(0, 800) 
                     
-                    # BEKLEME SÜRESİ: 3 - 6 SANİYE
-                    time.sleep(random.uniform(3.0, 6.0)) 
+                    # BEKLEME SÜRESİ: 6 - 12 SANİYE (Güvenli Alan)
+                    time.sleep(random.uniform(6.0, 12.0)) 
                     
                     if page.url == v_link:
                         hatali_kaydirma += 1
-                        if hatali_kaydirma >= 2:
-                            print("🔄 Akış takıldı, anlık Refresh!")
+                        if hatali_kaydirma >= 4: # Hemen yenileme, 4 kere zorla
+                            print("🔄 Gerçek takılma algılandı, güvenli Refresh...")
                             page.reload()
-                            time.sleep(10)
+                            time.sleep(15)
                             hatali_kaydirma = 0
                             try: page.locator('div[data-e2e="explore-item"]').first.click()
                             except: pass
 
-                if len(yeni_videolar) >= 1500:
-                    print("🎯 Hedeflenen dev hasat miktarına ulaşıldı.")
+                if len(yeni_videolar) >= 1000:
+                    print("🎯 Hedeflenen hasat tamamlandı.")
 
             except Exception as e:
                 print(f"❌ Tarayıcı hatası: {e}")
