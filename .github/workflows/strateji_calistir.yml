@@ -1,0 +1,33 @@
+name: Otonom Strateji Uretici
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch: 
+
+jobs:
+  strateji-planla:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Depoyu Klonla
+        uses: actions/checkout@v3
+
+      - name: Python Kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Kutuphaneleri Kur
+        run: pip install google-generativeai
+
+      - name: Fikir Kodunu Calistir
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python fikir_ureteci.py > son_strateji.txt
+
+      - name: Sonucu Dosyaya Kaydet
+        run: |
+          git config --global user.name "Melih Bot"
+          git config --global user.email "bot@github.com"
+          git add son_strateji.txt
+          git commit -m "Yeni strateji uretildi"
+          git push
