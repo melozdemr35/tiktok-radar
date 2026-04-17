@@ -100,7 +100,9 @@ def veri_yakala_ve_analiz_et(api_key):
                     # --- AKILLI KAYDIRMA (ZIRHLI MOD) ---
                     # Hem tuşla hem mouse tekerleğiyle kaydırıyoruz
                     page.keyboard.press("ArrowDown")
-                    page.mouse.wheel(0, 600) 
+time.sleep(0.5)
+page.keyboard.press("ArrowDown")
+page.mouse.wheel(0, 1000) 
                     
                     # İzleme simülasyonu için rastgele bekleme
                     time.sleep(random.uniform(3.0, 6.0)) 
