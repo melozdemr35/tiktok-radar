@@ -66,7 +66,7 @@ def veri_yakala_ve_analiz_et(api_key):
                 start_time = time.time()
 
                 # Yaklaşık 45-50 dakika boyunca çalışır
-                while (time.time() - start_time) < 2800:
+                while (time.time() - start_time) < 4500:
                     v_link = page.url
                     
                     if "/video/" in v_link and v_link not in yakalanan_linkler:
