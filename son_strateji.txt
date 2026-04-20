@@ -1,25 +1,41 @@
-🧠 Gemini radar verilerini analiz ediyor ve promptu hazırlıyor...
+🧠 Gemini radar verilerini analiz ediyor ve 2 adet prompt hazırlıyor...
 
 ============================================================
-🎯 ÜRETİM EMRİ HAZIR:
+🎯 ÇİFT ÜRETİM EMRİ HAZIR:
 ============================================================
+Profesyonel bir TikTok İçerik Stratejisti ve Yapay Zeka Video Yönetmeni olarak verileri analiz ettim. Mevcut trendler; **"Brainrot"** (absürt/kaotik mizah), **"Boneka"** (oyuncak/kukla estetiği), **IShowSpeed** enerjisi ve minimalist, gizemli açıklamaların ("i'm scared", "obsessed") bir karışımından oluşuyor. Yüksek yorum sayıları, izleyicinin etkileşime girmeye zorlandığı veya şaşırdığı içeriklerin zirvede olduğunu gösteriyor.
+
+İşte bu veriler ışığında hazırladığım 2 stratejik video planı:
+
 ---
-📊 **GEMİNİ RADAR ANALİZİ:**
-Mevcut veriler üç ana damarın birleştiğini gösteriyor: **"Obsession" (Kişisel Karizma/Narsisizm)**, **"Brainrot Surrealism" (Anlamsız/Kaotik Görseller)** ve **"Suspense" (Korku/Gizem)**. Natalie Reynolds'ın ulaştığı devasa beğeni sayıları "kendine güvenen/takıntılı" personasının gücünü kanıtlarken, IShowSpeed verileri yüksek yorum etkileşimi için "kaos ve hareketin" şart olduğunu gösteriyor. Kullanıcılar şu an hem estetik hem de "rahatsız edici derecede garip" (uncanny valley) olan içeriklere tepki veriyor.
+
+🎬 **VİDEO NO: 1**
+
+📊 **GEMİNİ RADAR ANALİZİ:** Veriler, "Brainrot" ve "Boneka" akımlarının zirvede olduğunu, özellikle yüksek tempolu veya görsel olarak absürt (unncany valley) videoların 20M+ beğeni aldığını gösteriyor. İlk video, bu kaotik ve absürt enerjiye tam uyum sağlayacak şekilde tasarlandı.
 
 ⏰ **HEDEFLENEN SAAT:** 10:00
 
-🎬 **VİDEO KONSEPTİ:** 
-**"The Glitch Obsession" (Kusursuzluğun Kaosu):** Natalie Reynolds estetiğinde (kusursuz bir model/doll görünümü) bir karakterin, aynada kendine bakarken aniden IShowSpeed kaosu ve "Brainrot" efektleriyle bozulmaya başladığı, izleyiciyi hem estetik olarak çeken hem de "i'm scared" dedirten sürreal bir geçiş videosu. Bu, hem "Güzellik/Moda" hem de "Brainrot/Mizah" kitlesini aynı anda yakalayacaktır.
+🎬 **VİDEO KONSEPTİ:** **"The Ultimate Brainrot Boneka"** - IShowSpeed'in hiperaktif enerjisini, bir "boneka" (oyuncak bebek) estetiğiyle birleştiren, fizik kurallarına aykırı dans eden yapay zeka karakteri. Görsel olarak hipnotize edici ve kafa karıştırıcı.
 
-🤖 **AI VİDEO ÜRETİM PROMPTU:** 
-> Cinematic high-detail shot, a hyper-realistic fashion model with doll-like porcelain skin (boneka style) looking into a digital mirror in a neon-lit futuristic room. She is smiling confidently, looking "obsessed" with her reflection. Suddenly, the video transitions into "brainrot" style chaos: her movements become erratic and high-energy like IShowSpeed, the background glitches with surreal 3D objects, and her eyes glow with an uncanny light. Intense camera shakes, vibrant colors, transition from slow-motion elegance to fast-paced glitch aesthetic. 4k, 60fps, high motion, unreal engine 5 render style.
+🤖 **AI VİDEO ÜRETİM PROMPTU:** (Kling/Luma/Sora için): A surreal, high-energy cinematic shot of a glitchy, oversized porcelain doll (boneka style) with glowing eyes, performing chaotic and hyper-fast breakdance moves in the middle of a crowded futuristic Tokyo intersection. The doll's movements are physics-defying, inspired by IShowSpeed’s frantic energy. Hyper-realistic textures, vibrant neon lighting, brainrot aesthetic with floating 3D emojis and glitch effects, 4k resolution, high frame rate.
 
-📝 **TIKTOK AÇIKLAMASI:** 
-Aynadaki aksim bile bana takıntılı... 👁️✨ Bu görüntü beni biraz korkutuyor ama gözlerimi alamıyorum. Sonuna kadar bekleyin, sistem hata veriyor! ⚡️
+📝 **TIKTOK AÇIKLAMASI:** Ne izlediğimi ben de bilmiyorum ama bağımlı oldum... 👁️👄👁️ #brainrot
 
-🏷️ **ETİKETLER:** 
-#ishowspeed #fyp #nataliereynolds #boneka #brainrot #aiart #uncannyvalley #trend #obsession #scared #sora #kling 
+🏷️ **ETİKETLER:** #ishowspeed #brainrot #boneka #fyp #viral #aiart #trend
 
 ---
+
+🎬 **VİDEO NO: 2**
+
+📊 **GEMİNİ RADAR ANALİZİ:** Natalie Reynolds ve Charli XCX (House) verileri, "takıntı" ve "korku/gizem" temalarının yüksek etkileşim (250K+ yorum) getirdiğini gösteriyor. İkinci video, izleyicinin "Bu ne?" diyerek yorum yapacağı, daha sinematik ve deneysel bir yaklaşıma odaklanıyor.
+
+⏰ **HEDEFLENEN SAAT:** 14:00
+
+🎬 **VİDEO KONSEPTİ:** **"The Invisible Obsession"** - "They are so obsessed with me" cümlesini görselleştiren, bir modelin etrafında havada asılı duran yüzlerce antika aynanın ve kameranın aynı anda ona dönmesini içeren karanlık-estetik bir video.
+
+🤖 **AI VİDEO ÜRETİM PROMPTU:** (Kling/Luma/Sora için): A cinematic, eerie high-fashion video shot in a dark, infinite void. A beautiful model walks forward as hundreds of antique floating mirrors and vintage cameras surround her, rotating in perfect synchronization to follow her every move. Cinematic lighting, moody atmosphere, inspired by the "i’m scared" and "obsessed" trend. Soft focus, 8k resolution, elegant but unsettling movement, hyper-realistic reflections.
+
+📝 **TIKTOK AÇIKLAMASI:** Nereye gitsem beni izliyorlar... korkmalı mıyım? 👁️‍🗨️
+
+🏷️ **ETİKETLER:** #nataliereynolds #imscared #obsessed #fyp #cinematic #ai #mystery
 ============================================================
