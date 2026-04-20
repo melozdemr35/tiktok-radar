@@ -19,7 +19,7 @@ jobs:
       - name: Kutuphaneleri Kur
         run: |
           pip install google-generativeai
-          pip install pyjwt requests
+          pip install pyjwt requests tiktok-uploader
 
       - name: Fikir Kodunu Calistir
         env:
@@ -30,13 +30,21 @@ jobs:
         env:
           KLING_ACCESS_KEY: ${{ secrets.KLING_ACCESS_KEY }}
           KLING_SECRET_KEY: ${{ secrets.KLING_SECRET_KEY }}
-        run: python video_ureteci.py
+        # Bakiye yoksa bile hata verip sistemi durdurmasın diye sonuna "|| true" eklendi
+        run: python video_ureteci.py || true
+
+      - name: TikTok Yukleyici Kodunu Calistir
+        env:
+          TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
+        # Videolar hazır olduğunda TikTok'a yükler, yoksa hata vermeden geçer
+        run: python tiktok_yukleyici.py || true
 
       - name: Sonucu Dosyaya Kaydet
         run: |
           git config --global user.name "Autonomous-Bot"
           git config --global user.email "actions@github.com"
           git add son_strateji.txt
-          git add video_output.mp4 || true
+          # Eskiden sadece video_output.mp4'ü alıyordu. Artık video_1 ve video_2'yi alması için * konuldu.
+          git add video_*.mp4 || true
           # Sadece değişiklik varsa commit yap, yoksa hata vermeden geç
           git diff --quiet && git diff --staged --quiet || (git commit -m "Strategy and Video updated [$(date)]" && git push)
