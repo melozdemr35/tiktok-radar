@@ -85,13 +85,13 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
     model = genai.GenerativeModel('gemini-3-flash-preview')
 
     sistem_talimati = f"""
-    Sen profesyonel bir TikTok İçerik Stratejisti ve Yapay Zeka Video Yönetmenisin.
+    Sen profesyonel bir TikTok İçerik Stratejisti ve Yapay Zeka (Kling/Sora) Video Yönetmenisin.
     Aşağıda sağlanan 'Top 10 Trend Verileri'ni ve popüler etiketleri dikkatle incele. 
     
     🛡️ ÖNEMLİ KURAL: Bu veriler arasında kazara sızmış yabancı dildeki (İngilizce, vb.) videoları KESİNLİKLE DİKKATE ALMA. Sadece Türkiye'deki lokal ve güncel trendleri baz alarak konsept üret.
     
     GÖREV 1 (RADAR ANALİZİ): Önce bu verilerdeki genel eğilimi analiz et.
-    GÖREV 2 (ÜRETİM EMRİ): Bu analizle birbirinden tamamen FARKLI 2 ADET YENİ video fikri oluştur. (Biri trende tam uygun, diğeri biraz daha deneysel/dikkat çekici olsun).
+    GÖREV 2 (ÜRETİM EMRİ): Bu analizle birbirinden tamamen FARKLI 2 ADET YENİ video fikri oluştur. (Biri trende tam uygun, diğeri biraz daha komik/deneysel olsun).
     
     RADAR VERİLERİ:
     - Haftanın Zirve Paylaşım Saati: {zirve_saat}
@@ -104,9 +104,9 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
     🎬 VİDEO NO: (1 veya 2)
     📊 GEMİNİ RADAR ANALİZİ: (Verilerden çıkardığın kısa genel trend yorumu)
     ⏰ HEDEFLENEN SAAT: (Video 1 için {zirve_saat}, Video 2 için bundan 4 saat sonrası)
-    🎬 VİDEO KONSEPTİ: (Net fikir)
-    🤖 AI VİDEO ÜRETİM PROMPTU: (Sora/Kling/Luma gibi yapay zekalara verilecek İNGİLİZCE, detaylı prompt)
-    📝 TIKTOK AÇIKLAMASI: (Türkçe metin)
+    🎬 VİDEO KONSEPTİ: (Net ve dikkat çekici bir fikir)
+    🤖 AI VİDEO ÜRETİM PROMPTU: (VİDEO GÖRÜNTÜSÜ VE DUDAK SENKRONLU SES İÇİN İNGİLİZCE PROMPT. KURAL: Prompt İngilizce olmalı ancak karakterin söyleyeceği cümle KESİNLİKLE TÜRKÇE yazılmalıdır. Videonun içeriğine göre karakterin DUYGU DURUMUNU (angry, happy, confused vb.) ve ses tonunu belirterek yaz. Örnek: 'A young man looks at the camera and says in Turkish "Şaka yapıyorsun, bu harika!" with a very excited and happy voice. Upbeat background music.')
+    📝 TIKTOK AÇIKLAMASI: (Türkçe metin, etkileyici)
     🏷️ ETİKETLER: (Hashtagler)
     ---
     """
