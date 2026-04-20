@@ -11,7 +11,7 @@ SECRET_KEY = os.environ.get("KLING_SECRET_KEY")
 STRATEJI_DOSYASI = "son_strateji.txt"
 
 def promptlari_ayikla(dosya_yolu):
-    """Dosyadaki tüm AI Promptlarını liste olarak çeker."""
+    """Dosyadaki tüm AI Promptlarını liste olarak çeker (YENİ FORMAT UYUMLU)."""
     try:
         if not os.path.exists(dosya_yolu):
             print(f"❌ Hata: {dosya_yolu} bulunamadı.")
@@ -20,19 +20,16 @@ def promptlari_ayikla(dosya_yolu):
         with open(dosya_yolu, "r", encoding="utf-8") as f:
             icerik = f.read()
             
-        # 🤖 ile başlayan her bloğu bul
-        bloklar = icerik.split("🤖")[1:] 
-        prompt_listesi = []
+        # 🛡️ YENİ AKILLI CIMBIZ: 🤖 ve 📝 arasındaki her şeyi (yeni satırlar dahil) yakalar
+        pattern = r"🤖.*?PROMPTU.*?:(.*?)📝"
+        eslesmeler = re.findall(pattern, icerik, re.DOTALL | re.IGNORECASE)
         
-        for blok in bloklar:
-            # Her blokta 📝 (Açıklama) kısmına kadar olan yeri al
-            if "📝" in blok:
-                ham_prompt = blok.split("📝")[0]
-                # Başlık ve süsleri temizle
-                temiz_prompt = re.sub(r".*PROMPTU.*?:", "", ham_prompt, flags=re.IGNORECASE)
-                temiz_prompt = temiz_prompt.replace(">", "").replace("*", "").strip()
-                if temiz_prompt:
-                    prompt_listesi.append(temiz_prompt)
+        prompt_listesi = []
+        for p in eslesmeler:
+            # Markdown yıldızlarını ve gereksiz boşlukları temizle
+            temiz = p.replace("*", "").replace(">", "").strip()
+            if temiz:
+                prompt_listesi.append(temiz)
         
         return prompt_listesi
     except Exception as e:
