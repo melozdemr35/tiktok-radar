@@ -5,10 +5,10 @@ import os
 import re
 import plotly.express as px
 
-# 1. SAYFA YAPILANDIRMASI (Senin Orijinal Tasarımın)
+# 1. SAYFA YAPILANDIRMASI
 st.set_page_config(page_title="TR TikTok Trend Radarı", layout="wide")
 
-# 2. GÖRSEL STİL (Senin Siyah Teman Birebir Aynı)
+# 2. GÖRSEL STİL
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: white; }
@@ -18,7 +18,6 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Gelişmiş Sayısal Dönüştürücü
 def parse_number(val):
     if pd.isna(val): return 0
     val_str = str(val).upper().replace(',', '.').strip()
@@ -31,13 +30,11 @@ def parse_number(val):
         except: return 0
     return 0
 
-# Rakamları Panelde Şık Gösterme
 def format_milyon(val):
     if val >= 1_000_000: return f"{val / 1_000_000:.1f} Milyon"
     elif val >= 1_000: return f"{val / 1_000:.1f} Bin"
     return f"{val:,.0f}"
 
-# Arka Planda Akım Türü Belirleme (Gizli çalışır, listeye ekler)
 def concept_detect(text):
     text = str(text).lower()
     if "pov" in text: return "POV"
@@ -46,7 +43,7 @@ def concept_detect(text):
     return "Genel"
 
 st.title("TR Türkiye TikTok Trend ve Strateji Radarı")
-st.caption("Otonom robot verileri analiz ediliyor. Veriler gerçek etkileşimlere göre sıralanmıştır.")
+st.caption("Otonom robot verileri analiz ediliyor. Yabancı sızıntılar temizlenmiştir.")
 
 db_path = "trend_veritabani.json"
 analiz_path = "son_analiz.txt"
@@ -57,7 +54,6 @@ if os.path.exists(db_path):
     
     df = pd.DataFrame(data)
     
-    # 🛡️ GÜVENLİK DUVARI: JSON boşsa çökme, uyarı ver
     if df.empty:
         st.warning("⏳ Radar şu an taze verileri topluyor... Lütfen birazdan sayfayı yenileyin.")
         st.stop()
@@ -66,29 +62,40 @@ if os.path.exists(db_path):
     df['n_comments'] = df['comments'].apply(parse_number)
     df['İçerik Türü'] = df['desc'].apply(concept_detect)
 
-    # 🛡️ YENİ EKLENEN: KESİN YABANCI DİL GÜMRÜĞÜ 🛡️
-    # Veriler panele yansımadan önce İngilizce ve İspanyolca videoları tamamen siler
-    def turkce_ve_temiz_mi(row):
-        metin_kucuk = f" {str(row['desc'])} ".lower()
-        yabanci_kelimeler = [
-            " the ", " and ", " you ", " for ", " of ", " in ", " is ", 
-            " el ", " la ", " de ", " que ", " my ", " with ", " on ", " a ", " to "
+    # 🛡️ YENİ: AKILLI KARA LİSTE (Suçluluğu kanıtlanana kadar herkes masumdur) 🛡️
+    def akilli_filtre(row):
+        metin = f" {str(row.get('desc', ''))} ".lower()
+        etiketler = [str(t).lower().replace('#', '') for t in row.get('hashtags', [])]
+        
+        # Sadece KESİN yabancı kelimeleri yakala (Boşluklara dikkat ki kelime içlerini kesmesin)
+        kara_liste_kelimeler = [
+            " the ", " and ", " you ", " for ", " is ", " this ", " that ", " my ", " with ",
+            " wedding ", " daughter ", " toddler ", " cheese ", " defendia "
         ]
-        for kelime in yabanci_kelimeler:
-            if kelime in metin_kucuk:
-                return False # Yabancı video, elendi.
+        
+        # Etiketlerdeki kesin yabancı izler (Not: fyp ve viral'i ellemiyoruz, Türkler de çok kullanıyor!)
+        kara_liste_etiket = ["parati", "foryoupage", "wedding", "toddler", "xyzbca"]
+        
+        # Eğer metinde kara liste kelimesi varsa -> SİL
+        if any(k in metin for k in kara_liste_kelimeler):
+            return False
+            
+        # Eğer etiketlerde kesin yabancı etiket varsa -> SİL
+        if any(e in kara_liste_etiket for e in etiketler):
+            return False
+            
+        # Kalan her şey (Sadece emoji atanlar, hiçbir şey yazmayanlar, Türkler) EKRANA ÇIKAR!
         return True
     
-    # Tüm Dataframe'i gümrükten geçirip temizliyoruz
-    df = df[df.apply(turkce_ve_temiz_mi, axis=1)]
+    # Filtreyi uygula
+    df = df[df.apply(akilli_filtre, axis=1)]
 
-    # Filtre sonrası veri kalmadıysa uyarı ver
     if df.empty:
-        st.warning("🧹 Şu anki veritabanında Türkçe/Yerel video bulunamadı. Otonom robotun yeni hasat yapmasını bekleyin.")
+        st.error("🚨 Filtre sonrası veri kalmadı. Otonom robotun yeni hasat yapmasını bekleyin.")
         st.stop()
 
 
-    # --- ÜST METRİKLER (Birebir Aynı) ---
+    # --- ÜST METRİKLER ---
     col1, col2, col3 = st.columns(3)
     toplam_video = len(df)
     toplam_begeni = df['n_likes'].sum()
@@ -99,7 +106,7 @@ if os.path.exists(db_path):
 
     st.divider()
 
-    # --- ORTA PANEL (Birebir Aynı) ---
+    # --- ORTA PANEL ---
     col_sol, col_sag = st.columns(2)
 
     with col_sol:
@@ -126,22 +133,8 @@ if os.path.exists(db_path):
     # --- TOP 10 TÜRKİYE ARENASI ---
     st.subheader("🇹🇷 Türkiye Etkileşim Arenası (Top 10 Yerel)")
 
-    # Daha önce yazdığın detaylı TR filtresi (artık sadece temizlenmiş veride çalışır)
-    def gercek_tr_radari(row):
-        metin_orijinal = f" {str(row['desc'])} {str(row['music'])} "
-        metin_kucuk = metin_orijinal.lower()
-        etiketler = [str(t).lower().replace('#', '') for t in row.get('hashtags', [])]
-        
-        if any(h in metin_orijinal for h in "ğĞıİ"): return True
-        tr_etiketler = ['keşfet', 'kesfet', 'türkiye', 'turkiye', 'istanbul', 'ankara', 'izmir', 'çorum', 'mizah', 'komik', 'akım']
-        if any(e in tr_etiketler for e in etiketler): return True
-        if any(h in metin_kucuk for h in "şöüç") or "orijinal ses" in metin_kucuk: return True
-        return False
-
-    df_tr = df[df.apply(gercek_tr_radari, axis=1)].copy()
-
-    if not df_tr.empty:
-        top_10_tr = df_tr.sort_values(by='n_likes', ascending=False).head(10)
+    if not df.empty:
+        top_10_tr = df.sort_values(by='n_likes', ascending=False).head(10)
         st.dataframe(
             top_10_tr[['desc', 'İçerik Türü', 'likes', 'comments', 'link']],
             column_config={
@@ -152,12 +145,10 @@ if os.path.exists(db_path):
             },
             use_container_width=True, hide_index=True
         )
-    else:
-        st.info("Top 10 listesi oluşturulacak kadar güçlü TR verisi bulunamadı.")
 
     st.divider()
 
-    # --- ALT PANEL (Hashtagler ve Gemini Analizi - Birebir Geri Geldi) ---
+    # --- ALT PANEL ---
     a1, a2 = st.columns(2)
     with a1:
         st.subheader("🏷️ Popüler Hashtagler")
