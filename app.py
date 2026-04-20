@@ -54,18 +54,46 @@ analiz_path = "son_analiz.txt"
 if os.path.exists(db_path):
     with open(db_path, "r", encoding="utf-8") as f:
         data = json.load(f)
+    
     df = pd.DataFrame(data)
     
+    # 🛡️ GÜVENLİK DUVARI: JSON boşsa çökme, uyarı ver
+    if df.empty:
+        st.warning("⏳ Radar şu an taze verileri topluyor... Lütfen birazdan sayfayı yenileyin.")
+        st.stop()
+        
     df['n_likes'] = df['likes'].apply(parse_number)
     df['n_comments'] = df['comments'].apply(parse_number)
-    df['İçerik Türü'] = df['desc'].apply(concept_detect) # Yeni zeka katmanı
+    df['İçerik Türü'] = df['desc'].apply(concept_detect)
+
+    # 🛡️ YENİ EKLENEN: KESİN YABANCI DİL GÜMRÜĞÜ 🛡️
+    # Veriler panele yansımadan önce İngilizce ve İspanyolca videoları tamamen siler
+    def turkce_ve_temiz_mi(row):
+        metin_kucuk = f" {str(row['desc'])} ".lower()
+        yabanci_kelimeler = [
+            " the ", " and ", " you ", " for ", " of ", " in ", " is ", 
+            " el ", " la ", " de ", " que ", " my ", " with ", " on ", " a ", " to "
+        ]
+        for kelime in yabanci_kelimeler:
+            if kelime in metin_kucuk:
+                return False # Yabancı video, elendi.
+        return True
+    
+    # Tüm Dataframe'i gümrükten geçirip temizliyoruz
+    df = df[df.apply(turkce_ve_temiz_mi, axis=1)]
+
+    # Filtre sonrası veri kalmadıysa uyarı ver
+    if df.empty:
+        st.warning("🧹 Şu anki veritabanında Türkçe/Yerel video bulunamadı. Otonom robotun yeni hasat yapmasını bekleyin.")
+        st.stop()
+
 
     # --- ÜST METRİKLER (Birebir Aynı) ---
     col1, col2, col3 = st.columns(3)
     toplam_video = len(df)
     toplam_begeni = df['n_likes'].sum()
     
-    col1.metric("Toplam Taranan Video", toplam_video)
+    col1.metric("Toplam Taranan Yerel Video", toplam_video)
     col2.metric("Toplam Tahmini İzlenme", format_milyon(toplam_begeni * 25)) 
     col3.metric("Toplam Beğeni Hacmi", format_milyon(toplam_begeni))
 
@@ -95,15 +123,15 @@ if os.path.exists(db_path):
 
     st.divider()
 
-    # --- TOP 10 TÜRKİYE ARENASI (Senin Sevdiğin TR Filtresi) ---
+    # --- TOP 10 TÜRKİYE ARENASI ---
     st.subheader("🇹🇷 Türkiye Etkileşim Arenası (Top 10 Yerel)")
 
+    # Daha önce yazdığın detaylı TR filtresi (artık sadece temizlenmiş veride çalışır)
     def gercek_tr_radari(row):
         metin_orijinal = f" {str(row['desc'])} {str(row['music'])} "
         metin_kucuk = metin_orijinal.lower()
         etiketler = [str(t).lower().replace('#', '') for t in row.get('hashtags', [])]
-        kara_liste = [' the ', ' is ', ' to ', ' you ', ' and ', ' a ', ' je ', ' ça ', ' que ']
-        if any(k in metin_kucuk for k in kara_liste): return False 
+        
         if any(h in metin_orijinal for h in "ğĞıİ"): return True
         tr_etiketler = ['keşfet', 'kesfet', 'türkiye', 'turkiye', 'istanbul', 'ankara', 'izmir', 'çorum', 'mizah', 'komik', 'akım']
         if any(e in tr_etiketler for e in etiketler): return True
@@ -114,7 +142,6 @@ if os.path.exists(db_path):
 
     if not df_tr.empty:
         top_10_tr = df_tr.sort_values(by='n_likes', ascending=False).head(10)
-        # Sadece İçerik Türü sütununu ekledim, gerisi aynı
         st.dataframe(
             top_10_tr[['desc', 'İçerik Türü', 'likes', 'comments', 'link']],
             column_config={
@@ -125,6 +152,8 @@ if os.path.exists(db_path):
             },
             use_container_width=True, hide_index=True
         )
+    else:
+        st.info("Top 10 listesi oluşturulacak kadar güçlü TR verisi bulunamadı.")
 
     st.divider()
 
