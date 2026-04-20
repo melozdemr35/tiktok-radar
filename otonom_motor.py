@@ -10,9 +10,12 @@ def veri_yakala_ve_analiz_et(api_key):
     yeni_videolar = []
     yakalanan_linkler = set()
     su_an = datetime.now()
+    
+    # 7 GÜNLÜK ZAMAN SINIRI
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
     print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v3.3: AKILLI KACIS & 1000+ HEDEF ---")
+    print(f"📅 Sistem {silme_siniri} tarihinden eski tüm videoları temizleyecek.")
 
     try:
         with sync_playwright() as p:
@@ -122,20 +125,29 @@ def veri_yakala_ve_analiz_et(api_key):
     except Exception as e:
         print(f"!!! KRITIK HATA: {e}")
 
-    # --- VERİTABANI KAYIT ---
+    # --- VERİTABANI KAYIT VE 7 GÜN TEMİZLİĞİ ---
     db_path = "trend_veritabani.json"
     eski_veriler = []
     if os.path.exists(db_path):
         with open(db_path, "r", encoding="utf-8") as f:
-            try: eski_veriler = json.load(f)
-            except: eski_veriler = []
+            try: 
+                eski_veriler = json.load(f)
+            except: 
+                eski_veriler = []
 
-    son_liste = list({v.get('link', ''): v for v in (yeni_videolar + eski_veriler) if v.get('link')}.values())
+    # 🛡️ MÜDAHALE BURADA: Sadece tarihi "silme_siniri"nden yeni olanları tut
+    guncel_eski_veriler = [v for v in eski_veriler if v.get('tarih', '') >= silme_siniri]
+    silinen_sayisi = len(eski_veriler) - len(guncel_eski_veriler)
+
+    # Yeni videolarla, filtrelenmiş temiz eski videoları birleştir
+    son_liste = list({v.get('link', ''): v for v in (yeni_videolar + guncel_eski_veriler) if v.get('link')}.values())
 
     with open(db_path, "w", encoding="utf-8") as f:
         json.dump(son_liste, f, ensure_ascii=False, indent=4)
     
     print(f"\n🏁 İŞLEM TAMAMLANDI: {len(yeni_videolar)} yeni video eklendi!")
+    if silinen_sayisi > 0:
+        print(f"🗑️ 7 günden eski {silinen_sayisi} video veritabanından silindi.")
     print(f"📂 Toplam Havuz Büyüklüğü: {len(son_liste)}")
 
 if __name__ == "__main__":
