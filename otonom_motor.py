@@ -11,10 +11,9 @@ def veri_yakala_ve_analiz_et(api_key):
     yakalanan_linkler = set()
     su_an = datetime.now()
     
-    # 7 GÜNLÜK ZAMAN SINIRI
     silme_siniri = (su_an - timedelta(days=7)).strftime('%Y-%m-%d')
     
-    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v3.3: AKILLI KACIS & 1000+ HEDEF ---")
+    print(f"[{su_an.strftime('%H:%M:%S')}] --- ULTIMATE MOTOR v3.4: KRIZ PROTOKOLU AKTIF ---")
     print(f"📅 Sistem {silme_siniri} tarihinden eski tüm videoları temizleyecek.")
 
     try:
@@ -55,19 +54,20 @@ def veri_yakala_ve_analiz_et(api_key):
                 except:
                     page.keyboard.press("ArrowDown")
                 
-                print("🚀 Hasat başladı. Hedef: 1000 Video.")
+                print("🚀 Hasat başladı. Hedef: Güvenlik duvarına kadar maksimum video.")
                 time.sleep(5)
 
                 hatali_kaydirma = 0 
+                kriz_sayaci = 0 # 🛡️ YENİ: Kriz sayacı eklendi
                 start_time = time.time()
 
-                # --- SÜRE: 75 DAKİKA (4500 SANİYE) ---
                 while (time.time() - start_time) < 4500:
                     v_link = page.url
                     
                     if "/video/" in v_link and v_link not in yakalanan_linkler:
                         yakalanan_linkler.add(v_link)
                         hatali_kaydirma = 0 
+                        kriz_sayaci = 0 # Yeni video bulunduysa krizi sıfırla
 
                         detaylar = page.evaluate('''() => {
                             return {
@@ -92,21 +92,28 @@ def veri_yakala_ve_analiz_et(api_key):
                         if len(yeni_videolar) % 50 == 0:
                             print(f"📊 Mevcut Durum: {len(yeni_videolar)} video toplandı...")
 
-                    # --- DOĞAL VE ETKİLİ KAYDIRMA ---
                     page.keyboard.press("ArrowDown")
                     page.mouse.wheel(0, 850) 
-                    
-                    # BEKLEME SÜRESİ: 4.5 - 7.5 SANİYE
                     time.sleep(random.uniform(4.5, 7.5)) 
                     
                     if page.url == v_link:
                         hatali_kaydirma += 1
                         if hatali_kaydirma >= 3: 
-                            # SERİ REFRESH YERİNE AKILLI ROTASYON
-                            print(f"🔄 Akış tıkandı! Keşfet'e reset atılarak yeni tünel açılıyor...")
+                            kriz_sayaci += 1
+                            
+                            # 🛡️ YENİ: Eğer duvar aşılamıyorsa döngüyü şıkça bitir
+                            if kriz_sayaci >= 4:
+                                print("🚨 TikTok duvarı aşılamadı (Muhtemel Captcha/Login Pop-up). Kurtarma iptal ediliyor.")
+                                print(f"✅ Mevcut {len(yeni_videolar)} video hasatı kurtarıldı. Kayıt aşamasına geçiliyor...")
+                                break
+                                
+                            print(f"🔄 Akış tıkandı! (Deneme {kriz_sayaci}/4) Keşfet'e reset atılıyor...")
                             try:
                                 page.goto("https://www.tiktok.com/explore?lang=tr-TR", wait_until="networkidle", timeout=30000)
                                 time.sleep(10)
+                                # 🛡️ YENİ: Ekranda Pop-up varsa kapatmayı dene
+                                page.keyboard.press("Escape")
+                                time.sleep(2)
                                 page.locator('div[data-e2e="explore-item"]').first.click()
                                 print("✨ Yeni akış başarıyla başlatıldı.")
                                 time.sleep(5)
@@ -125,7 +132,6 @@ def veri_yakala_ve_analiz_et(api_key):
     except Exception as e:
         print(f"!!! KRITIK HATA: {e}")
 
-    # --- VERİTABANI KAYIT VE 7 GÜN TEMİZLİĞİ ---
     db_path = "trend_veritabani.json"
     eski_veriler = []
     if os.path.exists(db_path):
@@ -135,11 +141,9 @@ def veri_yakala_ve_analiz_et(api_key):
             except: 
                 eski_veriler = []
 
-    # 🛡️ MÜDAHALE BURADA: Sadece tarihi "silme_siniri"nden yeni olanları tut
     guncel_eski_veriler = [v for v in eski_veriler if v.get('tarih', '') >= silme_siniri]
     silinen_sayisi = len(eski_veriler) - len(guncel_eski_veriler)
 
-    # Yeni videolarla, filtrelenmiş temiz eski videoları birleştir
     son_liste = list({v.get('link', ''): v for v in (yeni_videolar + guncel_eski_veriler) if v.get('link')}.values())
 
     with open(db_path, "w", encoding="utf-8") as f:
