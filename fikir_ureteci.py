@@ -62,26 +62,27 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
         return
 
     genai.configure(api_key=api_key)
-    # Model ismi tam olarak güncel API versiyonuna göre düzeltildi:
     model = genai.GenerativeModel('gemini-3-flash-preview')
 
+    # BURASI GÜNCELLENDİ: Artık 2 adet farklı video stratejisi istiyoruz.
     sistem_talimati = f"""
     Sen profesyonel bir TikTok İçerik Stratejisti ve Yapay Zeka Video Yönetmenisin.
     Aşağıda sağlanan 'Top 10 Trend Verileri'ni ve popüler etiketleri dikkatle incele. 
     
-    GÖREV 1 (RADAR ANALİZİ): Önce bu verilerdeki genel eğilimi, yükselen nişleri ve kullanıcı davranışlarını analiz et.
-    GÖREV 2 (ÜRETİM EMRİ): Bu analizle en yüksek etkileşimli Top 10 videonun mantığını harmanlayarak YENİ bir video fikri oluştur.
+    GÖREV 1 (RADAR ANALİZİ): Önce bu verilerdeki genel eğilimi analiz et.
+    GÖREV 2 (ÜRETİM EMRİ): Bu analizle birbirinden tamamen FARKLI 2 ADET YENİ video fikri oluştur. (Biri trende tam uygun, diğeri biraz daha deneysel/dikkat çekici olsun).
     
     RADAR VERİLERİ:
     - Haftanın Zirve Paylaşım Saati: {zirve_saat}
     - En Popüler Hashtagler: {hashtagler}
-    - Top 10 Video Analizi (İzlenme/Beğeni/Yorum Sıralı):
+    - Top 10 Video Analizi:
     {top_10_metni}
 
-    Lütfen bana doğrudan kopyalayıp sistemde kullanabileceğim şu formatta bir çıktı ver:
+    LÜTFEN ŞU FORMATI TAM OLARAK 2 KEZ TEKRARLA (VİDEO 1 ve VİDEO 2 olarak):
     ---
+    🎬 VİDEO NO: (1 veya 2)
     📊 GEMİNİ RADAR ANALİZİ: (Verilerden çıkardığın kısa genel trend yorumu)
-    ⏰ HEDEFLENEN SAAT: {zirve_saat}
+    ⏰ HEDEFLENEN SAAT: (Video 1 için {zirve_saat}, Video 2 için bundan 4 saat sonrası)
     🎬 VİDEO KONSEPTİ: (Net fikir)
     🤖 AI VİDEO ÜRETİM PROMPTU: (Sora/Kling/Luma gibi yapay zekalara verilecek İNGİLİZCE, detaylı prompt)
     📝 TIKTOK AÇIKLAMASI: (Türkçe metin)
@@ -89,11 +90,11 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
     ---
     """
 
-    print("🧠 Gemini radar verilerini analiz ediyor ve promptu hazırlıyor...")
+    print("🧠 Gemini radar verilerini analiz ediyor ve 2 adet prompt hazırlıyor...")
     try:
         response = model.generate_content(sistem_talimati)
         print("\n" + "="*60)
-        print("🎯 ÜRETİM EMRİ HAZIR:")
+        print("🎯 ÇİFT ÜRETİM EMRİ HAZIR:")
         print("="*60)
         print(response.text)
         print("="*60)
