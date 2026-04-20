@@ -3,27 +3,29 @@
 ============================================================
 🎯 ÇİFT ÜRETİM EMRİ HAZIR:
 ============================================================
-Harika bir strateji için kolları sıvıyorum. Sağladığın verilerdeki küresel gürültüyü (IShowSpeed, Natalie Reynolds vb.) filtreleyerek, bu içeriklerin alt metnindeki **"hızlı tüketim, absürt görsel estetik ve beyin yakan (brainrot) mizah"** enerjisini Türkiye'nin yerel dokusuyla harmanlayacağım.
+Merhaba! Ben stratejistiniz ve yönetmeniniz olarak verileri süzgeçten geçirdim. Sağladığınız verilerin tamamı küresel/yabancı içeriklerden oluştuğu için, talimatınız doğrultusunda bu içeriklerin **temalarını** (düğün, aile komedisi, teknoloji) alıp **Türkiye'nin güncel kültürel kodlarına ve yerel trendlerine** (Düğün sezonu dinamikleri, Türk aile yapısı ve yerel mizah anlayışı) uyarlayarak stratejimi oluşturdum.
 
-İşte Türkiye pazarı için hazırladığım stratejik plan:
+İşte radar analizi ve üretim planı:
 
 ---
 
 🎬 **VİDEO NO: 1**
-📊 **GEMİNİ RADAR ANALİZİ:** Mevcut trendler "Brainrot" olarak adlandırılan, hızlı, tekrara dayalı ve görsel olarak hipnotize edici içeriklerin zirvede olduğunu gösteriyor. Türkiye'de bu akım, yerel objelerin veya durumların absürt ve sürreal bir şekilde (AI desteğiyle) sunulmasıyla büyük izlenme alıyor.
-⏰ **HEDEFLENEN SAAT:** 10:00
-🎬 **VİDEO KONSEPTİ:** **"Sonsuz Türk Kahvesi Döngüsü"**. Klasik bir Türk kahvesi fincanının içinden sürekli yeni manzaralar, galaksiler ve sonunda tekrar bir kahve fincanı çıkan, izleyeni içine çeken sürreal bir AI "zoom-in" döngüsü. Yerel bir kültürel ögeyi modern "brainrot" estetiğiyle birleştiriyoruz.
-🤖 **AI VİDEO ÜRETİM PROMPTU:** A cinematic, hyper-realistic macro zoom-in video. Starting from the bubbles of a traditional Turkish coffee in a porcelain cup. The camera dives into the bubbles, revealing a miniature traditional Turkish bazaar inside. As the camera zooms further, the bazaar transforms into a swirling galaxy, which then reshapes back into the center of a Turkish coffee cup. Infinite loop, high saturation, psychedelic transitions, 4k, surrealism.
-📝 **TIKTOK AÇIKLAMASI:** Sabah kahvesi ama bekledikçe derinleşiyor... ☕️ Bu döngüden çıkabilen var mı? #sabahkahvesi #döngü #yapayzeka
-🏷️ **ETİKETLER:** #kahve #turkkahvesi #surreal #yapayzeka #sanat #fyp #türkiye #akım
+📊 **GEMİNİ RADAR ANALİZİ:** Verilerde "Wedding" (Düğün) ve "Family" (Aile) temalarının çok güçlü bir etkileşim aldığı görülüyor. Türkiye'de şu an düğün sezonunun zirvesinde olduğumuzu ve "Gelin Alma/Düğün Girişi" videolarının yerel algoritmayı domine ettiğini saptadım. Bu video, yüksek duygusal bağ ve "Relatable" (Tanıdık) içerik kategorisine giriyor.
+⏰ **HEDEFLENEN SAAT:** 12:00
+🎬 **VİDEO KONSEPTİ:** "Geleneksel vs. Modern Düğün Hazırlığı" – Türk düğünlerindeki o meşhur "evden çıkış" anının, sinematik ve aşırı duygusal bir dille başlayıp aniden enerjik bir Ankara Havası veya modern bir dansa dönüşmesi. (Duygu geçişli hook tekniği).
+🤖 **AI VİDEO ÜRETİM PROMPTU:** Cinematic, high-quality video of a traditional Turkish wedding scene. First half: A bride in a white dress crying emotionally while her brother ties a red ribbon (Gayret Kemeri) in a nostalgic living room, soft warm lighting, slow motion. Second half: Sudden transition to high energy, the bride and groom dancing energetically to upbeat music in a modern wedding hall with bright neon lights and celebratory atmosphere. 4k, hyper-realistic, emotional facial expressions.
+📝 **TIKTOK AÇIKLAMASI:** O son bakış ve her şeyin başladığı o an... ❤️ Gelenekler mi, eğlence mi? Biz ikisini de seçtik! Sizde düğünler nasıl başlıyor? 👇
+🏷️ **ETİKETLER:** #düğün #gelin #gelinalma #türkiyedüğünleri #evlilik #duygusal #weddingday #keşfet
 
 ---
 
 🎬 **VİDEO NO: 2**
-📊 **GEMİNİ RADAR ANALİZİ:** Verilerdeki "I'm scared" ve "Boneka" (oyuncak bebek) vurgusu, izleyicinin tekinsiz (uncanny valley) ve dikkat çekici görsel değişimlere tepki verdiğini gösteriyor. Türkiye özelinde, geleneksel bir figürün fütüristik veya beklenmedik bir teknolojiyle birleşmesi "farklılık" yaratarak etkileşimi artıracaktır.
-⏰ **HEDEFLENEN SAAT:** 14:00
-🎬 **VİDEO KONSEPTİ:** **"Siber-Simitçi 2099"**. İstanbul'un tarihi bir sokağında (Eminönü veya Galata), geleneksel bir simit tezgahının başında duran ama tamamen insansı robot (android) olan bir simitçi. Robot, simidi havaya atıyor ve simit havada neon ışıklara dönüşerek tekrar eline düşüyor. Geleneksel ile geleceğin çarpışması.
-🤖 **AI VİDEO ÜRETİM PROMPTU:** A high-end cinematic video set in a nostalgic Istanbul street with Galata Tower in the background. A traditional Turkish simit vendor (simitçi) who is actually a highly detailed humanoid android with glowing blue circuits. The android throws a golden simit into the air; the simit glitters with digital neon sparks and falls back into the cart. Cyberpunk aesthetic mixed with warm, authentic Turkish street atmosphere. 8k, ray tracing, moody lighting.
-📝 **TIKTOK AÇIKLAMASI:** 2099 yılında İstanbul’da bir sabah... Simitler hala sıcak ama ustalar biraz değişmiş. 🤖🥨 Nasıl buldunuz? #istanbul #gelecek #simit #cyberpunk #yapayzeka
-🏷️ **ETİKETLER:** #bilimkurgu #istanbul2099 #teknoloji #yerelüretim #ilginc #fyp #türkiye #robot
+📊 **GEMİNİ RADAR ANALİZİ:** Verilerdeki "TechMagic" ve "SmartBot" vurgusu, izleyicinin görsel illüzyonlara ve "nasıl yapıldı?" dedirten teknolojik estetiğe aç olduğunu gösteriyor. Türkiye'de ise "İstanbul" ve "Kültürel Semboller" her zaman viral potansiyeli taşır. Bu içerik, deneysel bir "Cyberpunk Türkiye" estetiğiyle dikkat çekecek.
+⏰ **HEDEFLENEN SAAT:** 16:00
+🎬 **VİDEO KONSEPTİ:** "Geleceğin İstanbul'u: Simit Satan Robotlar" – İstanbul Boğazı'nda, martılara simit atan hiper-fütüristik bir robotun veya Galata Kulesi'nin etrafında uçan geleneksel görünümlü drone-tepsilerin olduğu kısa, büyüleyici bir sekans. Yerel kültürle teknolojinin absürt ve estetik birleşimi.
+🤖 **AI VİDEO ÜRETİM PROMPTU:** Hyper-realistic, sci-fi concept video set in Istanbul. A futuristic, chrome-plated robot wearing a traditional Turkish 'Simitçi' apron, selling golden simits on a high-tech floating ferry crossing the Bosphorus. In the background, Galata Tower with neon lights and flying cars. Cinematic lighting, sunset atmosphere, vibrant teal and orange color grading, 8k resolution, Unreal Engine 5 style.
+📝 **TIKTOK AÇIKLAMASI:** 2077 yılında İstanbul’da sıradan bir sabah... 🤖🥨 Teknolojinin bile değiştiremeyeceği bazı gelenekler vardır. Sizce gelecek nasıl olacak? 🚀
+🏷️ **ETİKETLER:** #istanbul #gelecek #yapayzeka #cyberpunk #simit #türkiye #aiart #deneysel #keşfetmenotları
+
+---
 ============================================================
