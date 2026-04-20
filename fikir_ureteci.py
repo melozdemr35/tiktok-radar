@@ -22,7 +22,7 @@ def veritabani_analiz_et(dosya_yolu="trend_veritabani.json"):
     else:
         zirve_saat = "Belirsiz"
 
-    # 2. TOP 10 VİDEOYU ÇIKARMA (İzlenme, Beğeni ve Yorum toplamına göre)
+    # 2. TOP 10 VİDEOYU ÇIKARMA
     def parse_number(num_str):
         if not num_str: return 0
         num_str = str(num_str).upper().replace(',', '.')
@@ -36,7 +36,6 @@ def veritabani_analiz_et(dosya_yolu="trend_veritabani.json"):
         except:
             return 0
 
-    # Etkileşim gücüne göre sırala (İzlenme + Beğeni + Yorum)
     sirali_veriler = sorted(
         veriler, 
         key=lambda x: parse_number(x.get("views", "0")) + parse_number(x.get("likes", "0")) + parse_number(x.get("comments", "0")), 
@@ -44,13 +43,11 @@ def veritabani_analiz_et(dosya_yolu="trend_veritabani.json"):
     )
     top_10 = sirali_veriler[:10]
 
-    # Top 10 verilerini formatlama
     top_10_ozet = []
     for i, v in enumerate(top_10):
         views_metni = f"İzlenme: {v.get('views')} | " if "views" in v else ""
         top_10_ozet.append(f"{i+1}. {views_metni}Beğeni: {v.get('likes')} | Yorum: {v.get('comments')} | Müzik: {v.get('music')} | Açıklama: {v.get('desc')}")
 
-    # En çok tekrar eden popüler hashtagleri süzme
     tum_hashtagler = []
     for v in top_10:
         tum_hashtagler.extend(v.get("hashtags", []))
@@ -65,16 +62,15 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
         return
 
     genai.configure(api_key=api_key)
-   model = genai.GenerativeModel('gemini-3-flash-preview')
+    # Model ismi ve boşluk hatası burada düzeltildi:
+    model = genai.GenerativeModel('gemini-3-flash')
 
-    # GEMINI'YE VERİLEN YENİ EMİR: ÖNCE RADAR ANALİZİ YAP, SONRA ÜRET!
     sistem_talimati = f"""
     Sen profesyonel bir TikTok İçerik Stratejisti ve Yapay Zeka Video Yönetmenisin.
     Aşağıda sağlanan 'Top 10 Trend Verileri'ni ve popüler etiketleri dikkatle incele. 
     
-    GÖREV 1 (RADAR ANALİZİ): Önce bu verilerdeki genel eğilimi, yükselen nişleri (örneğin: yapay zeka hikayeciliği, komedi, estetik editler vb.) ve kullanıcı davranışlarını analiz et. Tıpkı bir 'TikTok Trend Radarı' paneli gibi bu haftanın genel stratejisini belirle.
-    
-    GÖREV 2 (ÜRETİM EMRİ): Kendi hayal gücünü kullanma. Yaptığın bu 'Radar Analizi'ni ve listedeki en yüksek etkileşimli Top 10 videonun konseptini/mantığını harmanlayarak YENİ, viral olma potansiyeli çok yüksek, otomatik üretilmeye uygun bir video fikri oluştur.
+    GÖREV 1 (RADAR ANALİZİ): Önce bu verilerdeki genel eğilimi, yükselen nişleri ve kullanıcı davranışlarını analiz et.
+    GÖREV 2 (ÜRETİM EMRİ): Bu analizle en yüksek etkileşimli Top 10 videonun mantığını harmanlayarak YENİ bir video fikri oluştur.
     
     RADAR VERİLERİ:
     - Haftanın Zirve Paylaşım Saati: {zirve_saat}
@@ -84,12 +80,12 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
 
     Lütfen bana doğrudan kopyalayıp sistemde kullanabileceğim şu formatta bir çıktı ver:
     ---
-    📊 GEMİNİ RADAR ANALİZİ: (Verilerden çıkardığın kısa genel trend ve strateji yorumu)
+    📊 GEMİNİ RADAR ANALİZİ: (Verilerden çıkardığın kısa genel trend yorumu)
     ⏰ HEDEFLENEN SAAT: {zirve_saat}
-    🎬 VİDEO KONSEPTİ: (Radar analizine ve Top 10 mantığına dayalı net fikir)
-    🤖 AI VİDEO ÜRETİM PROMPTU: (Sora/Kling/Luma gibi yapay zekalara verilecek İNGİLİZCE, detaylı, sinematik kamera açıları içeren prompt)
-    📝 TIKTOK AÇIKLAMASI: (Top 10'da tutan tarza uygun, etkileşim çekecek Türkçe metin)
-    🏷️ ETİKETLER: (Verideki popüler hashtagler ve konseptle uyumlu eklemeler)
+    🎬 VİDEO KONSEPTİ: (Net fikir)
+    🤖 AI VİDEO ÜRETİM PROMPTU: (Sora/Kling/Luma gibi yapay zekalara verilecek İNGİLİZCE, detaylı prompt)
+    📝 TIKTOK AÇIKLAMASI: (Türkçe metin)
+    🏷️ ETİKETLER: (Hashtagler)
     ---
     """
 
