@@ -10,37 +10,45 @@ ACCESS_KEY = os.environ.get("KLING_ACCESS_KEY")
 SECRET_KEY = os.environ.get("KLING_SECRET_KEY")
 STRATEJI_DOSYASI = "son_strateji.txt"
 
-def promptu_cikar(dosya_yolu):
-    """son_strateji.txt dosyasından sadece AI Promptunu (garantili yolla) çeker."""
+def promptlari_ayikla(dosya_yolu):
+    """Dosyadaki tüm AI Promptlarını liste olarak çeker."""
     try:
+        if not os.path.exists(dosya_yolu):
+            print(f"❌ Hata: {dosya_yolu} bulunamadı.")
+            return []
+
         with open(dosya_yolu, "r", encoding="utf-8") as f:
             icerik = f.read()
             
-        # 🤖 ve 📝 emojileri arasındaki metni kopar (Format ne kadar bozulursa bozulsun çalışır)
-        if "🤖" in icerik and "📝" in icerik:
-            ham_prompt = icerik.split("🤖")[1].split("📝")[0]
-            # Başlık metnini ve gereksiz > * gibi süsleri temizle
-            temiz_prompt = re.sub(r".*PROMPTU.*?:", "", ham_prompt, flags=re.IGNORECASE)
-            temiz_prompt = temiz_prompt.replace(">", "").replace("*", "").strip()
-            return temiz_prompt
-        else:
-            print("❌ Hata: Strateji dosyasında '🤖' veya '📝' işaretleri bulunamadı. Metin yapısı farklı.")
-            return None
-            
-    except FileNotFoundError:
-        print(f"❌ Hata: {dosya_yolu} bulunamadı.")
-        return None
+        # 🤖 ile başlayan her bloğu bul
+        bloklar = icerik.split("🤖")[1:] 
+        prompt_listesi = []
+        
+        for blok in bloklar:
+            # Her blokta 📝 (Açıklama) kısmına kadar olan yeri al
+            if "📝" in blok:
+                ham_prompt = blok.split("📝")[0]
+                # Başlık ve süsleri temizle
+                temiz_prompt = re.sub(r".*PROMPTU.*?:", "", ham_prompt, flags=re.IGNORECASE)
+                temiz_prompt = temiz_prompt.replace(">", "").replace("*", "").strip()
+                if temiz_prompt:
+                    prompt_listesi.append(temiz_prompt)
+        
+        return prompt_listesi
+    except Exception as e:
+        print(f"❌ Dosya okuma hatası: {e}")
+        return []
 
-def video_uret_kling(prompt):
-    """Kling API'sini kullanarak video üretim emri verir ve sonucu bekler."""
+def video_uret_kling(prompt, video_no):
+    """Kling API'sini kullanarak video üretir ve video_{no}.mp4 olarak kaydeder."""
     if not ACCESS_KEY or not SECRET_KEY:
         print("❌ Hata: KLING API anahtarları eksik.")
         return False
         
-    print(f"🎬 Kling'e Gönderilen Prompt: {prompt}\n")
-    print("⏳ Kling AI videoyu render ediyor... (Bu işlem birkaç dakika sürebilir)")
+    print(f"\n🎬 VİDEO {video_no} HAZIRLANIYOR...")
+    print(f"📝 Prompt: {prompt[:100]}...")
     
-    # 1. JWT Token Oluşturma (Güvenlik Kapısı)
+    # 1. JWT Token Oluşturma
     payload = {
         "iss": ACCESS_KEY,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=1800),
@@ -58,64 +66,70 @@ def video_uret_kling(prompt):
         "Content-Type": "application/json"
     }
 
+    # 2. Görev Başlat
     api_url_task = "https://api.klingai.com/v1/videos/text2video"
-    
     data = {
         "prompt": prompt,
         "ratio": "9:16",
         "duration": "5"
     }
 
-    # 1. Görev Başlat
     try:
         response = requests.post(api_url_task, headers=headers, json=data)
         response_data = response.json()
         
         if response.status_code == 200 and response_data.get("code") == 0:
             task_id = response_data["data"]["task_id"]
-            print(f"✅ Video görevi başlatıldı! Görev ID: {task_id}")
+            print(f"✅ Görev başlatıldı! ID: {task_id}")
         else:
-            print(f"❌ API Hatası (Görev Başlatılamadı): {response_data}")
+            print(f"❌ API Hatası: {response_data}")
             return False
             
     except Exception as e:
          print(f"❌ İstek Hatası: {e}")
          return False
 
-    # 2. Sonucu Bekle (Polling)
+    # 3. Sonucu Bekle ve İndir
     api_url_result = f"https://api.klingai.com/v1/videos/text2video/{task_id}"
-    
     while True:
         try:
             res = requests.get(api_url_result, headers=headers)
             res_data = res.json()
-            
             status = res_data.get("data", {}).get("task_status")
             
             if status == "succeed":
                 video_url = res_data["data"]["task_result"]["videos"][0]["url"]
-                print(f"🎉 Video Hazır! URL: {video_url}")
+                print(f"🎉 Video {video_no} Hazır!")
                 
-                print("📥 Video indiriliyor...")
+                # İsimlendirme: video_1.mp4, video_2.mp4 vb.
+                dosya_adi = f"video_{video_no}.mp4"
                 video_icerik = requests.get(video_url).content
-                with open("video_output.mp4", "wb") as f:
+                with open(dosya_adi, "wb") as f:
                     f.write(video_icerik)
-                print("✅ Video başarıyla kaydedildi: video_output.mp4")
+                print(f"✅ Kaydedildi: {dosya_adi}")
                 return True
                 
             elif status == "failed":
-                print("❌ Video üretimi başarısız oldu (Kling reddetti).")
+                print(f"❌ Video {video_no} üretimi başarısız.")
                 return False
-                
             else:
-                print("⏳ İşleniyor... Kling videoyu çiziyor (30 saniye bekleniyor)")
+                print(f"⏳ Video {video_no} çiziliyor... (30sn bekleniyor)")
                 time.sleep(30)
                 
         except Exception as e:
-            print(f"❌ Durum kontrolü sırasında hata: {e}")
+            print(f"❌ Durum kontrol hatası: {e}")
             time.sleep(30)
 
 if __name__ == "__main__":
-    hedef_prompt = promptu_cikar(STRATEJI_DOSYASI)
-    if hedef_prompt:
-        video_uret_kling(hedef_prompt)
+    promp_listesi = promptlari_ayikla(STRATEJI_DOSYASI)
+    
+    if not promp_listesi:
+        print("📭 Üretilecek yeni prompt bulunamadı.")
+    else:
+        print(f"🚀 Toplam {len(promp_listesi)} video üretilecek.")
+        for index, prompt in enumerate(promp_listesi):
+            # Sırayla her prompt için video üret
+            video_uret_kling(prompt, index + 1)
+            # API'yi yormamak için kısa bir mola
+            if index < len(promp_listesi) - 1:
+                time.sleep(5)
