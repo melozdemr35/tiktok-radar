@@ -17,17 +17,26 @@ jobs:
           python-version: '3.9'
 
       - name: Kutuphaneleri Kur
-        run: pip install google-generativeai
+        run: |
+          pip install google-generativeai
+          pip install pyjwt requests
 
       - name: Fikir Kodunu Calistir
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python fikir_ureteci.py > son_strateji.txt
 
+      - name: Video Ureteci Kodunu Calistir
+        env:
+          KLING_ACCESS_KEY: ${{ secrets.KLING_ACCESS_KEY }}
+          KLING_SECRET_KEY: ${{ secrets.KLING_SECRET_KEY }}
+        run: python video_ureteci.py
+
       - name: Sonucu Dosyaya Kaydet
         run: |
           git config --global user.name "Autonomous-Bot"
           git config --global user.email "actions@github.com"
           git add son_strateji.txt
+          git add video_output.mp4 || true
           # Sadece değişiklik varsa commit yap, yoksa hata vermeden geç
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Strategy updated [$(date)]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Strategy and Video updated [$(date)]" && git push)
