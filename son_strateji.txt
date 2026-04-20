@@ -1,2 +1,24 @@
 🧠 Gemini radar verilerini analiz ediyor ve promptu hazırlıyor...
-❌ Gemini API Hatası: 404 models/gemini-3-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+
+============================================================
+🎯 ÜRETİM EMRİ HAZIR:
+============================================================
+---
+
+📊 **GEMİNİ RADAR ANALİZİ:**
+Veriler, TikTok ekosisteminde şu an üç ana damarın birleştiğini gösteriyor: **"Narsist Estetik"** (Natalie Reynolds), **"Kaotik Enerji"** (IShowSpeed) ve **"Absürt Gerçeküstücülük"** (#brainrot/#boneka). Kullanıcılar artık sadece izlemiyor; ya aşırı özgüvenli ya da anlamlandırılamayan (fever dream) içeriklere devasa yorum sayılarıyla (IShowSpeed videolarındaki 460K+ yorum gibi) tepki veriyor. "I'm scared" ve "Obsessed" gibi kısa, duygu tetikleyici açıklamalar etkileşimi maksimize ediyor.
+
+⏰ **HEDEFLENEN SAAT:** 10:00
+
+🎬 **VİDEO KONSEPTİ:** 
+**"The Glitch Doll Aesthetic (Brainrot Core)"**: Natalie Reynolds'ın özgüvenli "main character" duruşunu, #boneka (oyuncak bebek) temasının ürkütücülüğü ve IShowSpeed'in kaotik glitch efektleriyle birleştiren, yapay zeka tarafından üretilmiş hiper-gerçekçi bir video. İzleyicide "Az önce ne izledim?" hissi yaratarak yorumlarda tartışma (brainrot) başlatmayı hedefler.
+
+🤖 **AI VİDEO ÜRETİM PROMPTU (Sora/Kling/Luma):**
+> Cinematic hyper-realistic close-up shot of a stylish, doll-like humanoid figure with glowing neon eyes, standing in a distorted urban environment. The character is performing a high-energy, glitchy dance move similar to IShowSpeed's erratic movements. The lighting shifts between soft aesthetic pink (Natalie Reynolds vibe) and aggressive strobing glitches. Surround the character with floating, surreal 3D objects (rubber ducks and distorted emojis) to trigger "brainrot" aesthetics. 4k resolution, liquid motion, eerie atmosphere, highly detailed textures, trending TikTok visual style.
+
+📝 **TIKTOK AÇIKLAMASI:**
+Neden herkes bana bakıyor? Korkmaya başladım… 💀🌀 #brainrot
+
+🏷️ **ETİKETLER:**
+#ishowspeed #fyp #nataliereynolds #boneka #brainrot #aiart #trend #kesfet #surreal #vibe ---
+============================================================
