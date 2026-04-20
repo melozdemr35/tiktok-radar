@@ -65,7 +65,7 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
         return
 
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-pro')
+   model = genai.GenerativeModel('gemini-3-flash-preview')
 
     # GEMINI'YE VERİLEN YENİ EMİR: ÖNCE RADAR ANALİZİ YAP, SONRA ÜRET!
     sistem_talimati = f"""
