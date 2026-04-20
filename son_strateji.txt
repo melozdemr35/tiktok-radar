@@ -1,31 +1,29 @@
-🧠 Gemini radar verilerini analiz ediyor ve 2 adet prompt hazırlıyor...
+🧠 Gemini radar verilerini analiz ediyor (Yabancı içerikler filtrelendi) ve 2 adet prompt hazırlıyor...
 
 ============================================================
 🎯 ÇİFT ÜRETİM EMRİ HAZIR:
 ============================================================
-Merhaba! Ben TikTok İçerik Stratejisti ve AI Yönetmeniyim. Verileri analiz ettim; şu an platformda **"Yüksek Ego/Narsizm"** (Natalie Reynolds), **"Görsel Kaos/Absürtlük"** (Brainrot/Boneka) ve **"Anlık Korku/Şaşkınlık"** (I’m scared) temalarının zirvede olduğunu görüyorum. Özellikle "Brainrot" akımı, Gen Alpha ve Gen Z arasındaki dikkat süresinin kısalığını kullanarak aşırı hızlı ve absürt görsellere yöneliyor.
+Harika bir strateji için kolları sıvıyorum. Sağladığın verilerdeki küresel gürültüyü (IShowSpeed, Natalie Reynolds vb.) filtreleyerek, bu içeriklerin alt metnindeki **"hızlı tüketim, absürt görsel estetik ve beyin yakan (brainrot) mizah"** enerjisini Türkiye'nin yerel dokusuyla harmanlayacağım.
 
-İşte bu verilere dayanarak hazırladığım stratejik video planları:
+İşte Türkiye pazarı için hazırladığım stratejik plan:
 
 ---
 
 🎬 **VİDEO NO: 1**
-📊 **GEMİNİ RADAR ANALİZİ:** Verilerdeki en yüksek etkileşim "Obsessed with me" (Natalie Reynolds) ve "Brainrot" temalarından geliyor. İnsanlar ya kendinden aşırı emin bir duruşu ya da hiçbir mantığı olmayan görsel kaosu izliyor. Video 1, bu narsistik güveni AI estetiğiyle birleştirerek "Trende Tam Uyum" sağlıyor.
+📊 **GEMİNİ RADAR ANALİZİ:** Mevcut trendler "Brainrot" olarak adlandırılan, hızlı, tekrara dayalı ve görsel olarak hipnotize edici içeriklerin zirvede olduğunu gösteriyor. Türkiye'de bu akım, yerel objelerin veya durumların absürt ve sürreal bir şekilde (AI desteğiyle) sunulmasıyla büyük izlenme alıyor.
 ⏰ **HEDEFLENEN SAAT:** 10:00
-🎬 **VİDEO KONSEPTİ:** "The Glitch Goddess". Bir karakterin (Natalie Reynolds tarzı bir özgüvenle) kameraya bakarken gerçeklikten kopup ultra lüks bir "Boneka" bebeğine ve ardından dijital bir veriye dönüşmesini içeren, yüksek tempolu bir "Glow-up/Transformation" videosu.
-🤖 **AI VİDEO ÜRETİM PROMPTU:** (Kling/Luma/Sora için): A hyper-realistic, high-fashion woman walking confidently towards the camera in a futuristic neon-lit street. Suddenly, her skin starts turning into a porcelain doll texture (boneka style), then glitches into liquid gold and digital particles. High energy, rhythmic movement, strobe lighting effects, 8k resolution, cinematic lighting, sharp focus on eyes expressing "obsession".
-📝 **TIKTOK AÇIKLAMASI:** Gerçeklik sadece bir illüzyon ama ben her zaman merkezdeyim... 💅✨ #brainrot dünyasında bir kraliçe. 
-🏷️ **ETİKETLER:** #ishowspeed #fyp #nataliereynolds #boneka #brainrot #aiart #transformation #obsessed
+🎬 **VİDEO KONSEPTİ:** **"Sonsuz Türk Kahvesi Döngüsü"**. Klasik bir Türk kahvesi fincanının içinden sürekli yeni manzaralar, galaksiler ve sonunda tekrar bir kahve fincanı çıkan, izleyeni içine çeken sürreal bir AI "zoom-in" döngüsü. Yerel bir kültürel ögeyi modern "brainrot" estetiğiyle birleştiriyoruz.
+🤖 **AI VİDEO ÜRETİM PROMPTU:** A cinematic, hyper-realistic macro zoom-in video. Starting from the bubbles of a traditional Turkish coffee in a porcelain cup. The camera dives into the bubbles, revealing a miniature traditional Turkish bazaar inside. As the camera zooms further, the bazaar transforms into a swirling galaxy, which then reshapes back into the center of a Turkish coffee cup. Infinite loop, high saturation, psychedelic transitions, 4k, surrealism.
+📝 **TIKTOK AÇIKLAMASI:** Sabah kahvesi ama bekledikçe derinleşiyor... ☕️ Bu döngüden çıkabilen var mı? #sabahkahvesi #döngü #yapayzeka
+🏷️ **ETİKETLER:** #kahve #turkkahvesi #surreal #yapayzeka #sanat #fyp #türkiye #akım
 
 ---
 
 🎬 **VİDEO NO: 2**
-📊 **GEMİNİ RADAR ANALİZİ:** "I'm scared" (Korkuyorum) başlığıyla 24M beğeni alan videolar, izleyicide merak ve tetikte olma hissi uyandırıyor. Bu deneysel videoda, alışılagelmişin dışında, devasa ve "tekinsiz" (uncanny valley) bir görsellik kullanarak "durdurma gücü" (stop-scrolling power) hedefliyoruz.
+📊 **GEMİNİ RADAR ANALİZİ:** Verilerdeki "I'm scared" ve "Boneka" (oyuncak bebek) vurgusu, izleyicinin tekinsiz (uncanny valley) ve dikkat çekici görsel değişimlere tepki verdiğini gösteriyor. Türkiye özelinde, geleneksel bir figürün fütüristik veya beklenmedik bir teknolojiyle birleşmesi "farklılık" yaratarak etkileşimi artıracaktır.
 ⏰ **HEDEFLENEN SAAT:** 14:00
-🎬 **VİDEO KONSEPTİ:** "The Urban Giant". Bir şehrin ortasında, binaların arasından aniden çıkan devasa, sevimli ama aynı zamanda ürkütücü bir AI karakteri (Speed'in enerjisini ve Boneka'nın tuhaflığını taşıyan bir yaratık). İzleyiciye "Bu ne?" dedirten, fizik kurallarına aykırı bir devasa etkileşim.
-🤖 **AI VİDEO ÜRETİM PROMPTU:** (Kling/Luma/Sora için): A wide cinematic handheld shot of a busy New York street. Suddenly, a colossal, surreal fluffy creature with large glowing eyes peeks from behind a skyscraper. The creature moves with fluid, unpredictable "brainrot" style movements. People on the street look up in awe. Hyper-realistic textures, volumetric fog, dramatic shadows, realistic camera shake, 8k, uncanny valley aesthetic.
-📝 **TIKTOK AÇIKLAMASI:** Şehrin yeni bir sahibi var ve dürüst olmak gerekirse... Biraz korkuyorum. 😳 Herkes buna bakıyor!
-🏷️ **ETİKETLER:** #ishowspeed #brainrot #imscared #boneka #surrealism #aitiktok #trending #viralvideo
-
----
+🎬 **VİDEO KONSEPTİ:** **"Siber-Simitçi 2099"**. İstanbul'un tarihi bir sokağında (Eminönü veya Galata), geleneksel bir simit tezgahının başında duran ama tamamen insansı robot (android) olan bir simitçi. Robot, simidi havaya atıyor ve simit havada neon ışıklara dönüşerek tekrar eline düşüyor. Geleneksel ile geleceğin çarpışması.
+🤖 **AI VİDEO ÜRETİM PROMPTU:** A high-end cinematic video set in a nostalgic Istanbul street with Galata Tower in the background. A traditional Turkish simit vendor (simitçi) who is actually a highly detailed humanoid android with glowing blue circuits. The android throws a golden simit into the air; the simit glitters with digital neon sparks and falls back into the cart. Cyberpunk aesthetic mixed with warm, authentic Turkish street atmosphere. 8k, ray tracing, moody lighting.
+📝 **TIKTOK AÇIKLAMASI:** 2099 yılında İstanbul’da bir sabah... Simitler hala sıcak ama ustalar biraz değişmiş. 🤖🥨 Nasıl buldunuz? #istanbul #gelecek #simit #cyberpunk #yapayzeka
+🏷️ **ETİKETLER:** #bilimkurgu #istanbul2099 #teknoloji #yerelüretim #ilginc #fyp #türkiye #robot
 ============================================================
