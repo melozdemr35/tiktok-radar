@@ -62,8 +62,8 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
         return
 
     genai.configure(api_key=api_key)
-    # Model ismi ve boşluk hatası burada düzeltildi:
-    model = genai.GenerativeModel('gemini-3-flash')
+    # Model ismi tam olarak güncel API versiyonuna göre düzeltildi:
+    model = genai.GenerativeModel('gemini-3-flash-preview')
 
     sistem_talimati = f"""
     Sen profesyonel bir TikTok İçerik Stratejisti ve Yapay Zeka Video Yönetmenisin.
