@@ -22,7 +22,7 @@ def veritabani_analiz_et(dosya_yolu="trend_veritabani.json"):
     else:
         zirve_saat = "Belirsiz"
 
-    # 2. TOP 10 VİDEOYU ÇIKARMA
+    # 2. SAYILARI PARÇALAMA
     def parse_number(num_str):
         if not num_str: return 0
         num_str = str(num_str).upper().replace(',', '.')
@@ -36,8 +36,28 @@ def veritabani_analiz_et(dosya_yolu="trend_veritabani.json"):
         except:
             return 0
 
+    # 🛡️ YENİ EKLENEN: DİL VE ESKİ VİDEO FİLTRESİ
+    def turkce_ve_temiz_mi(metin, hashtag_listesi):
+        if not metin: return True
+        metin_kucuk = metin.lower()
+        
+        # Kesinlikle yabancı olan kelimeleri arıyoruz (İngilizce, İspanyolca vs.)
+        yabanci_kelimeler = [" the ", " and ", " you ", " for ", " of ", " in ", " is ", " el ", " la ", " de ", " que ", " my "]
+        
+        for kelime in yabanci_kelimeler:
+            if kelime in f" {metin_kucuk} ":
+                return False # Yabancı video tespit edildi, ele!
+                
+        return True
+
+    # 3. FİLTRELEME VE TOP 10 VİDEOYU ÇIKARMA
+    temizlenmis_veriler = [
+        v for v in veriler 
+        if turkce_ve_temiz_mi(v.get("desc", ""), v.get("hashtags", []))
+    ]
+
     sirali_veriler = sorted(
-        veriler, 
+        temizlenmis_veriler, 
         key=lambda x: parse_number(x.get("views", "0")) + parse_number(x.get("likes", "0")) + parse_number(x.get("comments", "0")), 
         reverse=True
     )
@@ -64,10 +84,11 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-3-flash-preview')
 
-    # BURASI GÜNCELLENDİ: Artık 2 adet farklı video stratejisi istiyoruz.
     sistem_talimati = f"""
     Sen profesyonel bir TikTok İçerik Stratejisti ve Yapay Zeka Video Yönetmenisin.
     Aşağıda sağlanan 'Top 10 Trend Verileri'ni ve popüler etiketleri dikkatle incele. 
+    
+    🛡️ ÖNEMLİ KURAL: Bu veriler arasında kazara sızmış yabancı dildeki (İngilizce, vb.) videoları KESİNLİKLE DİKKATE ALMA. Sadece Türkiye'deki lokal ve güncel trendleri baz alarak konsept üret.
     
     GÖREV 1 (RADAR ANALİZİ): Önce bu verilerdeki genel eğilimi analiz et.
     GÖREV 2 (ÜRETİM EMRİ): Bu analizle birbirinden tamamen FARKLI 2 ADET YENİ video fikri oluştur. (Biri trende tam uygun, diğeri biraz daha deneysel/dikkat çekici olsun).
@@ -90,7 +111,7 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
     ---
     """
 
-    print("🧠 Gemini radar verilerini analiz ediyor ve 2 adet prompt hazırlıyor...")
+    print("🧠 Gemini radar verilerini analiz ediyor (Yabancı içerikler filtrelendi) ve 2 adet prompt hazırlıyor...")
     try:
         response = model.generate_content(sistem_talimati)
         print("\n" + "="*60)
