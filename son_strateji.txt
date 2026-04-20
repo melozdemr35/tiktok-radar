@@ -1,31 +1,24 @@
 🧠 Gemini radar verilerini analiz ediyor (Yabancı içerikler filtrelendi) ve 2 adet prompt hazırlıyor...
-
-============================================================
-🎯 ÇİFT ÜRETİM EMRİ HAZIR:
-============================================================
-Merhaba! Ben stratejistiniz ve yönetmeniniz olarak verileri süzgeçten geçirdim. Sağladığınız verilerin tamamı küresel/yabancı içeriklerden oluştuğu için, talimatınız doğrultusunda bu içeriklerin **temalarını** (düğün, aile komedisi, teknoloji) alıp **Türkiye'nin güncel kültürel kodlarına ve yerel trendlerine** (Düğün sezonu dinamikleri, Türk aile yapısı ve yerel mizah anlayışı) uyarlayarak stratejimi oluşturdum.
-
-İşte radar analizi ve üretim planı:
-
----
-
-🎬 **VİDEO NO: 1**
-📊 **GEMİNİ RADAR ANALİZİ:** Verilerde "Wedding" (Düğün) ve "Family" (Aile) temalarının çok güçlü bir etkileşim aldığı görülüyor. Türkiye'de şu an düğün sezonunun zirvesinde olduğumuzu ve "Gelin Alma/Düğün Girişi" videolarının yerel algoritmayı domine ettiğini saptadım. Bu video, yüksek duygusal bağ ve "Relatable" (Tanıdık) içerik kategorisine giriyor.
-⏰ **HEDEFLENEN SAAT:** 12:00
-🎬 **VİDEO KONSEPTİ:** "Geleneksel vs. Modern Düğün Hazırlığı" – Türk düğünlerindeki o meşhur "evden çıkış" anının, sinematik ve aşırı duygusal bir dille başlayıp aniden enerjik bir Ankara Havası veya modern bir dansa dönüşmesi. (Duygu geçişli hook tekniği).
-🤖 **AI VİDEO ÜRETİM PROMPTU:** Cinematic, high-quality video of a traditional Turkish wedding scene. First half: A bride in a white dress crying emotionally while her brother ties a red ribbon (Gayret Kemeri) in a nostalgic living room, soft warm lighting, slow motion. Second half: Sudden transition to high energy, the bride and groom dancing energetically to upbeat music in a modern wedding hall with bright neon lights and celebratory atmosphere. 4k, hyper-realistic, emotional facial expressions.
-📝 **TIKTOK AÇIKLAMASI:** O son bakış ve her şeyin başladığı o an... ❤️ Gelenekler mi, eğlence mi? Biz ikisini de seçtik! Sizde düğünler nasıl başlıyor? 👇
-🏷️ **ETİKETLER:** #düğün #gelin #gelinalma #türkiyedüğünleri #evlilik #duygusal #weddingday #keşfet
-
----
-
-🎬 **VİDEO NO: 2**
-📊 **GEMİNİ RADAR ANALİZİ:** Verilerdeki "TechMagic" ve "SmartBot" vurgusu, izleyicinin görsel illüzyonlara ve "nasıl yapıldı?" dedirten teknolojik estetiğe aç olduğunu gösteriyor. Türkiye'de ise "İstanbul" ve "Kültürel Semboller" her zaman viral potansiyeli taşır. Bu içerik, deneysel bir "Cyberpunk Türkiye" estetiğiyle dikkat çekecek.
-⏰ **HEDEFLENEN SAAT:** 16:00
-🎬 **VİDEO KONSEPTİ:** "Geleceğin İstanbul'u: Simit Satan Robotlar" – İstanbul Boğazı'nda, martılara simit atan hiper-fütüristik bir robotun veya Galata Kulesi'nin etrafında uçan geleneksel görünümlü drone-tepsilerin olduğu kısa, büyüleyici bir sekans. Yerel kültürle teknolojinin absürt ve estetik birleşimi.
-🤖 **AI VİDEO ÜRETİM PROMPTU:** Hyper-realistic, sci-fi concept video set in Istanbul. A futuristic, chrome-plated robot wearing a traditional Turkish 'Simitçi' apron, selling golden simits on a high-tech floating ferry crossing the Bosphorus. In the background, Galata Tower with neon lights and flying cars. Cinematic lighting, sunset atmosphere, vibrant teal and orange color grading, 8k resolution, Unreal Engine 5 style.
-📝 **TIKTOK AÇIKLAMASI:** 2077 yılında İstanbul’da sıradan bir sabah... 🤖🥨 Teknolojinin bile değiştiremeyeceği bazı gelenekler vardır. Sizce gelecek nasıl olacak? 🚀
-🏷️ **ETİKETLER:** #istanbul #gelecek #yapayzeka #cyberpunk #simit #türkiye #aiart #deneysel #keşfetmenotları
-
----
-============================================================
+❌ Gemini API Hatası: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3-flash
+Please retry in 19.102060316s. [links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-3-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 20
+}
+, retry_delay {
+  seconds: 19
+}
+]
