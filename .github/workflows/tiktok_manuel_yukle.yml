@@ -1,0 +1,25 @@
+name: TikTok Manuel Yukle (Kredi Harcamaz)
+
+on:
+  workflow_dispatch: # Bu satır "Run Workflow" butonunu çıkarır
+
+jobs:
+  yukle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Depoyu Klonla
+        uses: actions/checkout@v3
+
+      - name: Python Kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Kutuphaneleri Kur
+        run: |
+          pip install requests tiktok-uploader
+
+      - name: 📱 Sadece TikTok'a Yukle
+        env:
+          TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
+        run: python tiktok_yukleyici.py
