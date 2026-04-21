@@ -24,7 +24,9 @@ jobs:
 
       - name: 📱 Sadece TikTok'a Yukle
         env:
+          # 🗝️ Burası robotun GitHub kasasından (Secrets) veri çekmesini sağlar
           TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
+          TIKTOK_COOKIES: ${{ secrets.TIKTOK_COOKIES }} # ✅ BU SATIR EKLENDİ
         run: |
           # 🖥️ XVFB-RUN KOMUTU İLE SANAL EKRAN OLUŞTURUYORUZ
           xvfb-run python tiktok_yukleyici.py
