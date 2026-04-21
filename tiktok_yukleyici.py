@@ -44,12 +44,13 @@ def yukleme_islemcisi(video_yolu, metin, video_no):
     video_abs_path = os.path.abspath(video_yolu)
 
     try:
-        # Kütüphaneye bu tam teşekküllü belgeyi sunuyoruz
+        # 🔥 ÖZEL AYARLAR: Tarayıcıyı zorlamak için headless=False yapıyoruz!
+        # Xvfb (Sanal Ekran) sayesinde hata vermeyecek ama gerçek fare tıklaması yapacak.
         upload_video(
             video_abs_path,
             description=metin,
             cookies=cookie_path, 
-            headless=True
+            headless=False # <--- İŞTE KRİTİK DEĞİŞİKLİK BURADA
         )
         print(f"✅ {video_no}. VİDEO BAŞARIYLA TİKTOK'A YÜKLENDİ!")
         
