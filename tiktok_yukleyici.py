@@ -1,11 +1,12 @@
 import os
 import re
+import json
 import time
 import multiprocessing
 from datetime import datetime
 from tiktok_uploader.upload import upload_video
 
-# GitHub Secrets'tan tertemiz session id'yi al
+# GitHub Secrets'tan session id'yi al
 SESSION_ID = os.environ.get("TIKTOK_SESSION_ID")
 STRATEJI_DOSYASI = "son_strateji.txt"
 
@@ -37,41 +38,46 @@ def paylasim_bilgilerini_al(dosya_yolu):
         return []
 
 def yukleme_islemcisi(video_yolu, metin, session_id, video_no):
-    """Her yüklemeyi izole bir işlem içinde, en direkt parametrelerle çalıştırır."""
+    """Her yüklemeyi izole bir işlem içinde, fiziksel bir kurabiye dosyası yoluyla çalıştırır."""
     print(f"🚀 {video_no}. Video için motor ateşleniyor...")
     
-    # 🔍 Hata Ayıklama: ID'nin yüklendiğinden emin olalım (İlk 5 karakteri basar)
-    if not session_id:
-        print(f"❌ Hata: SESSION_ID bulunamadı! GitHub Secrets'ı kontrol et.")
-        return
-    else:
-        print(f"🔑 Session ID yüklendi (Karakter Sayısı: {len(session_id)})")
-
-    video_abs_path = os.path.abspath(video_yolu)
-
-    # 🍪 EN SAĞLAM FORMAT: Doğrudan liste olarak gönderiyoruz
-    cookies_list = [
+    # 🍪 KURABİYE DOSYASI OLUŞTURMA: Kütüphanenin istediği fiziksel dosya
+    cookie_filename = f"temp_cookies_{video_no}.json"
+    # os.path.abspath ile dosyanın tam yolunu alıyoruz (Örn: /home/runner/work/.../temp_cookies_1.json)
+    cookie_path = os.path.abspath(cookie_filename)
+    
+    cookies_data = [
         {
             "name": "sessionid",
             "value": session_id,
             "domain": ".tiktok.com",
-            "path": "/"
+            "path": "/",
+            "httpOnly": True,
+            "secure": True
         }
     ]
+    
+    with open(cookie_path, 'w') as f:
+        json.dump(cookies_data, f)
+
+    video_abs_path = os.path.abspath(video_yolu)
 
     try:
-        # 🔥 Dosya yazma işini bıraktık, direkt listeyi veriyoruz.
-        # Eğer bu da olmazsa, kütüphanenin beklediği sessionid= parametresini deneriz.
+        # 🔥 KRİTİK: cookies parametresine 'cookie_path' (string yol) veriyoruz.
+        # Screenshot'taki 'not list' hatasını bu şekilde çözüyoruz.
         upload_video(
             video_abs_path,
             description=metin,
-            cookies=cookies_list, 
+            cookies=cookie_path, 
             headless=True
         )
         print(f"✅ {video_no}. VİDEO TİKTOK'A FIRLATILDI!")
     except Exception as e:
         print(f"❌ {video_no}. Video Yükleme Hatası: {e}")
-        print("💡 İPUCU: Eğer hala 'No valid auth' diyorsa, ID kopyalanırken başına 'sessionid=' eklenmiş olabilir, sadece değeri kopyala.")
+    finally:
+        # Temizlik: Geçici kurabiye dosyasını imha et
+        if os.path.exists(cookie_path):
+            os.remove(cookie_path)
 
 if __name__ == "__main__":
     paylasimlar = paylasim_bilgilerini_al(STRATEJI_DOSYASI)
@@ -79,19 +85,21 @@ if __name__ == "__main__":
     if not paylasimlar:
         print("📭 Yüklenecek veri bulunamadı. son_strateji.txt dosyasını kontrol et.")
     else:
+        # Kling'den gelen tarihli dosya formatı (Örn: video_21-04_1.mp4)
         bugun = datetime.now().strftime("%d-%m")
+        
         for i in range(1, 3):
             video_adi = f"video_{bugun}_{i}.mp4"
             if os.path.exists(video_adi) and len(paylasimlar) >= i:
                 metin = paylasimlar[i-1]
                 
-                # İzole process (Playwright asyncio çakışmalarını önlemek için)
+                # İzole process (Playwright asyncio çakışmalarını önler)
                 p = multiprocessing.Process(
                     target=yukleme_islemcisi, 
                     args=(video_adi, metin, SESSION_ID, i)
                 )
                 p.start()
-                p.join() 
+                p.join() # Video bitene kadar bekle
                 
                 if i < 2:
                     print("☕ Güvenlik molası (20 saniye)...")
