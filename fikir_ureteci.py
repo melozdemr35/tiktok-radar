@@ -57,9 +57,8 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
 
     genai.configure(api_key=api_key)
     
-    # 🛡️ GÜVENLİ MODEL SEÇİMİ: Önce Flash-Latest, olmazsa Flash, o da olmazsa Pro
+    # 🎯 HATA YOK: AI Studio'dan teyit ettiğimiz kesin model ismi
     model = genai.GenerativeModel('gemini-3-flash-preview')
-    model = None
     
     bugun = datetime.now().strftime("%d %B %Y")
 
@@ -89,27 +88,23 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
 
     print(f"🧠 Gemini 'Viral Canavarı' modunda {bugun} analizini yapıyor...")
     
-    for isim in model_isimleri:
-        try:
-            print(f"🔄 {isim} deneniyor...")
-            model = genai.GenerativeModel(isim)
-            response = model.generate_content(sistem_talimati)
+    try:
+        response = model.generate_content(sistem_talimati)
+        
+        if response.text:
+            strateji_metni = response.text
+            print("\n" + "="*60)
+            print(strateji_metni)
+            print("="*60)
             
-            if response.text:
-                strateji_metni = response.text
-                print("\n" + "="*60)
-                print(strateji_metni)
-                print("="*60)
-                
-                with open("son_strateji.txt", "w", encoding="utf-8") as f:
-                    f.write(strateji_metni)
-                print(f"✅ Başarılı! {isim} ile fikirler kaydedildi.")
-                return # Başarılı olduysa fonksiyondan çık
-        except Exception as e:
-            print(f"⚠️ {isim} başarısız oldu: {str(e)[:50]}...")
-            continue
-
-    print("❌ Maalesef hiçbir model yanıt vermedi.")
+            with open("son_strateji.txt", "w", encoding="utf-8") as f:
+                f.write(strateji_metni)
+            print("✅ Başarılı! Fikirler 'son_strateji.txt' dosyasına mühürlendi.")
+        else:
+            print("❌ Gemini cevap üretemedi, içerik boş.")
+            
+    except Exception as e:
+        print(f"❌ Gemini Hatası: {e}")
 
 if __name__ == "__main__":
     analiz = veritabani_analiz_et()
