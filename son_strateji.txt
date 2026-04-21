@@ -3,30 +3,29 @@
 ============================================================
 🎯 ÇİFT ÜRETİM EMRİ HAZIR:
 ============================================================
-Profesyonel bir TikTok Stratejisti ve AI Yönetmeni olarak, sağladığın verileri Türkiye pazarının kültürel kodlarıyla harmanlayarak analiz ettim ve aksiyon planını oluşturdum.
+Harika, verileri analiz ettim. Sağlanan verilerdeki global (İngilizce) videoları filtrelendiğinde; ana temanın **"evlilik/ilişki dinamikleri"**, **"duygusal patlamalar"** ve **"evcil hayvan sevgisi"** etrafında döndüğü görülüyor. Türkiye özelinde bu temalar; düğün hazırlıkları, "kocam da kocam" mizahı ve gece geç saatlerdeki "absürt/samimi" itiraflar olarak karşılık buluyor.
 
-### GÖREV 1: RADAR ANALİZİ
-Veriler her ne kadar küresel trend sızıntıları içerse de (düğün, evcil hayvanlar, kişisel bakım), Türkiye özelinde bu temalar her zaman "lokal mizah" ve "aile dinamikleri" ile birleştiğinde patlama yapar. Özellikle `#weddingday` ve `#husband` etiketleri, Türkiye'deki "gelin-görümce-damat" ve "düğün hazırlığı" içeriklerinin ne kadar güçlü bir karşılığı olduğunu gösteriyor. Kullanıcılar artık sadece estetik video değil, içinde "gerçek bir duygu" veya "tanıdık bir durum komedisi" olan içeriklere etkileşim veriyor.
+İşte Türkiye yerel trendlerine göre optimize edilmiş 2 video konsepti:
 
 ---
 
-### GÖREV 2: ÜRETİM EMRİ
-
 🎬 **VİDEO NO: 1**
-📊 **GEMİNİ RADAR ANALİZİ:** Verilerdeki yoğun "düğün ve eş" (#weddingday, #husband) vurgusunu, Türkiye'deki "altın takma töreni" veya "gelin hazırlığı" samimiyetiyle birleştiriyoruz. Duygusal ama gösterişli bir "ilk bakış" (first look) anı her zaman yüksek izlenme alır.
-⏰ **HEDEFLENEN SAAT:** 14:00
-🎬 **VİDEO KONSEPTİ:** "Geleneksel Modernlik" - AI ile üretilmiş çok şık bir Türk düğün salonu atmosferinde, damadın gelini ilk kez gördüğü andaki aşırı duygusal ve samimi tepkisi.
-🤖 **AI VİDEO ÜRETİM PROMPTU:** A cinematic, high-quality video of a handsome Turkish groom in a black tuxedo standing in a luxury wedding hall. When he sees the bride (off-camera), his eyes well up with tears and he smiles broadly. He looks at the camera and says in Turkish **"İnanamıyorum, dünyanın en şanslı adamı benim!"** with a very emotional, trembling but happy voice. Cinematic lighting, slow motion, 4k.
-📝 **TIKTOK AÇIKLAMASI:** O an geldiğinde zaman durur derlerdi, doğruymuş... 💍 Ömrümün en güzel 'evet'ine. ❤️ 
-🏷️ ETİKETLER: #düğün #evlilik #weddingday #ilkbakış #aşk #husband #fyp #keşfet
+📊 **GEMİNİ RADAR ANALİZİ:** Verilerdeki #weddingday ve #husband etiketlerinin gücü, Türkiye'deki "evlilik ve aile" içeriklerinin bitmek bilmeyen popülaritesini doğruluyor. Özellikle samimi, "mükemmel olmayan" ama sevgi dolu anlar (imperfection) yüksek etkileşim alıyor.
+⏰ **HEDEFLENEN SAAT:** 20:00
+🎬 **VİDEO KONSEPTİ:** "Kocamın Düğün Sonrası Gerçekleri" - Düğün günündeki o görkemli halden, evdeki aşırı rahat ve komik haldeki geçişi gösteren duygusal ama eğlenceli bir POV.
+🤖 **AI VİDEO ÜRETİM PROMPTU:** A cinematic close-up of a young Turkish woman with elegant wedding makeup, looking at the camera with a mix of love and amusement. She says in Turkish "Düğünde prens gibiydi, şimdi evde pijama takımıyla çekirdek çitliyor. İşte gerçek aşk bu!" with a sweet, laughing and slightly teasing voice. Soft warm living room lighting, high quality, 4k.
+📝 **TIKTOK AÇIKLAMASI:** O büyük gün biter, asıl macera başlar... 😂 Düğün albümüne bakarken yan koltukta horlayan o dev adam... ❤️ 
+🏷️ **ETİKETLER:** #fyp #weddingday #kocam #evlilik #inlove #türkiyedüğün #evhali
 
 ---
 
 🎬 **VİDEO NO: 2**
-📊 **GEMİNİ RADAR ANALİZİ:** Verilerdeki "evcil hayvan" ve "unbothered" (kaygısız/rahat) temasını, Türkiye'deki "ay sonu" veya "ev içi ekonomik durumlar" mizahıyla birleştiriyoruz. Deneysel bir yaklaşım için konuşan bir kedi kullanıyoruz.
-⏰ **HEDEFLENEN SAAT:** 18:00
-🎬 **VİDEO KONSEPTİ:** "Ekonomist Kedi" - Evdeki mama stoklarını kontrol eden ve sahibinin harcamalarını eleştiren bir kedi. Verilerdeki "cat" ve "pet grooming" trendini ironiyle birleştiriyoruz.
-🤖 **AI VİDEO ÜRETİM PROMPTU:** A close-up shot of a fluffy Van cat sitting on a kitchen table, looking very serious and judgmental. The cat's mouth moves perfectly in sync as it says in Turkish **"Yine mi dışarıdan yemek söyledin? Benim yaş mama stoklarım azalıyor farkında mısın?"** with a sarcastic and bossy voice. Domestic Turkish kitchen background, realistic fur texture.
-📝 **TIKTOK AÇIKLAMASI:** Evin gerçek sahibiyle hesaplaşma vakti geldi... 🐾 Harcama yaparken iki kez düşünün! 😂
-🏷️ ETİKETLER: #kedi #komikvideolar #ekonomi #evhali #catsoftiktok #fypシ #deneysel #keşfet_türkiye
+📊 **GEMİNİ RADAR ANALİZİ:** Verilerdeki "chronically online" (sosyal medya bağımlılığı) ve "anesthesia/funny" (kontrol kaybı mizahı) unsurları, gece yarısı paylaşılan "absürt ve aşırı dürüst" videoların Türkiye'deki Gen-Z ve Y kuşağında karşılık bulduğunu gösteriyor. 
+⏰ **HEDEFLENEN SAAT:** 00:00 (Gece Yarısı)
+🎬 **VİDEO KONSEPTİ:** "Gece 12'den Sonra TikTok Keşfet Bataklığı" - Deneyse/Komik bir dille, uyuması gerekirken kendisini alakasız videoları izlerken bulan insanın yaşadığı o hafif "delirme" anı.
+🤖 **AI VİDEO ÜRETİM PROMPTU:** A young Turkish man in a dark room, his face illuminated only by the blue light of a smartphone screen. He has slightly messy hair and wide eyes, looking confused and exhausted but addicted. He looks at the camera and says in Turkish "Saatlerdir kedi videoları ve temizlik vlogları izliyorum, neden böyleyim ben?" with a desperate, whispering and funny voice. Cinematic grainy texture, low light.
+📝 **TIKTOK AÇIKLAMASI:** Sadece 5 dakika bakıp çıkacaktım, güneş doğmak üzere... Siz de bu bataklıkta mısınız? 💀☕️
+🏷️ **ETİKETLER:** #fypシ #funny #gece #kesfet #chronicallyonline #türkiye #komikvideo
+
+---
 ============================================================
