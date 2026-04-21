@@ -1,0 +1,44 @@
+name: 🚀 Saatlik Otonom Sevkiyat (Trend Korumalı)
+
+on:
+  schedule:
+    # 🕒 Her saat başı tam olarak çalışır (00:00, 01:00, 02:00...)
+    - cron: '0 * * * *'
+  workflow_dispatch: # Manuel çalıştırma hakkın her zaman var
+
+jobs:
+  analiz_ve_yukle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Depoyu Klonla
+        uses: actions/checkout@v3
+
+      - name: Python Kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Kütüphaneleri Kur
+        run: |
+          pip install requests tiktok-uploader google-generativeai pyjwt
+          python -m playwright install chromium
+          sudo npx playwright install-deps chromium
+
+      - name: 🧠 Trend Analizi ve Saat Belirleme
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python analiz_robotu.py
+
+      - name: 📱 TikTok'a Fırlat (Sadece Saati Geldiyse!)
+        env:
+          TIKTOK_COOKIES_TXT: ${{ secrets.TIKTOK_COOKIES_TXT }}
+        run: |
+          # 🖥️ FULL HD EKRANDA İŞLEM YAPAR (Modal Katili ve Etkileşimli Etiket aktif)
+          xvfb-run --server-args="-screen 0 1920x1080x24" python tiktok_yukleyici.py
+
+      - name: 🖼️ İşlem Kanıtlarını Sakla
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: otonom-islem-fotograflari
+          path: "*.png"
