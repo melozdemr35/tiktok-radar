@@ -11,128 +11,71 @@ SECRET_KEY = os.environ.get("KLING_SECRET_KEY")
 STRATEJI_DOSYASI = "son_strateji.txt"
 
 def promptlari_ayikla(dosya_yolu):
-    """🤖 ve 📝 arasındaki fantastik promptları hatasız çeker."""
     try:
-        if not os.path.exists(dosya_yolu):
-            print(f"❌ Hata: {dosya_yolu} bulunamadı.")
-            return []
-
+        if not os.path.exists(dosya_yolu): return []
         with open(dosya_yolu, "r", encoding="utf-8") as f:
             icerik = f.read()
-            
-        # GÜÇLENDİRİLMİŞ CIMBIZ: Robot ve Not simgeleri arasını yakalar
         pattern = r"🤖.*?PROMPTU.*?\:(.*?)📝"
         eslesmeler = re.findall(pattern, icerik, re.DOTALL | re.IGNORECASE)
-        
-        prompt_listesi = []
-        for p in eslesmeler:
-            # Markdown kalıntılarını temizle
-            temiz = p.replace("*", "").replace(">", "").strip()
-            if temiz:
-                prompt_listesi.append(temiz)
-        
-        return prompt_listesi
-    except Exception as e:
-        print(f"❌ Dosya okuma hatası: {e}")
-        return []
+        return [p.replace("*", "").replace(">", "").strip() for p in eslesmeler if p.strip()]
+    except: return []
 
 def video_uret_kling(prompt, video_no):
-    """Kling V2.5-Turbo Pro kullanarak 10sn, 9:16 formatında TARİHLİ video üretir."""
-    if not ACCESS_KEY or not SECRET_KEY:
-        print("❌ Hata: API Anahtarları eksik.")
-        return False
-        
-    print(f"\n🚀 {video_no}. VİDEO ÜRETİLİYOR (Model: V2.5-Turbo | Kalite: Pro | Süre: 10sn)...")
+    if not ACCESS_KEY or not SECRET_KEY: return False
     
-    # 1. JWT Token Oluşturma (API Kimlik Doğrulaması)
+    # 🔊 SES VE FORMAT HİLESİ: Promptun sonuna ses komutlarını biz ekliyoruz
+    gucendirilmis_prompt = f"{prompt}. Cinematic sound effects, atmospheric background audio, high quality synchronized sound, 9:16 vertical orientation."
+
+    print(f"\n🚀 {video_no}. VİDEO ÜRETİLİYOR (9:16 Dikey & Sesli Mod)...")
+    
     payload = {
         "iss": ACCESS_KEY,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=1800),
         "nbf": datetime.datetime.utcnow() - datetime.timedelta(seconds=5)
     }
-    
-    try:
-        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-    except Exception as e:
-        print(f"❌ JWT Oluşturma Hatası: {e}")
-        return False
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-
-    # 🎥 VİRAL FORMAT VE PARAMETRELER
-    # Not: Kling API'si 'duration' için maksimum "10" değerini kabul eder.
     data = {
         "model": "kling-v2-5-turbo",
-        "prompt": prompt,
+        "prompt": gucendirilmis_prompt,
         "ratio": "9:16",
-        "duration": "10",  # Hata düzelttildi: 15 yerine 10 saniye.
-        "mode": "pro",
+        "duration": "10",
+        "mode": "pro", # Ses ve kalite için 'pro' şart
         "cfg_scale": 0.5
     }
 
     try:
         api_url_task = "https://api.klingai.com/v1/videos/text2video"
         response = requests.post(api_url_task, headers=headers, json=data)
-        response_data = response.json()
+        task_id = response.json()["data"]["task_id"]
         
-        if response.status_code == 200 and response_data.get("code") == 0:
-            task_id = response_data["data"]["task_id"]
-            print(f"✅ Görev kuyruğa alındı! ID: {task_id}")
-        else:
-            print(f"❌ Kling API Hatası: {response_data}")
-            return False
-            
-    except Exception as e:
-         print(f"❌ API Bağlantı Hatası: {e}")
-         return False
-
-    # 3. Sonucu Takip Et ve İndir
-    api_url_result = f"https://api.klingai.com/v1/videos/text2video/{task_id}"
-    while True:
-        try:
-            res = requests.get(api_url_result, headers=headers)
-            res_data = res.json()
+        api_url_result = f"https://api.klingai.com/v1/videos/text2video/{task_id}"
+        while True:
+            res_data = requests.get(api_url_result, headers=headers).json()
             status = res_data.get("data", {}).get("task_status")
             
             if status == "succeed":
                 video_url = res_data["data"]["task_result"]["videos"][0]["url"]
-                print(f"🎉 Video {video_no} tamamlandı!")
-                
-                # 📅 TARİHLİ İSİMLENDİRME
                 bugun = datetime.datetime.now().strftime("%d-%m")
                 dosya_adi = f"video_{bugun}_{video_no}.mp4"
                 
                 video_icerik = requests.get(video_url).content
                 with open(dosya_adi, "wb") as f:
                     f.write(video_icerik)
-                print(f"✅ Dosya mühürlendi: {dosya_adi}")
+                print(f"✅ Dikey ve Sesli Video Hazır: {dosya_adi}")
                 return True
-                
-            elif status == "failed":
-                print(f"❌ Üretim başarısız. API Mesajı: {res_data.get('message')}")
-                return False
+            elif status == "failed": return False
             else:
-                # Durum güncellemesi
-                print(f"⏳ İşleniyor... (Durum: {status})")
-                time.sleep(60) 
-                
-        except Exception as e:
-            print(f"❌ Hata: {e}")
-            time.sleep(30)
+                print(f"⏳ {video_no}. Video Hazırlanıyor... ({status})")
+                time.sleep(60)
+    except Exception as e:
+        print(f"❌ Hata: {e}")
+        return False
 
 if __name__ == "__main__":
     promp_listesi = promptlari_ayikla(STRATEJI_DOSYASI)
-    
-    if not promp_listesi:
-        print("📭 Yeni fikir bulunamadı. Lütfen 'son_strateji.txt' dosyasını kontrol edin.")
-    else:
-        print(f"🚀 Toplam {len(promp_listesi)} prompt bulundu. İşlem başlıyor...")
-        for index, prompt in enumerate(promp_listesi[:2]):
-            success = video_uret_kling(prompt, index + 1)
-            # API'yi yormamak ve eş zamanlılık limitlerine takılmamak için mola
-            if success and index < 1:
-                print("☕ İkinci video için 15 saniye bekleniyor...")
-                time.sleep(15)
+    if promp_listesi:
+        for index, p in enumerate(promp_listesi[:2]):
+            video_uret_kling(p, index + 1)
+            time.sleep(15)
