@@ -1,7 +1,5 @@
 import os
-import re
 import time
-import json
 import multiprocessing
 from datetime import datetime
 from tiktok_uploader.upload import upload_video
@@ -31,33 +29,28 @@ def paylasim_bilgilerini_al(dosya_yolu):
         return []
 
 def yukleme_islemcisi(video_yolu, metin, session_id, video_no):
-    """Kütüphanenin bug'ını atlatmak için kusursuz çerez dosyasını oluşturur."""
+    """Kütüphanenin format bug'ını aşmak için klasik Netscape formatını kullanır."""
     print(f"🚀 {video_no}. Video işlemi başlatıldı...")
     
     if not session_id or len(session_id) < 10:
         print(f"❌ HATA: SESSION_ID bulunamadı! Lütfen GitHub Secrets'ı kontrol et.")
         return
 
-    # 🍪 İŞTE SİHİRLİ DOKUNUŞ: Tarayıcının reddedemeyeceği format
-    cookie_path = os.path.abspath(f"tiktok_cookie_{video_no}.json")
-    kusursuz_cerez = [
-        {
-            "name": "sessionid",
-            "value": session_id,
-            "domain": ".tiktok.com",  # Tarayıcı bunu istiyordu
-            "path": "/",              # ve bunu
-            "url": "https://www.tiktok.com" # İşi garantiye alan URL parametresi
-        }
-    ]
+    # 🍪 SİHİRLİ DOKUNUŞ: Netscape HTTP Cookie File formatı (.txt)
+    # Kütüphanenin json ile kafası karışıyor, bu yüzden en eski ve garantili yolu seçiyoruz.
+    cookie_path = os.path.abspath(f"cookies_{video_no}.txt")
     
-    # Kendi ellerimizle hazırladığımız çerezi dosyaya yazıyoruz
+    # Sekme (\t) boşluklarıyla ayrılmış, tarayıcının mutlak doğru anladığı format
+    netscape_icerik = f"# Netscape HTTP Cookie File\n.tiktok.com\tTRUE\t/\tTRUE\t2147483647\tsessionid\t{session_id}\n"
+    
+    # Text dosyası olarak yazıyoruz
     with open(cookie_path, 'w', encoding='utf-8') as f:
-        json.dump(kusursuz_cerez, f)
+        f.write(netscape_icerik)
 
     video_abs_path = os.path.abspath(video_yolu)
 
     try:
-        # 🔥 Artık sessionid parametresi yerine hazırladığımız kusursuz dosyayı veriyoruz
+        # 🎯 Kütüphanenin en sevdiği şey: İçinde şifre olan bir .txt dosyası
         upload_video(
             video_abs_path,
             description=metin,
@@ -68,6 +61,7 @@ def yukleme_islemcisi(video_yolu, metin, session_id, video_no):
         
     except Exception as e:
         print(f"❌ {video_no}. Yükleme sırasında hata: {e}")
+        print("💡 İPUCU: Hata devam ediyorsa anahtarın (sessionid) süresi dolmuş demektir.")
     finally:
         # Çöp bırakmıyoruz
         if os.path.exists(cookie_path):
