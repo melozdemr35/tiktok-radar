@@ -1,20 +1,18 @@
-name: Tam Otonom TikTok Casusu
+name: 🕵️‍♂️ Tam Otonom TikTok Casusu ve Kuryesi
 
 on:
   schedule:
-    # UTC saatine göre ayarlanır (TR saati için 3 saat çıkarıyoruz)
-    - cron: '30 7 * * *'   # TR saatiyle 10:30
-    - cron: '30 16 * * *'  # TR saatiyle 19:30
-  workflow_dispatch:        # Bu da senin "Manuel" başlatmanı sağlar
+    # 🕒 Her saat başı uyanır (00:00, 01:00, 02:00...)
+    - cron: '0 * * * *'
+  workflow_dispatch: # Manuel çalıştırma hakkın her zaman kalsın
 
 permissions:
-  contents: write # Robotun çektiği binlerce veriyi veritabanına kaydedebilmesi için ŞART!
+  contents: write # Veritabanını ve resimleri kaydedebilmesi için
 
 jobs:
   otonom_islem:
     runs-on: ubuntu-latest
-    # GitHub Actions varsayılan süresi 360 dakikadır, bizim 60 dakikalık işimiz için fazlasıyla yeterli.
-    timeout-minutes: 90 
+    timeout-minutes: 90 # 60 dakikalık casusluk + 10 dakikalık yükleme için yeterli
     
     steps:
       - name: Kodları Çek
@@ -27,14 +25,14 @@ jobs:
       - name: Python Kur
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
-      - name: Kütüphaneleri Hızlı Kur
+      - name: Kütüphaneleri Kur
         run: |
-          pip install --no-cache-dir google-genai playwright pandas
+          pip install --no-cache-dir google-generativeai playwright pandas requests tiktok-uploader pyjwt
           playwright install --with-deps chromium
 
-      - name: TikTok'tan Video Çek ve Analiz Et
+      - name: 🕵️‍♂️ TikTok'tan Veri Çek ve Analiz Et
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TIKTOK_SESSION_1: ${{ secrets.TIKTOK_SESSION_1 }}
@@ -43,21 +41,27 @@ jobs:
           TIKTOK_SESSION_4: ${{ secrets.TIKTOK_SESSION_4 }}
           TIKTOK_SESSION_5: ${{ secrets.TIKTOK_SESSION_5 }}
         run: |
-          # Bu komut otonom_motor.py içindeki 60 dakikalık döngüyü başlatır
+          # Senin meşhur 60 dakikalık casusluk döngün başlar
           python otonom_motor.py
 
-      - name: Değişiklikleri GitHub'a Kaydet
+      - name: 📱 TikTok'a Sevkiyat (Saati Geldiyse)
+        env:
+          TIKTOK_COOKIES_TXT: ${{ secrets.TIKTOK_COOKIES_TXT }}
+        run: |
+          # Kurye uyanır, saati kontrol eder. 
+          # Eğer o an analizdeki 'Viral Saat' değilse hiçbir şey yüklemez.
+          xvfb-run --server-args="-screen 0 1920x1080x24" python tiktok_yukleyici.py
+
+      - name: 💾 Verileri ve Kanıtları GitHub'a Kaydet
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          # Trendleri, analizi ve robotun hata fotoğraflarını ekle
+          git add trend_veritabani.json son_analiz.txt son_strateji.txt *.png || true
           
-          git add trend_veritabani.json son_analiz.txt
+          git commit -m "🕵️‍♂️ Otonom Güncelleme ve Sevkiyat Kontrolü [$(date)]" || echo "Degisiklik yok"
           
-          git commit -m "Otonom Veri Güncellemesi [$(date)]" || echo "Degisiklik yok"
-          
-          # Veritabanı şişerken çakışma olmaması için 'theirs' stratejisiyle pull yap
+          # Çakışmaları önlemek için 'theirs' stratejisiyle birleştir
           git pull origin main --strategy-option=theirs --no-rebase || echo "Pull atlandı"
-          
           git push origin main --force
