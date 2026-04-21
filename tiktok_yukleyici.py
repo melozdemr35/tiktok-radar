@@ -1,5 +1,6 @@
 import os
 import re
+import json
 from datetime import datetime
 from tiktok_uploader.upload import upload_video
 
@@ -27,10 +28,10 @@ def paylasim_bilgilerini_al(dosya_yolu):
             etiketler = ""
             
             for satir in satirlar:
-                # 📝 emojisi geçen satırı find ve iki noktadan sonrasını al
+                # 📝 emojisi geçen satırı bul ve iki noktadan sonrasını al
                 if "📝" in satir and ":" in satir:
                     aciklama = satir.split(":", 1)[-1].replace("*", "").strip()
-                # 🏷️ emojisi geçen satırı find ve iki noktadan sonrasını al
+                # 🏷️ emojisi geçen satırı bul ve iki noktadan sonrasını al
                 if "🏷️" in satir and ":" in satir:
                     etiketler = satir.split(":", 1)[-1].replace("*", "").strip()
             
@@ -46,26 +47,44 @@ def paylasim_bilgilerini_al(dosya_yolu):
         return []
 
 def tiktok_paylas(video_yolu, metin):
-    """Videoyu TikTok'a yükler (Görünmez/Headless Mod)."""
+    """Geçici kurabiye dosyası oluşturarak TikTok'a yükler."""
     if not SESSION_ID:
         print("❌ Hata: TIKTOK_SESSION_ID bulunamadı! Secrets kısmını kontrol et.")
         return False
 
-    print(f"🚀 TikTok'a fırlatılıyor: {video_yolu}")
+    # 🍪 KRİTİK DÜZELTME: Kütüphanenin beklediği JSON formatında geçici dosya oluştur
+    cookie_path = "temp_cookies.json"
+    cookies = [
+        {
+            "name": "sessionid",
+            "value": SESSION_ID,
+            "domain": ".tiktok.com",
+            "path": "/"
+        }
+    ]
+    
     try:
-        # CRITICAL UPDATE: headless=True ekleyerek 'Ekran Yok' hatasını çözüyoruz.
+        with open(cookie_path, 'w') as f:
+            json.dump(cookies, f)
+
+        print(f"🚀 TikTok'a fırlatılıyor: {video_yolu}")
+        
+        # cookies parametresine sözlük yerine dosya yolunu veriyoruz
         upload_video(
             video_yolu,
             description=metin,
-            cookies={'sessionid': SESSION_ID},
-            headless=True # <--- Bu satır GitHub Actions için HAYATİ önem taşıyor.
+            cookies=cookie_path, 
+            headless=True
         )
         print(f"✅ Paylaşım Başarılı: {video_yolu}")
         return True
     except Exception as e:
         print(f"❌ TikTok Yükleme Hatası: {e}")
-        print("💡 İPUCU: SessionID eskiyse tarayıcıdan yenisini alıp Secrets'ı güncelle.")
         return False
+    finally:
+        # 🧹 Temizlik: Geçici kurabiye dosyasını sil
+        if os.path.exists(cookie_path):
+            os.remove(cookie_path)
 
 if __name__ == "__main__":
     paylasimlar = paylasim_bilgilerini_al(STRATEJI_DOSYASI)
