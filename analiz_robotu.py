@@ -20,11 +20,10 @@ except FileNotFoundError:
     print("Veritabanı dosyası bulunamadı!")
     exit(1)
 
-# 2. GÜNCEL VERİ SEÇİMİ (Tarih Odaklı)
+# 2. GÜNCEL VERİ SEÇİMİ
 bugun_str = datetime.now().strftime("%Y-%m-%d")
 taze_veriler = [v for v in veriler if v.get('kayit_tarihi') == bugun_str]
 
-# Eğer bugün yeterli veri yoksa, en son eklenen 20 videoyu al (Dinamik güncelleme)
 if len(taze_veriler) < 5:
     guncel_set = veriler[-20:]
 else:
@@ -32,36 +31,47 @@ else:
 
 ozet_metin = ""
 for v in guncel_set:
-    # Veri setindeki alan adlarına göre (desc/hashtags) metni oluştur
     ozet_metin += f"- Açıklama: {v.get('desc')} | Etiketler: {v.get('hashtags', [])}\n"
 
-# 3. Gemini ile Analiz Yap
+# 3. Gemini ile Analiz ve Strateji Oluştur
 model = genai.GenerativeModel('gemini-1.5-flash')
 bugun_tam_tarih = datetime.now().strftime("%d %B %Y")
 
+# 🎯 KRİTİK PROMPT GÜNCELLEMESİ
 prompt = f"""
 BUGÜNÜN TARİHİ: {bugun_tam_tarih}
-Sen profesyonel bir TikTok Viral Stratejistisin. Sadece Türkiye (TR) pazarındaki en son trendlere odaklan.
+Sen profesyonel bir TikTok Viral Stratejistisin. Türkiye (TR) pazarında uzmanlaşmış bir AI'sın.
 
 TÜRKİYE'DEN GELEN TAZE VERİLER:
 {ozet_metin}
 
 GÖREV:
-1. Sunulan veriler ışığında, {bugun_tam_tarih} tarihli TikTok Türkiye ekosistemine yönelik kapsamlı analiz yap.
-2. Şu anki ana konsepti ve insanların neye ilgi gösterdiğini (mizah, kaos, absürtlük vb.) açıkla.
-3. Bizim 'Absürt Viral' konseptimize uygun, ŞOK EDİCİ ve İMKANSIZ 3 adet içerik fikri ver. 
-   (Not: Hayvanların konuşturulması veya nesnelere kişilik yüklenmesi gibi viral 'hook'lar kullan).
+1. Verilere bakarak bugün Türkiye'de TikTok'ta en yüksek etkileşim alacak paylaşım saatini belirle (Format: ⏰ PAYLAŞIM SAATİ: 20:00).
+2. 'Absürt Viral' konseptimize uygun, hayvanların konuştuğu veya nesnelere kişilik yüklendiği 3 adet video fikri üret.
+3. Her fikri mutlaka şu formatta yaz (Formatı bozma):
 
-ÖNEMLİ: Analizin başına mutlaka '{bugun_tam_tarih} Tarihli Trend Analizi' başlığını at.
+⏰ PAYLAŞIM SAATİ: [Buraya Saat Yaz]
+
+🎬 Video 1
+🤖 PROMPTU: [Kling AI için detaylı İngilizce görsel komut]
+📝 AÇIKLAMA: [Türkçe ilgi çekici açıklama]
+🏷️ ETİKETLER: [Hashtagler aralarında boşluk bırakılarak yazılmalı]
+
+(Bu formatı Video 2 ve Video 3 için tekrarla)
 """
 
 try:
-    print(f"🧠 {bugun_tam_tarih} verileri analiz ediliyor...")
+    print(f"🧠 {bugun_tam_tarih} verileri analiz ediliyor ve strateji oluşturuluyor...")
     response = model.generate_content(prompt)
     
-    # 4. Sonucu kaydet (W modu dosyayı tamamen yeniler)
+    # 4. Sonucu "son_strateji.txt" olarak kaydet (Diğer robotlar bu dosyayı okuyacak)
+    with open("son_strateji.txt", "w", encoding="utf-8") as f:
+        f.write(response.text)
+    
+    # Yedek analiz dosyası
     with open("son_analiz.txt", "w", encoding="utf-8") as f:
         f.write(response.text)
-    print(f"✅ Analiz başarıyla tamamlandı! Tarih: {bugun_tam_tarih}")
+        
+    print(f"✅ Strateji ve Fikirler Başarıyla Oluşturuldu! Dosya: son_strateji.txt")
 except Exception as e:
     print(f"Analiz sırasında hata oluştu: {e}")
