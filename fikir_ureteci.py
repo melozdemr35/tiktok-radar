@@ -20,11 +20,9 @@ def veritabani_analiz_et(dosya_yolu="trend_veritabani.json"):
         print("❌ Hata: Veritabanı boş!")
         return None
 
-    # 1. ZİRVE SAAT ANALİZİ
     saatler = [v.get("kayit_saati") for v in veriler if v.get("kayit_saati")]
     zirve_saat = Counter(saatler).most_common(1)[0][0] if saatler else "19:00"
 
-    # 2. SAYI TEMİZLEME (İzlenme/Beğeni)
     def parse_number(num_str):
         if not num_str: return 0
         num_str = str(num_str).upper().replace(',', '.')
@@ -34,7 +32,6 @@ def veritabani_analiz_et(dosya_yolu="trend_veritabani.json"):
             return float(num_str)
         except: return 0
 
-    # 3. YABANCI İÇERİK FİLTRESİ
     def turkce_mi(metin):
         if not metin: return True
         metin_kucuk = metin.lower()
@@ -42,13 +39,10 @@ def veritabani_analiz_et(dosya_yolu="trend_veritabani.json"):
         return not any(kelime in f" {metin_kucuk} " for kelime in yabanci_kelimeler)
 
     temiz_veriler = [v for v in veriler if turkce_mi(v.get("desc", ""))]
-    
-    # En çok etkileşim alan 10 video
     sirali = sorted(temiz_veriler, key=lambda x: parse_number(x.get("views", "0")) + parse_number(x.get("likes", "0")), reverse=True)
     top_10 = sirali[:10]
 
     top_10_ozet = [f"{i+1}. Beğeni: {v.get('likes')} | Açıklama: {v.get('desc')}" for i, v in enumerate(top_10)]
-    
     tum_h = []
     for v in top_10: tum_h.extend(v.get("hashtags", []))
     populer_h = ", ".join([h[0] for h in Counter(tum_h).most_common(5)])
@@ -62,36 +56,32 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
         return
 
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash') # Daha stabil analiz için
-
+    
+    # 🛡️ GÜVENLİ MODEL SEÇİMİ: Önce Flash-Latest, olmazsa Flash, o da olmazsa Pro
+    model_isimleri = ['gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-pro']
+    model = None
+    
     bugun = datetime.now().strftime("%d %B %Y")
 
     sistem_talimati = f"""
-    BUGÜNÜN TARİHİ: {bugun}
     Sen dünyanın en ünlü TikTok Viral İçerik Tasarımcısısın. Sıradan içeriklerden nefret ediyorsun.
     Amacın; insanların kaydırmayı bırakıp 'Oha bu ne!' diyeceği, absürt, görsel olarak imkansız ve Türk mizahına uygun videolar tasarlamak.
-
     GÖREV: Aşağıdaki radar verilerini baz alarak, 2 adet ŞOK EDİCİ video fikri üret.
-    
     KURALLAR:
-    1. ABSÜRTLÜK: İnsan yerine hayvanları konuştur, cansız nesnelere kişilik yükle veya imkansız mekanları birleştir (Örn: Çorum leblebisinin Mars'ta kavrulması).
+    1. ABSÜRTLÜK: Hayvanları konuştur, cansız nesnelere kişilik yükle (Örn: Çorum leblebisinin Mars'ta kavrulması).
     2. GÖRSEL ŞOK (HOOK): İlk kare mutlaka şaşırtıcı olmalı.
     3. SES & DİYALOG: Karakterler mutlaka komik, yöresel veya duygulu (angry, sarcastic, dramatic) TÜRKÇE konuşmalı.
     4. İNGİLİZCE PROMPT: Kling/Sora promptu İNGİLİZCE olmalı ama diyaloglar tırnak içinde TÜRKÇE kalmalı.
 
     RADAR VERİLERİ:
-    - Zirve Saat: {zirve_saat}
-    - Trendler: {hashtagler}
-    - Top 10 Analizi:
-    {top_10_metni}
+    - Zirve Saat: {zirve_saat} | Trendler: {hashtagler}
+    - Top 10 Analizi: {top_10_metni}
 
-    LÜTFEN BU FORMATI KULLAN:
+    FORMAT:
     ---
     🎬 VİDEO NO: (1 veya 2)
     📊 VİRAL ANALİZ: (Neden patlayacağını açıkla)
-    ⏰ HEDEFLENEN SAAT: {zirve_saat}
-    🎬 VİDEO KONSEPTİ: (Absürt fikir)
-    🤖 AI VİDEO ÜRETİM PROMPTU: (Kling için detaylı İngilizce prompt. Duygu durumunu ve Türkçe diyaloğu ekle.)
+    🤖 AI VİDEO ÜRETİM PROMPTU: (Kling için detaylı İngilizce prompt. Türkçe diyaloğu ekle.)
     📝 TIKTOK AÇIKLAMASI: (Dikkat çekici metin)
     🏷️ ETİKETLER: (#ai #viral #çorum vb.)
     ---
@@ -99,27 +89,27 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
 
     print(f"🧠 Gemini 'Viral Canavarı' modunda {bugun} analizini yapıyor...")
     
-    try:
-        response = model.generate_content(sistem_talimati)
-        strateji_metni = response.text
-        
-        # Terminale bas
-        print("\n" + "="*60)
-        print(strateji_metni)
-        print("="*60)
-        
-        # 💾 DOSYAYA KAYDET (Video üreticinin okuması için)
-        with open("son_strateji.txt", "w", encoding="utf-8") as f:
-            f.write(strateji_metni)
-        print("✅ Fikirler 'son_strateji.txt' dosyasına mühürlendi!")
+    for isim in model_isimleri:
+        try:
+            print(f"🔄 {isim} deneniyor...")
+            model = genai.GenerativeModel(isim)
+            response = model.generate_content(sistem_talimati)
+            
+            if response.text:
+                strateji_metni = response.text
+                print("\n" + "="*60)
+                print(strateji_metni)
+                print("="*60)
+                
+                with open("son_strateji.txt", "w", encoding="utf-8") as f:
+                    f.write(strateji_metni)
+                print(f"✅ Başarılı! {isim} ile fikirler kaydedildi.")
+                return # Başarılı olduysa fonksiyondan çık
+        except Exception as e:
+            print(f"⚠️ {isim} başarısız oldu: {str(e)[:50]}...")
+            continue
 
-    except Exception as e:
-        if "429" in str(e):
-            print("⏳ Kota doldu, 45 saniye bekleniyor...")
-            time.sleep(45)
-            # Tekrar deneme yapılabilir veya burada kesilebilir
-        else:
-            print(f"❌ Gemini Hatası: {e}")
+    print("❌ Maalesef hiçbir model yanıt vermedi.")
 
 if __name__ == "__main__":
     analiz = veritabani_analiz_et()
