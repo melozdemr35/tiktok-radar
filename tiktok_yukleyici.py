@@ -61,7 +61,10 @@ def paylasim_bilgilerini_al(dosya_yolu):
         return []
 
 def yukleme_islemcisi(video_yolu, metin, video_no):
+    # ⏳ İstediğin sabır molasını buraya ekledik Melih.
     print(f"🚀 {video_no}. Video işlemi başlatıldı...")
+    print("⏳ Telif kontrolünün bitmesi ve sistemin oturması için 10 saniye sabrediyoruz...")
+    time.sleep(10)
     
     if not COOKIES_TXT_ICERIK:
         print(f"❌ HATA: TIKTOK_COOKIES_TXT bulunamadı! GitHub Secrets'ı kontrol et.")
@@ -76,8 +79,7 @@ def yukleme_islemcisi(video_yolu, metin, video_no):
     video_abs_path = os.path.abspath(video_yolu)
 
     try:
-        # 🔥 ÖZEL AYARLAR: Tarayıcıyı zorlamak için headless=False yapıyoruz!
-        # Xvfb (Sanal Ekran) sayesinde hata vermeyecek ama gerçek fare tıklaması yapacak.
+        # Xvfb (Sanal Ekran) üzerinde gerçek fare tıklaması yapacak.
         upload_video(
             video_abs_path,
             description=metin,
