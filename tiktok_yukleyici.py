@@ -4,9 +4,9 @@ import multiprocessing
 from datetime import datetime
 from tiktok_uploader.upload import upload_video
 
-# --- EFSANE HACK: ROBOTU ZORLA TIKLAMAYA PROGRAMLIYORUZ ---
-# Bu bölüm robotun "önümde telif baloncuğu var" diyerek durmasını engeller
-# ve kaba kuvvet (force=True) kullanarak direkt alttaki butona tıklar.
+# --- 🛰️ EFSANE HACK: KABA KUVVET (FORCE CLICK) YAMASI ---
+# Robotun "önümde baloncuk var" diyerek durmasını engeller.
+# Üstteki uyarıları yok sayarak direkt "Paylaş" butonuna zorla basar.
 from playwright.sync_api import Locator, Page
 
 orijinal_loc_click = Locator.click
@@ -36,12 +36,12 @@ Page.click = zorla_page_click
 Page.fill = zorla_page_fill
 # -----------------------------------------------------------
 
-# GitHub'dan o devasa, tam teşekküllü çerez metnini alıyoruz
+# GitHub Secrets'tan tam kimlik dosyasını alıyoruz
 COOKIES_TXT_ICERIK = os.environ.get("TIKTOK_COOKIES_TXT", "").strip()
 STRATEJI_DOSYASI = "son_strateji.txt"
 
 def paylasim_bilgilerini_al(dosya_yolu):
-    """Metinleri temiz bir şekilde ayıklar."""
+    """🎬, 📝 ve 🏷️ emojilerini takip ederek metni ayıklar."""
     try:
         if not os.path.exists(dosya_yolu): return []
         with open(dosya_yolu, "r", encoding="utf-8") as f:
@@ -61,25 +61,24 @@ def paylasim_bilgilerini_al(dosya_yolu):
         return []
 
 def yukleme_islemcisi(video_yolu, metin, video_no):
-    # ⏳ İstediğin sabır molasını buraya ekledik Melih.
+    # ⏳ Melih, buradaki süreyi 45 saniyeye çıkardım. 
+    # TikTok videoyu yükleyip telif kontrolü yaparken robotumuz "Ares sakinliğiyle" bekleyecek.
     print(f"🚀 {video_no}. Video işlemi başlatıldı...")
-    print("⏳ Telif kontrolünün bitmesi ve sistemin oturması için 10 saniye sabrediyoruz...")
-    time.sleep(10)
+    print("⏳ Telif kontrolünün bitmesi ve butonun canlanması için 45 saniye sabrediyoruz...")
+    time.sleep(45) 
     
     if not COOKIES_TXT_ICERIK:
-        print(f"❌ HATA: TIKTOK_COOKIES_TXT bulunamadı! GitHub Secrets'ı kontrol et.")
+        print(f"❌ HATA: TIKTOK_COOKIES_TXT bulunamadı!")
         return
 
-    # Orijinal metin belgesini fiziksel olarak oluşturuyoruz
     cookie_path = os.path.abspath(f"tiktok_tam_kimlik_{video_no}.txt")
-    
     with open(cookie_path, 'w', encoding='utf-8') as f:
         f.write(COOKIES_TXT_ICERIK)
 
     video_abs_path = os.path.abspath(video_yolu)
 
     try:
-        # Xvfb (Sanal Ekran) üzerinde gerçek fare tıklaması yapacak.
+        # headless=False ve Full HD ekran ile butonlar artık tam yerinde olacak.
         upload_video(
             video_abs_path,
             description=metin,
@@ -111,7 +110,7 @@ if __name__ == "__main__":
                 p.join()
                 
                 if i < 2:
-                    print("☕ Güvenlik molası (20 saniye)...")
-                    time.sleep(20)
+                    print("☕ Güvenlik molası (30 saniye)...")
+                    time.sleep(30)
             else:
                 print(f"⚠️ {video_adi} bulunamadı, bu adım atlanıyor.")
