@@ -4,6 +4,38 @@ import multiprocessing
 from datetime import datetime
 from tiktok_uploader.upload import upload_video
 
+# --- EFSANE HACK: ROBOTU ZORLA TIKLAMAYA PROGRAMLIYORUZ ---
+# Bu bölüm robotun "önümde telif baloncuğu var" diyerek durmasını engeller
+# ve kaba kuvvet (force=True) kullanarak direkt alttaki butona tıklar.
+from playwright.sync_api import Locator, Page
+
+orijinal_loc_click = Locator.click
+orijinal_loc_fill = Locator.fill
+orijinal_page_click = Page.click
+orijinal_page_fill = Page.fill
+
+def zorla_loc_click(self, *args, **kwargs):
+    kwargs['force'] = True # Kaba kuvvet kilidini açar
+    return orijinal_loc_click(self, *args, **kwargs)
+
+def zorla_loc_fill(self, *args, **kwargs):
+    kwargs['force'] = True
+    return orijinal_loc_fill(self, *args, **kwargs)
+
+def zorla_page_click(self, *args, **kwargs):
+    kwargs['force'] = True
+    return orijinal_page_click(self, *args, **kwargs)
+
+def zorla_page_fill(self, *args, **kwargs):
+    kwargs['force'] = True
+    return orijinal_page_fill(self, *args, **kwargs)
+
+Locator.click = zorla_loc_click
+Locator.fill = zorla_loc_fill
+Page.click = zorla_page_click
+Page.fill = zorla_page_fill
+# -----------------------------------------------------------
+
 # GitHub'dan o devasa, tam teşekküllü çerez metnini alıyoruz
 COOKIES_TXT_ICERIK = os.environ.get("TIKTOK_COOKIES_TXT", "").strip()
 STRATEJI_DOSYASI = "son_strateji.txt"
@@ -50,7 +82,7 @@ def yukleme_islemcisi(video_yolu, metin, video_no):
             video_abs_path,
             description=metin,
             cookies=cookie_path, 
-            headless=False # <--- İŞTE KRİTİK DEĞİŞİKLİK BURADA
+            headless=False 
         )
         print(f"✅ {video_no}. VİDEO BAŞARIYLA TİKTOK'A YÜKLENDİ!")
         
