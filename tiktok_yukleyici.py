@@ -1,11 +1,12 @@
 import os
 import re
 import time
+import json
 import multiprocessing
 from datetime import datetime
 from tiktok_uploader.upload import upload_video
 
-# Sadece ve sadece saf SESSION_ID'yi alıyoruz
+# Sadece saf SESSION_ID'yi alıyoruz
 SESSION_ID = os.environ.get("TIKTOK_SESSION_ID", "").strip()
 STRATEJI_DOSYASI = "son_strateji.txt"
 
@@ -30,28 +31,47 @@ def paylasim_bilgilerini_al(dosya_yolu):
         return []
 
 def yukleme_islemcisi(video_yolu, metin, session_id, video_no):
-    """Dosya oluşturma derdi olmadan, saf parametre ile yükler."""
+    """Kütüphanenin bug'ını atlatmak için kusursuz çerez dosyasını oluşturur."""
     print(f"🚀 {video_no}. Video işlemi başlatıldı...")
     
     if not session_id or len(session_id) < 10:
         print(f"❌ HATA: SESSION_ID bulunamadı! Lütfen GitHub Secrets'ı kontrol et.")
         return
 
+    # 🍪 İŞTE SİHİRLİ DOKUNUŞ: Tarayıcının reddedemeyeceği format
+    cookie_path = os.path.abspath(f"tiktok_cookie_{video_no}.json")
+    kusursuz_cerez = [
+        {
+            "name": "sessionid",
+            "value": session_id,
+            "domain": ".tiktok.com",  # Tarayıcı bunu istiyordu
+            "path": "/",              # ve bunu
+            "url": "https://www.tiktok.com" # İşi garantiye alan URL parametresi
+        }
+    ]
+    
+    # Kendi ellerimizle hazırladığımız çerezi dosyaya yazıyoruz
+    with open(cookie_path, 'w', encoding='utf-8') as f:
+        json.dump(kusursuz_cerez, f)
+
     video_abs_path = os.path.abspath(video_yolu)
 
     try:
-        # 🔥 HİÇBİR DOSYA OLUŞTURMADAN DOĞRUDAN PARAMETRE VERİYORUZ
+        # 🔥 Artık sessionid parametresi yerine hazırladığımız kusursuz dosyayı veriyoruz
         upload_video(
             video_abs_path,
             description=metin,
-            sessionid=session_id, # Saf anahtarımız
+            cookies=cookie_path, 
             headless=True
         )
         print(f"✅ {video_no}. VİDEO BAŞARIYLA TİKTOK'A YÜKLENDİ!")
         
     except Exception as e:
         print(f"❌ {video_no}. Yükleme sırasında hata: {e}")
-        print("💡 İPUCU: Hata devam ediyorsa TikTok tarayıcından güncel bir 'sessionid' alıp Secrets'ı yenile.")
+    finally:
+        # Çöp bırakmıyoruz
+        if os.path.exists(cookie_path):
+            os.remove(cookie_path)
 
 if __name__ == "__main__":
     paylasimlar = paylasim_bilgilerini_al(STRATEJI_DOSYASI)
