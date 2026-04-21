@@ -27,10 +27,10 @@ def paylasim_bilgilerini_al(dosya_yolu):
             etiketler = ""
             
             for satir in satirlar:
-                # 📝 emojisi geçen satırı bul ve iki noktadan sonrasını al
+                # 📝 emojisi geçen satırı find ve iki noktadan sonrasını al
                 if "📝" in satir and ":" in satir:
                     aciklama = satir.split(":", 1)[-1].replace("*", "").strip()
-                # 🏷️ emojisi geçen satırı bul ve iki noktadan sonrasını al
+                # 🏷️ emojisi geçen satırı find ve iki noktadan sonrasını al
                 if "🏷️" in satir and ":" in satir:
                     etiketler = satir.split(":", 1)[-1].replace("*", "").strip()
             
@@ -46,18 +46,19 @@ def paylasim_bilgilerini_al(dosya_yolu):
         return []
 
 def tiktok_paylas(video_yolu, metin):
-    """Videoyu TikTok'a yükler."""
+    """Videoyu TikTok'a yükler (Görünmez/Headless Mod)."""
     if not SESSION_ID:
         print("❌ Hata: TIKTOK_SESSION_ID bulunamadı! Secrets kısmını kontrol et.")
         return False
 
     print(f"🚀 TikTok'a fırlatılıyor: {video_yolu}")
     try:
-        # tiktok-uploader kütüphanesi headless (arka planda) çalışır
+        # CRITICAL UPDATE: headless=True ekleyerek 'Ekran Yok' hatasını çözüyoruz.
         upload_video(
             video_yolu,
             description=metin,
-            cookies={'sessionid': SESSION_ID}
+            cookies={'sessionid': SESSION_ID},
+            headless=True # <--- Bu satır GitHub Actions için HAYATİ önem taşıyor.
         )
         print(f"✅ Paylaşım Başarılı: {video_yolu}")
         return True
