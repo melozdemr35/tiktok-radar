@@ -22,10 +22,10 @@ def promptlari_ayikla(dosya_yolu):
 def video_uret_kling(prompt, video_no):
     if not ACCESS_KEY or not SECRET_KEY: return False
     
-    # 🔊 KRİTİK GÜNCELLEME: AI'ya dikey ve sesli olması için baskı yapıyoruz
-    gucendirilmis_prompt = f"{prompt}. 9:16 vertical orientation, high quality synchronized sound, cinematic audio, trending tiktok style."
+    # 🔊 KRİTİK GÜNCELLEME: Dikey formatı zorluyoruz ve sesi kesinlikle TÜRKÇE istiyoruz.
+    gucendirilmis_prompt = f"{prompt}. 9:16 vertical orientation, high quality synchronized sound, strictly Turkish language audio, clear Turkish voiceover, cinematic background music, trending tiktok style."
 
-    print(f"\n🚀 {video_no}. VİDEO ÜRETİLİYOR (Dikey & Sesli Mod)...")
+    print(f"\n🚀 {video_no}. VİDEO ÜRETİLİYOR (Dikey & Türkçe Sesli Mod)...")
     
     payload = {
         "iss": ACCESS_KEY,
@@ -60,7 +60,7 @@ def video_uret_kling(prompt, video_no):
                 video_icerik = requests.get(video_url).content
                 with open(dosya_adi, "wb") as f:
                     f.write(video_icerik)
-                print(f"✅ Üretim Tamam: {dosya_adi}")
+                print(f"✅ Üretim Tamam (9:16 TR Sesli): {dosya_adi}")
                 return True
             elif status == "failed": return False
             else:
