@@ -1,7 +1,7 @@
 name: TikTok Manuel Yukle (Kredi Harcamaz)
 
 on:
-  workflow_dispatch: # Bu satır "Run Workflow" butonunu çıkarır
+  workflow_dispatch:
 
 jobs:
   yukle:
@@ -18,8 +18,13 @@ jobs:
       - name: Kutuphaneleri Kur
         run: |
           pip install requests tiktok-uploader
+          # 🛠️ TARAYICI SÜRÜCÜLERİNİ VE SİSTEM BAĞIMLILIKLARINI KUR
+          python -m playwright install chromium
+          sudo npx playwright install-deps chromium
 
       - name: 📱 Sadece TikTok'a Yukle
         env:
           TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
-        run: python tiktok_yukleyici.py
+        run: |
+          # 🖥️ XVFB-RUN KOMUTU İLE SANAL EKRAN OLUŞTURUYORUZ
+          xvfb-run python tiktok_yukleyici.py
