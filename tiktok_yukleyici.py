@@ -4,8 +4,8 @@ import multiprocessing
 from datetime import datetime
 from tiktok_uploader.upload import upload_video
 
-# Sadece saf SESSION_ID'yi alıyoruz
-SESSION_ID = os.environ.get("TIKTOK_SESSION_ID", "").strip()
+# GitHub'dan o devasa, tam teşekküllü çerez metnini alıyoruz
+COOKIES_TXT_ICERIK = os.environ.get("TIKTOK_COOKIES_TXT", "").strip()
 STRATEJI_DOSYASI = "son_strateji.txt"
 
 def paylasim_bilgilerini_al(dosya_yolu):
@@ -28,29 +28,23 @@ def paylasim_bilgilerini_al(dosya_yolu):
         print(f"❌ Ayrıştırma hatası: {e}")
         return []
 
-def yukleme_islemcisi(video_yolu, metin, session_id, video_no):
-    """Kütüphanenin format bug'ını aşmak için klasik Netscape formatını kullanır."""
+def yukleme_islemcisi(video_yolu, metin, video_no):
     print(f"🚀 {video_no}. Video işlemi başlatıldı...")
     
-    if not session_id or len(session_id) < 10:
-        print(f"❌ HATA: SESSION_ID bulunamadı! Lütfen GitHub Secrets'ı kontrol et.")
+    if not COOKIES_TXT_ICERIK:
+        print(f"❌ HATA: TIKTOK_COOKIES_TXT bulunamadı! GitHub Secrets'ı kontrol et.")
         return
 
-    # 🍪 SİHİRLİ DOKUNUŞ: Netscape HTTP Cookie File formatı (.txt)
-    # Kütüphanenin json ile kafası karışıyor, bu yüzden en eski ve garantili yolu seçiyoruz.
-    cookie_path = os.path.abspath(f"cookies_{video_no}.txt")
+    # Orijinal metin belgesini fiziksel olarak oluşturuyoruz
+    cookie_path = os.path.abspath(f"tiktok_tam_kimlik_{video_no}.txt")
     
-    # Sekme (\t) boşluklarıyla ayrılmış, tarayıcının mutlak doğru anladığı format
-    netscape_icerik = f"# Netscape HTTP Cookie File\n.tiktok.com\tTRUE\t/\tTRUE\t2147483647\tsessionid\t{session_id}\n"
-    
-    # Text dosyası olarak yazıyoruz
     with open(cookie_path, 'w', encoding='utf-8') as f:
-        f.write(netscape_icerik)
+        f.write(COOKIES_TXT_ICERIK)
 
     video_abs_path = os.path.abspath(video_yolu)
 
     try:
-        # 🎯 Kütüphanenin en sevdiği şey: İçinde şifre olan bir .txt dosyası
+        # Kütüphaneye bu tam teşekküllü belgeyi sunuyoruz
         upload_video(
             video_abs_path,
             description=metin,
@@ -61,9 +55,7 @@ def yukleme_islemcisi(video_yolu, metin, session_id, video_no):
         
     except Exception as e:
         print(f"❌ {video_no}. Yükleme sırasında hata: {e}")
-        print("💡 İPUCU: Hata devam ediyorsa anahtarın (sessionid) süresi dolmuş demektir.")
     finally:
-        # Çöp bırakmıyoruz
         if os.path.exists(cookie_path):
             os.remove(cookie_path)
 
@@ -76,10 +68,9 @@ if __name__ == "__main__":
         for i in range(1, 3):
             video_adi = f"video_{bugun}_{i}.mp4"
             if os.path.exists(video_adi) and len(paylasimlar) >= i:
-                # Playwright asyncio çakışmalarını önlemek için process
                 p = multiprocessing.Process(
                     target=yukleme_islemcisi, 
-                    args=(video_adi, paylasimlar[i-1], SESSION_ID, i)
+                    args=(video_adi, paylasimlar[i-1], i)
                 )
                 p.start()
                 p.join()
