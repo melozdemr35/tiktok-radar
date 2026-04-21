@@ -4,22 +4,33 @@ import multiprocessing
 from datetime import datetime
 from tiktok_uploader.upload import upload_video
 
-# --- 🛰️ GÖRSEL RADAR SİSTEMİ (MONKEY PATCH) ---
-# Robotun her "tıklama" öncesi fotoğraf çekmesini sağlar.
-# Illustrator'daki 'Snapshot' özelliği gibi düşünebilirsin.
+# --- 🛰️ MODAL KATİLİ VE GÖRSEL RADAR SİSTEMİ ---
 from playwright.sync_api import Locator
 
-def fotolu_radar_aktif_et(video_no):
+def modal_katili_aktif_et(video_no):
     orijinal_click = Locator.click
+    
     def yeni_click(self, *args, **kwargs):
         kwargs['force'] = True # Kaba kuvvet her zaman devrede
-        # Tıklamadan hemen önce zaman damgalı bir resim al
+        
+        # 🎯 MODAL KONTROLÜ: Eğer o meşhur "Turn on" butonu varsa önce ona bas!
+        try:
+            # TikTok'un o sinir bozucu penceresini yakalıyoruz
+            turn_on_button = self.page.get_by_role("button", name="Turn on")
+            if turn_on_button.is_visible():
+                print(f"🎯 1. Video: Telif kontrolü modalı yakalandı, onaylanıyor...")
+                turn_on_button.click(force=True)
+                time.sleep(2) # Pencerenin kapanması için kısa bir es
+        except:
+            pass
+
+        # Tıklamadan hemen önce ne yaptığımızı görelim (Radar)
         dosya_adi = f"adim_{video_no}_{int(time.time())}.png"
         try:
             self.page.screenshot(path=dosya_adi)
-            print(f"📸 Fotoğraf çekildi: {dosya_adi}")
         except:
             pass
+            
         return orijinal_click(self, *args, **kwargs)
     
     Locator.click = yeni_click
@@ -40,17 +51,16 @@ def paylasim_bilgilerini_al(dosya_yolu):
             satirlar = blok.split('\n')
             aciklama, etiketler = "", ""
             for satir in satirlar:
-                if "📝" in satir and ":" in satir: ac_parca = satir.split(":", 1)[-1]
-                if "🏷️" in satir and ":" in satir: et_parca = satir.split(":", 1)[-1]
-            bilgiler.append(f"{ac_parca.strip()}\n\n{et_parca.strip()}")
+                if "📝" in satir and ":" in satir: aciklama = satir.split(":", 1)[-1]
+                if "🏷️" in satir and ":" in satir: etiketler = satir.split(":", 1)[-1]
+            if aciklama and etiketler:
+                bilgiler.append(f"{aciklama.strip()}\n\n{etiketler.strip()}")
         return bilgiler
     except:
         return []
 
 def yukleme_islemcisi(video_yolu, metin, video_no):
-    # Radarı bu işlem için aktif et
-    fotolu_radar_aktif_et(video_no)
-    
+    modal_katili_aktif_et(video_no) # Katil devreye giriyor!
     print(f"🚀 {video_no}. Video işlemi başlatıldı...")
     
     if not COOKIES_TXT_ICERIK:
@@ -62,15 +72,14 @@ def yukleme_islemcisi(video_yolu, metin, video_no):
         f.write(COOKIES_TXT_ICERIK)
 
     try:
-        # ⏳ Robotun butona basmadan önce telif uyarısını 
-        # atlatabilmesi için arkada 20 saniye ekstra bekliyoruz.
+        # Video yükleme sayfasında 10 saniye fazladan bekleyerek sistemin oturmasını sağlıyoruz
         upload_video(
             os.path.abspath(video_yolu),
             description=metin,
             cookies=cookie_path, 
             headless=False 
         )
-        print(f"✅ {video_no}. İŞLEM DENENDİ!")
+        print(f"✅ {video_no}. İŞLEM TAMAMLANDI! Lütfen profilini kontrol et.")
         
     except Exception as e:
         print(f"❌ {video_no}. Hata: {e}")
@@ -85,10 +94,8 @@ if __name__ == "__main__":
         for i in range(1, 3):
             video_adi = f"video_{bugun}_{i}.mp4"
             if os.path.exists(video_adi):
-                p = multiprocessing.Process(
-                    target=yukleme_islemcisi, 
-                    args=(video_adi, paylasimlar[i-1], i)
-                )
+                p = multiprocessing.Process(target=yukleme_islemcisi, args=(video_adi, paylasimlar[i-1], i))
                 p.start()
                 p.join()
-                time.sleep(15)
+                print("☕ Güvenlik molası (20 saniye)...")
+                time.sleep(20)
