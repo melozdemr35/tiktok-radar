@@ -1,12 +1,13 @@
-name: Otonom Strateji ve Video Fabrikası
+name: 🎬 Otonom Video Üretim Fabrikası
 
 on:
   schedule:
-    - cron: '0 2 * * *' # Her gece 02:00'de otomatik çalışır
+    # 🕒 Her gece Türkiye saatiyle 05:00'te (UTC 02:00) otomatik çalışır
+    - cron: '0 2 * * *' 
   workflow_dispatch: # İstediğinde manuel başlatabilmen için
 
 jobs:
-  strateji-planla:
+  uretim-hatti:
     runs-on: ubuntu-latest
     steps:
       - name: Depoyu Klonla
@@ -20,46 +21,38 @@ jobs:
       - name: Kutuphaneleri Kur
         run: |
           python -m pip install --upgrade pip
-          pip install google-generativeai pyjwt requests pandas plotly streamlit edge-tts
-          # TikTok yükleyici için gerekli bağımlılık (Eğer kütüphanen özelse ismini kontrol et)
-          pip install tiktok-uploader || echo "TikTok uploader yuklenemedi, manuel kontrol et"
+          # Kling API ve Gemini için gerekli kütüphaneler (pyjwt eklendi)
+          pip install google-generativeai pyjwt requests
 
       - name: 🧹 Eski Videoları Temizle (7 Günlük)
         run: |
-          # 7 günden eski mp4'leri bul ve sil
           find . -name "video_*.mp4" -mtime +7 -exec rm {} \;
           echo "Eski arşiv temizlendi, yer açıldı."
 
-      - name: 🧠 Fikir ve Strateji Üret
+      - name: 🧠 Trend Analizi ve Fikir Üretimi
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python fikir_ureteci.py
+        run: python analiz_robotu.py # Beyin katmanını çalıştırıyoruz
 
-      - name: 🎬 Kling ile Video Üret (V2.5-Turbo Pro)
+      - name: 🎥 Kling ile Video Üret (V2.5-Turbo Pro)
         env:
           KLING_ACCESS_KEY: ${{ secrets.KLING_ACCESS_KEY }}
           KLING_SECRET_KEY: ${{ secrets.KLING_SECRET_KEY }}
-        # Bakiye biterse veya API hata verirse tüm süreci bozmasın diye || true
+        # Bakiye biterse süreci bozmasın diye || true
         run: python video_ureteci.py || true
 
-      - name: 📱 TikTok'a Otomatik Yükle
-        env:
-          TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
-        run: python tiktok_yukleyici.py || true
-
-      - name: 💾 Değişiklikleri Depoya Mühürle
+      - name: 💾 Yeni Videoları ve Stratejiyi Depoya Mühürle
         run: |
           git config --global user.name "Autonomous-Bot"
           git config --global user.email "actions@github.com"
           
-          # Yeni strateji dosyasını ve yeni üretilen videoları ekle
+          # Üretilen videoları ve güncellenen strateji dosyasını ekle
           git add son_strateji.txt
           git add video_*.mp4 || true
           
-          # Sadece değişiklik varsa commit yap, hata almamak için kontrol ekle
           if [[ -n "$(git status --porcelain)" ]]; then
-            git commit -m "🚀 Otomatik Güncelleme: $(date +'%d-%m-%Y %H:%M')"
+            git commit -m "🎬 Yeni Üretim Hazır: $(date +'%d-%m-%Y %H:%M')"
             git push
           else
-            echo "Kaydedilecek yeni bir değişiklik yok."
+            echo "Kaydedilecek yeni bir video bulunamadı."
           fi
