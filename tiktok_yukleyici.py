@@ -3,28 +3,33 @@ import time
 import multiprocessing
 from datetime import datetime
 from tiktok_uploader.upload import upload_video
-
-# --- 🛰️ MODAL KATİLİ VE GÖRSEL RADAR SİSTEMİ ---
 from playwright.sync_api import Locator
 
-def modal_katili_aktif_et(video_no):
-    orijinal_click = Locator.click
-    
-    def yeni_click(self, *args, **kwargs):
-        kwargs['force'] = True # Kaba kuvvet her zaman devrede
-        
-        # 🎯 MODAL KONTROLÜ: Eğer o meşhur "Turn on" butonu varsa önce ona bas!
-        try:
-            # TikTok'un o sinir bozucu penceresini yakalıyoruz
-            turn_on_button = self.page.get_by_role("button", name="Turn on")
-            if turn_on_button.is_visible():
-                print(f"🎯 1. Video: Telif kontrolü modalı yakalandı, onaylanıyor...")
-                turn_on_button.click(force=True)
-                time.sleep(2) # Pencerenin kapanması için kısa bir es
-        except:
-            pass
+# --- 🛰️ MODAL KATİLİ (DÖNGÜSÜZ VERSİYON) ---
+# Orijinal tıklama fonksiyonunu güvenli bir yere saklıyoruz
+orijinal_click = Locator.click
 
-        # Tıklamadan hemen önce ne yaptığımızı görelim (Radar)
+def modal_katili_yama(video_no):
+    def yeni_click(self, *args, **kwargs):
+        kwargs['force'] = True
+        
+        # 🛡️ DÖNGÜYÜ KIRAN MANTIK: 
+        # Eğer zaten "Turn on" butonuna basmaya çalışıyorsak, tekrar kontrol etme!
+        is_modal_button = "Turn on" in str(args) or kwargs.get("name") == "Turn on"
+        
+        if not is_modal_button:
+            try:
+                # Sadece ana işlemler sırasında modal kontrolü yap
+                turn_on_button = self.page.get_by_role("button", name="Turn on")
+                if turn_on_button.is_visible():
+                    print(f"🎯 Modal yakalandı, onaylanıyor...")
+                    # DİKKAT: Burada 'orijinal_click' kullanıyoruz ki döngüye girmesin!
+                    orijinal_click(turn_on_button, force=True)
+                    time.sleep(2)
+            except:
+                pass
+
+        # Fotoğraf al ve orijinal tıklamayı yap
         dosya_adi = f"adim_{video_no}_{int(time.time())}.png"
         try:
             self.page.screenshot(path=dosya_adi)
@@ -33,6 +38,7 @@ def modal_katili_aktif_et(video_no):
             
         return orijinal_click(self, *args, **kwargs)
     
+    # Yamayı sisteme entegre et
     Locator.click = yeni_click
 
 # -----------------------------------------------------------
@@ -56,15 +62,14 @@ def paylasim_bilgilerini_al(dosya_yolu):
             if aciklama and etiketler:
                 bilgiler.append(f"{aciklama.strip()}\n\n{etiketler.strip()}")
         return bilgiler
-    except:
-        return []
+    except: return []
 
 def yukleme_islemcisi(video_yolu, metin, video_no):
-    modal_katili_aktif_et(video_no) # Katil devreye giriyor!
+    modal_katili_yama(video_no) # Yamayı yükle
     print(f"🚀 {video_no}. Video işlemi başlatıldı...")
     
     if not COOKIES_TXT_ICERIK:
-        print(f"❌ HATA: TIKTOK_COOKIES_TXT bulunamadı!")
+        print(f"❌ HATA: Çerez dosyası bulunamadı!")
         return
 
     cookie_path = os.path.abspath(f"tiktok_kimlik_{video_no}.txt")
@@ -72,14 +77,14 @@ def yukleme_islemcisi(video_yolu, metin, video_no):
         f.write(COOKIES_TXT_ICERIK)
 
     try:
-        # Video yükleme sayfasında 10 saniye fazladan bekleyerek sistemin oturmasını sağlıyoruz
+        # TikTok sisteminin oturması için 10 saniye ön hazırlık
         upload_video(
             os.path.abspath(video_yolu),
             description=metin,
             cookies=cookie_path, 
             headless=False 
         )
-        print(f"✅ {video_no}. İŞLEM TAMAMLANDI! Lütfen profilini kontrol et.")
+        print(f"✅ {video_no}. İŞLEM BAŞARIYLA TAMAMLANDI!")
         
     except Exception as e:
         print(f"❌ {video_no}. Hata: {e}")
@@ -97,5 +102,5 @@ if __name__ == "__main__":
                 p = multiprocessing.Process(target=yukleme_islemcisi, args=(video_adi, paylasimlar[i-1], i))
                 p.start()
                 p.join()
-                print("☕ Güvenlik molası (20 saniye)...")
+                print("☕ Güvenlik molası...")
                 time.sleep(20)
