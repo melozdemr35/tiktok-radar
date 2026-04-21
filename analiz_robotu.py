@@ -1,8 +1,9 @@
 import google.generativeai as genai
 import json
 import os
+from datetime import datetime
 
-# API Anahtarını GitHub Secrets üzerinden güvenli şekilde alıyoruz
+# API Anahtarını al
 api_key = os.environ.get("GEMINI_API_KEY")
 
 if not api_key:
@@ -19,28 +20,48 @@ except FileNotFoundError:
     print("Veritabanı dosyası bulunamadı!")
     exit(1)
 
-# 2. Analiz için en güncel 15 videoyu seç
-top_15 = sorted(veriler, key=lambda x: x.get('izlenme', 0), reverse=True)[:15]
+# 2. GÜNCEL VERİ SEÇİMİ (Tarih Odaklı)
+bugun_str = datetime.now().strftime("%Y-%m-%d")
+taze_veriler = [v for v in veriler if v.get('kayit_tarihi') == bugun_str]
+
+# Eğer bugün yeterli veri yoksa, en son eklenen 20 videoyu al (Dinamik güncelleme)
+if len(taze_veriler) < 5:
+    guncel_set = veriler[-20:]
+else:
+    guncel_set = taze_veriler
+
 ozet_metin = ""
-for v in top_15:
-    ozet_metin += f"- {v.get('desc')} | Hashtagler: {v.get('hashtagler')}\n"
+for v in guncel_set:
+    # Veri setindeki alan adlarına göre (desc/hashtags) metni oluştur
+    ozet_metin += f"- Açıklama: {v.get('desc')} | Etiketler: {v.get('hashtags', [])}\n"
 
 # 3. Gemini ile Analiz Yap
 model = genai.GenerativeModel('gemini-1.5-flash')
+bugun_tam_tarih = datetime.now().strftime("%d %B %Y")
+
 prompt = f"""
-Sen profesyonel bir TikTok stratejistisin. Türkiye'deki son trend verileri şunlar:
+BUGÜNÜN TARİHİ: {bugun_tam_tarih}
+Sen profesyonel bir TikTok Viral Stratejistisin. Sadece Türkiye (TR) pazarındaki en son trendlere odaklan.
+
+TÜRKİYE'DEN GELEN TAZE VERİLER:
 {ozet_metin}
 
-Lütfen:
-1. Şu anki ana konsepti açıkla.
-2. 3 adet viral olabilecek içerik fikri ver.
+GÖREV:
+1. Sunulan veriler ışığında, {bugun_tam_tarih} tarihli TikTok Türkiye ekosistemine yönelik kapsamlı analiz yap.
+2. Şu anki ana konsepti ve insanların neye ilgi gösterdiğini (mizah, kaos, absürtlük vb.) açıkla.
+3. Bizim 'Absürt Viral' konseptimize uygun, ŞOK EDİCİ ve İMKANSIZ 3 adet içerik fikri ver. 
+   (Not: Hayvanların konuşturulması veya nesnelere kişilik yüklenmesi gibi viral 'hook'lar kullan).
+
+ÖNEMLİ: Analizin başına mutlaka '{bugun_tam_tarih} Tarihli Trend Analizi' başlığını at.
 """
 
 try:
+    print(f"🧠 {bugun_tam_tarih} verileri analiz ediliyor...")
     response = model.generate_content(prompt)
-    # 4. Sonucu bir metin dosyasına kaydet
+    
+    # 4. Sonucu kaydet (W modu dosyayı tamamen yeniler)
     with open("son_analiz.txt", "w", encoding="utf-8") as f:
         f.write(response.text)
-    print("Analiz başarıyla tamamlandı ve kaydedildi!")
+    print(f"✅ Analiz başarıyla tamamlandı! Tarih: {bugun_tam_tarih}")
 except Exception as e:
     print(f"Analiz sırasında hata oluştu: {e}")
