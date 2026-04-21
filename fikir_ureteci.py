@@ -58,7 +58,7 @@ def prompt_olustur(zirve_saat, top_10_metni, hashtagler):
     genai.configure(api_key=api_key)
     
     # 🛡️ GÜVENLİ MODEL SEÇİMİ: Önce Flash-Latest, olmazsa Flash, o da olmazsa Pro
-    model_isimleri = ['gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-pro']
+    model = genai.GenerativeModel('gemini-3-flash-preview')
     model = None
     
     bugun = datetime.now().strftime("%d %B %Y")
