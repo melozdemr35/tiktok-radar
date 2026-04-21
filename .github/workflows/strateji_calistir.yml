@@ -1,8 +1,9 @@
-name: Otonom Strateji Uretici
+name: Otonom Strateji ve Video Fabrikası
+
 on:
   schedule:
-    - cron: '0 2 * * *'
-  workflow_dispatch: 
+    - cron: '0 2 * * *' # Her gece 02:00'de otomatik çalışır
+  workflow_dispatch: # İstediğinde manuel başlatabilmen için
 
 jobs:
   strateji-planla:
@@ -18,33 +19,47 @@ jobs:
 
       - name: Kutuphaneleri Kur
         run: |
-          pip install google-generativeai
-          pip install pyjwt requests tiktok-uploader
+          python -m pip install --upgrade pip
+          pip install google-generativeai pyjwt requests pandas plotly streamlit edge-tts
+          # TikTok yükleyici için gerekli bağımlılık (Eğer kütüphanen özelse ismini kontrol et)
+          pip install tiktok-uploader || echo "TikTok uploader yuklenemedi, manuel kontrol et"
 
-      - name: Fikir Kodunu Calistir
+      - name: 🧹 Eski Videoları Temizle (7 Günlük)
+        run: |
+          # 7 günden eski mp4'leri bul ve sil
+          find . -name "video_*.mp4" -mtime +7 -exec rm {} \;
+          echo "Eski arşiv temizlendi, yer açıldı."
+
+      - name: 🧠 Fikir ve Strateji Üret
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python fikir_ureteci.py > son_strateji.txt
+        run: python fikir_ureteci.py
 
-      - name: Video Ureteci Kodunu Calistir
+      - name: 🎬 Kling ile Video Üret (V2.5-Turbo Pro)
         env:
           KLING_ACCESS_KEY: ${{ secrets.KLING_ACCESS_KEY }}
           KLING_SECRET_KEY: ${{ secrets.KLING_SECRET_KEY }}
-        # Bakiye yoksa bile hata verip sistemi durdurmasın diye sonuna "|| true" eklendi
+        # Bakiye biterse veya API hata verirse tüm süreci bozmasın diye || true
         run: python video_ureteci.py || true
 
-      - name: TikTok Yukleyici Kodunu Calistir
+      - name: 📱 TikTok'a Otomatik Yükle
         env:
           TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
-        # Videolar hazır olduğunda TikTok'a yükler, yoksa hata vermeden geçer
         run: python tiktok_yukleyici.py || true
 
-      - name: Sonucu Dosyaya Kaydet
+      - name: 💾 Değişiklikleri Depoya Mühürle
         run: |
           git config --global user.name "Autonomous-Bot"
           git config --global user.email "actions@github.com"
+          
+          # Yeni strateji dosyasını ve yeni üretilen videoları ekle
           git add son_strateji.txt
-          # Eskiden sadece video_output.mp4'ü alıyordu. Artık video_1 ve video_2'yi alması için * konuldu.
           git add video_*.mp4 || true
-          # Sadece değişiklik varsa commit yap, yoksa hata vermeden geç
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Strategy and Video updated [$(date)]" && git push)
+          
+          # Sadece değişiklik varsa commit yap, hata almamak için kontrol ekle
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git commit -m "🚀 Otomatik Güncelleme: $(date +'%d-%m-%Y %H:%M')"
+            git push
+          else
+            echo "Kaydedilecek yeni bir değişiklik yok."
+          fi
