@@ -26,6 +26,7 @@ def promptlari_ayikla(dosya_yolu):
         
         prompt_listesi = []
         for p in eslesmeler:
+            # Markdown yıldızlarını ve gereksiz karakterleri temizle
             temiz = p.replace("*", "").replace(">", "").strip()
             if temiz:
                 prompt_listesi.append(temiz)
@@ -36,14 +37,14 @@ def promptlari_ayikla(dosya_yolu):
         return []
 
 def video_uret_kling(prompt, video_no):
-    """Kling V2.5-Turbo Pro kullanarak 15sn sesli video üretir."""
+    """Kling V2.5-Turbo Pro kullanarak 15sn, 9:16 formatında video üretir."""
     if not ACCESS_KEY or not SECRET_KEY:
         print("❌ Hata: API Anahtarları eksik.")
         return False
         
-    print(f"\n🚀 {video_no}. VİDEO ÜRETİLİYOR (V2.5-Turbo | Pro | 15sn)...")
+    print(f"\n🚀 {video_no}. VİDEO ÜRETİLİYOR (Model: V2.5-Turbo | Kalite: Pro | Süre: 15sn)...")
     
-    # 1. JWT Token Oluşturma
+    # 1. JWT Token Oluşturma (API Güvenliği için)
     payload = {
         "iss": ACCESS_KEY,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=1800),
@@ -53,7 +54,7 @@ def video_uret_kling(prompt, video_no):
     try:
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
     except Exception as e:
-        print(f"❌ JWT Hatası: {e}")
+        print(f"❌ JWT Oluşturma Hatası: {e}")
         return False
 
     headers = {
@@ -61,14 +62,14 @@ def video_uret_kling(prompt, video_no):
         "Content-Type": "application/json"
     }
 
-    # 🎥 SATIN ALINAN PAKETE UYGUN AYARLAR
+    # 🎥 VİRAL FORMAT VE PAKET AYARLARI
     data = {
         "model": "kling-v2-5-turbo",
         "prompt": prompt,
-        "ratio": "9:16",
-        "duration": "15", # Senin istediğin o uzunluk
-        "mode": "pro",    # Fantastik detaylar için en yüksek kalite
-        "cfg_scale": 0.5
+        "ratio": "9:16",     # 📱 Tam ekran dikey format (TikTok/Reels)
+        "duration": "15",    # ⏳ 15 saniye (Sarı çizmeli kedi için ideal)
+        "mode": "pro",       # ✨ Satın aldığın paketteki en yüksek kalite modu
+        "cfg_scale": 0.5     # 🧠 Yaratıcılık ve prompt uyumu dengesi
     }
 
     try:
@@ -78,16 +79,16 @@ def video_uret_kling(prompt, video_no):
         
         if response.status_code == 200 and response_data.get("code") == 0:
             task_id = response_data["data"]["task_id"]
-            print(f"✅ Görev kuyrukta! ID: {task_id}")
+            print(f"✅ Görev başarıyla kuyruğa alındı! ID: {task_id}")
         else:
-            print(f"❌ API Hatası: {response_data}")
+            print(f"❌ Kling API Hatası: {response_data}")
             return False
             
     except Exception as e:
-         print(f"❌ İstek Hatası: {e}")
+         print(f"❌ API Bağlantı Hatası: {e}")
          return False
 
-    # 3. Sonucu Bekle ve İndir
+    # 3. Sonucu Takip Et ve Video Hazır Olduğunda İndir
     api_url_result = f"https://api.klingai.com/v1/videos/text2video/{task_id}"
     while True:
         try:
@@ -97,34 +98,38 @@ def video_uret_kling(prompt, video_no):
             
             if status == "succeed":
                 video_url = res_data["data"]["task_result"]["videos"][0]["url"]
-                print(f"🎉 Video {video_no} Hazır! İndiriliyor...")
+                print(f"🎉 TEBRİKLER! Video {video_no} tamamlandı. İndiriliyor...")
                 
                 dosya_adi = f"video_{video_no}.mp4"
                 video_icerik = requests.get(video_url).content
                 with open(dosya_adi, "wb") as f:
                     f.write(video_icerik)
-                print(f"✅ Başarıyla Kaydedildi: {dosya_adi}")
+                print(f"✅ Dosya başarıyla kaydedildi: {dosya_adi}")
                 return True
                 
             elif status == "failed":
-                print(f"❌ Üretim başarısız. Hata Detayı: {res_data}")
+                print(f"❌ Üretim maalesef başarısız oldu. API Mesajı: {res_data}")
                 return False
             else:
-                print(f"⏳ {video_no}. video ilmek ilmek işleniyor... (60sn bekleniyor)")
-                time.sleep(60) # Uzun videolar için bekleme süresini artırdık
+                # Video üretim aşamasındayken terminale bilgi ver
+                print(f"⏳ {video_no}. video ilmek ilmek işleniyor... (Tahmini 60sn bekleme)")
+                time.sleep(60) 
                 
         except Exception as e:
-            print(f"❌ Durum kontrol hatası: {e}")
+            print(f"❌ Durum kontrolü sırasında hata: {e}")
             time.sleep(30)
 
 if __name__ == "__main__":
     promp_listesi = promptlari_ayikla(STRATEJI_DOSYASI)
     
     if not promp_listesi:
-        print("📭 Üretilecek yeni fantastik prompt bulunamadı.")
+        print("📭 'son_strateji.txt' içinde üretilecek yeni fantastik fikir bulunamadı.")
     else:
-        # Satın aldığın paketle günde en az 2 kaliteli video hedefi
+        print(f"🚀 Toplam {len(promp_listesi)} video için otonom üretim hattı başlıyor.")
+        # Günlük 2 kaliteli video hedefiyle ilk 2 promptu işleme al
         for index, prompt in enumerate(promp_listesi[:2]):
-            video_uret_kling(prompt, index + 1)
-            if index < 1: # İki video arası kısa mola
-                time.sleep(10)
+            success = video_uret_kling(prompt, index + 1)
+            # İki video arasında API'yi dinlendirmek için 15 saniye mola
+            if success and index < 1:
+                print("☕ İkinci video için kısa bir kahve molası...")
+                time.sleep(15)
