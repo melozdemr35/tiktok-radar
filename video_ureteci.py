@@ -20,11 +20,13 @@ def promptlari_ayikla(dosya_yolu):
         with open(dosya_yolu, "r", encoding="utf-8") as f:
             icerik = f.read()
             
+        # GÜÇLENDİRİLMİŞ CIMBIZ: Robot ve Not simgeleri arasını yakalar
         pattern = r"🤖.*?PROMPTU.*?\:(.*?)📝"
         eslesmeler = re.findall(pattern, icerik, re.DOTALL | re.IGNORECASE)
         
         prompt_listesi = []
         for p in eslesmeler:
+            # Markdown kalıntılarını temizle
             temiz = p.replace("*", "").replace(">", "").strip()
             if temiz:
                 prompt_listesi.append(temiz)
@@ -35,14 +37,14 @@ def promptlari_ayikla(dosya_yolu):
         return []
 
 def video_uret_kling(prompt, video_no):
-    """Kling V2.5-Turbo Pro kullanarak 15sn, 9:16 formatında TARİHLİ video üretir."""
+    """Kling V2.5-Turbo Pro kullanarak 10sn, 9:16 formatında TARİHLİ video üretir."""
     if not ACCESS_KEY or not SECRET_KEY:
         print("❌ Hata: API Anahtarları eksik.")
         return False
         
-    print(f"\n🚀 {video_no}. VİDEO ÜRETİLİYOR (Model: V2.5-Turbo | Kalite: Pro | Süre: 15sn)...")
+    print(f"\n🚀 {video_no}. VİDEO ÜRETİLİYOR (Model: V2.5-Turbo | Kalite: Pro | Süre: 10sn)...")
     
-    # 1. JWT Token Oluşturma
+    # 1. JWT Token Oluşturma (API Kimlik Doğrulaması)
     payload = {
         "iss": ACCESS_KEY,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=1800),
@@ -60,12 +62,13 @@ def video_uret_kling(prompt, video_no):
         "Content-Type": "application/json"
     }
 
-    # 🎥 VİRAL FORMAT VE PAKET AYARLARI
+    # 🎥 VİRAL FORMAT VE PARAMETRELER
+    # Not: Kling API'si 'duration' için maksimum "10" değerini kabul eder.
     data = {
         "model": "kling-v2-5-turbo",
         "prompt": prompt,
         "ratio": "9:16",
-        "duration": "15",
+        "duration": "10",  # Hata düzelttildi: 15 yerine 10 saniye.
         "mode": "pro",
         "cfg_scale": 0.5
     }
@@ -98,7 +101,7 @@ def video_uret_kling(prompt, video_no):
                 video_url = res_data["data"]["task_result"]["videos"][0]["url"]
                 print(f"🎉 Video {video_no} tamamlandı!")
                 
-                # 📅 TARİHLİ İSİMLENDİRME (Örn: video_21-04_1.mp4)
+                # 📅 TARİHLİ İSİMLENDİRME
                 bugun = datetime.datetime.now().strftime("%d-%m")
                 dosya_adi = f"video_{bugun}_{video_no}.mp4"
                 
@@ -109,10 +112,11 @@ def video_uret_kling(prompt, video_no):
                 return True
                 
             elif status == "failed":
-                print(f"❌ Üretim başarısız.")
+                print(f"❌ Üretim başarısız. API Mesajı: {res_data.get('message')}")
                 return False
             else:
-                print(f"⏳ İşleniyor... (Tahmini 60sn bekleme)")
+                # Durum güncellemesi
+                print(f"⏳ İşleniyor... (Durum: {status})")
                 time.sleep(60) 
                 
         except Exception as e:
@@ -123,9 +127,12 @@ if __name__ == "__main__":
     promp_listesi = promptlari_ayikla(STRATEJI_DOSYASI)
     
     if not promp_listesi:
-        print("📭 Yeni fikir bulunamadı.")
+        print("📭 Yeni fikir bulunamadı. Lütfen 'son_strateji.txt' dosyasını kontrol edin.")
     else:
+        print(f"🚀 Toplam {len(promp_listesi)} prompt bulundu. İşlem başlıyor...")
         for index, prompt in enumerate(promp_listesi[:2]):
             success = video_uret_kling(prompt, index + 1)
+            # API'yi yormamak ve eş zamanlılık limitlerine takılmamak için mola
             if success and index < 1:
+                print("☕ İkinci video için 15 saniye bekleniyor...")
                 time.sleep(15)
