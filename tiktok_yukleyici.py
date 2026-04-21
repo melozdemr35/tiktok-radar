@@ -1,18 +1,16 @@
 import os
 import re
-import json
 import time
 import multiprocessing
 from datetime import datetime
 from tiktok_uploader.upload import upload_video
 
-# GitHub Secrets'tan anahtarları al
+# Sadece ve sadece saf SESSION_ID'yi alıyoruz
 SESSION_ID = os.environ.get("TIKTOK_SESSION_ID", "").strip()
-TIKTOK_COOKIES = os.environ.get("TIKTOK_COOKIES", "").strip()
 STRATEJI_DOSYASI = "son_strateji.txt"
 
 def paylasim_bilgilerini_al(dosya_yolu):
-    """Metinleri ayıklar."""
+    """Metinleri temiz bir şekilde ayıklar."""
     try:
         if not os.path.exists(dosya_yolu): return []
         with open(dosya_yolu, "r", encoding="utf-8") as f:
@@ -32,42 +30,28 @@ def paylasim_bilgilerini_al(dosya_yolu):
         return []
 
 def yukleme_islemcisi(video_yolu, metin, session_id, video_no):
-    """Hibrit yöntem: Dosyayı en sade haliyle hazırlar ve yükler."""
+    """Dosya oluşturma derdi olmadan, saf parametre ile yükler."""
     print(f"🚀 {video_no}. Video işlemi başlatıldı...")
     
-    # 🍪 EN SADE ÇEREZ DOSYASI: Kütüphanenin asla hayır diyemeyeceği format
-    cookie_path = os.path.abspath(f"clean_cookie_{video_no}.json")
-    
-    # TikTok'un kütüphane üzerinden en sevdiği kimlik kartı budur
-    simple_cookie = [
-        {
-            "name": "sessionid",
-            "value": session_id,
-            "domain": ".tiktok.com",
-            "path": "/"
-        }
-    ]
-    
-    with open(cookie_path, 'w', encoding='utf-8') as f:
-        json.dump(simple_cookie, f)
+    if not session_id or len(session_id) < 10:
+        print(f"❌ HATA: SESSION_ID bulunamadı! Lütfen GitHub Secrets'ı kontrol et.")
+        return
 
     video_abs_path = os.path.abspath(video_yolu)
 
     try:
-        # 🎯 YÜKLEME: Hem dosya yoluyla hem de headless modda
-        # NOT: Eğer bu da 'No valid auth' derse kütüphaneyi 'sessionid=session_id' ile zorlarız
+        # 🔥 HİÇBİR DOSYA OLUŞTURMADAN DOĞRUDAN PARAMETRE VERİYORUZ
         upload_video(
             video_abs_path,
             description=metin,
-            cookies=cookie_path, 
+            sessionid=session_id, # Saf anahtarımız
             headless=True
         )
-        print(f"✅ {video_no}. VİDEO BAŞARIYLA PAYLAŞILDI!")
+        print(f"✅ {video_no}. VİDEO BAŞARIYLA TİKTOK'A YÜKLENDİ!")
         
     except Exception as e:
-        print(f"❌ {video_no}. Yükleme sırasında bir engel çıktı: {e}")
-    finally:
-        if os.path.exists(cookie_path): os.remove(cookie_path)
+        print(f"❌ {video_no}. Yükleme sırasında hata: {e}")
+        print("💡 İPUCU: Hata devam ediyorsa TikTok tarayıcından güncel bir 'sessionid' alıp Secrets'ı yenile.")
 
 if __name__ == "__main__":
     paylasimlar = paylasim_bilgilerini_al(STRATEJI_DOSYASI)
@@ -78,11 +62,16 @@ if __name__ == "__main__":
         for i in range(1, 3):
             video_adi = f"video_{bugun}_{i}.mp4"
             if os.path.exists(video_adi) and len(paylasimlar) >= i:
-                # Her yükleme için taptaze bir işlem
+                # Playwright asyncio çakışmalarını önlemek için process
                 p = multiprocessing.Process(
                     target=yukleme_islemcisi, 
                     args=(video_adi, paylasimlar[i-1], SESSION_ID, i)
                 )
                 p.start()
                 p.join()
-                time.sleep(20) # Spam filtresi için mola
+                
+                if i < 2:
+                    print("☕ Güvenlik molası (20 saniye)...")
+                    time.sleep(20)
+            else:
+                print(f"⚠️ {video_adi} bulunamadı, bu adım atlanıyor.")
