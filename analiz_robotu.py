@@ -1,4 +1,4 @@
-import google.generativeai as genai
+from google import genai
 import json
 import os
 from datetime import datetime
@@ -10,7 +10,8 @@ if not api_key:
     print("Hata: API Anahtarı bulunamadı!")
     exit(1)
 
-genai.configure(api_key=api_key)
+# YENİ NESİL GOOGLE GENAI İSTEMCİSİ
+client = genai.Client(api_key=api_key)
 
 # 1. Veritabanını oku
 try:
@@ -34,10 +35,9 @@ for v in guncel_set:
     ozet_metin += f"- Açıklama: {v.get('desc')} | Etiketler: {v.get('hashtags', [])}\n"
 
 # 3. Gemini ile Analiz ve Strateji Oluştur
-model = genai.GenerativeModel('gemini-1.5-flash')
 bugun_tam_tarih = datetime.now().strftime("%d %B %Y")
 
-# 🎯 KRİTİK PROMPT GÜNCELLEMESİ
+# 🎯 KRİTİK PROMPT GÜNCELLEMESİ (Günlük Limite uygun olarak 2 video istiyoruz)
 prompt = f"""
 BUGÜNÜN TARİHİ: {bugun_tam_tarih}
 Sen profesyonel bir TikTok Viral Stratejistisin. Türkiye (TR) pazarında uzmanlaşmış bir AI'sın.
@@ -47,7 +47,7 @@ TÜRKİYE'DEN GELEN TAZE VERİLER:
 
 GÖREV:
 1. Verilere bakarak bugün Türkiye'de TikTok'ta en yüksek etkileşim alacak paylaşım saatini belirle (Format: ⏰ PAYLAŞIM SAATİ: 20:00).
-2. 'Absürt Viral' konseptimize uygun, hayvanların konuştuğu veya nesnelere kişilik yüklendiği 3 adet video fikri üret.
+2. 'Absürt Viral' konseptimize uygun, hayvanların konuştuğu veya nesnelere kişilik yüklendiği 2 adet video fikri üret.
 3. Her fikri mutlaka şu formatta yaz (Formatı bozma):
 
 ⏰ PAYLAŞIM SAATİ: [Buraya Saat Yaz]
@@ -57,12 +57,17 @@ GÖREV:
 📝 AÇIKLAMA: [Türkçe ilgi çekici açıklama]
 🏷️ ETİKETLER: [Hashtagler aralarında boşluk bırakılarak yazılmalı]
 
-(Bu formatı Video 2 ve Video 3 için tekrarla)
+(Bu formatı Video 2 için de tekrarla)
 """
 
 try:
     print(f"🧠 {bugun_tam_tarih} verileri analiz ediliyor ve strateji oluşturuluyor...")
-    response = model.generate_content(prompt)
+    
+    # YENİ SİSTEM API ÇAĞRISI
+    response = client.models.generate_content(
+        model='gemini-1.5-flash',
+        contents=prompt
+    )
     
     # 4. Sonucu "son_strateji.txt" olarak kaydet (Diğer robotlar bu dosyayı okuyacak)
     with open("son_strateji.txt", "w", encoding="utf-8") as f:
