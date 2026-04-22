@@ -25,6 +25,8 @@ jobs:
           pip uninstall -y google-generativeai
           # Şimdi yepyeni kütüphanemizi ve SES MOTORUMUZU (edge-tts) kuruyoruz
           pip install google-genai pyjwt requests edge-tts
+          # 🛠️ Montaj makinesi FFmpeg'i kuruyoruz (Güvenlik Sigortası)
+          sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: 🧹 Eski Videoları ve Limiti Temizle
         run: |
@@ -63,7 +65,7 @@ jobs:
           git add gunluk_limit.txt || true
           
           if [[ -n "$(git status --porcelain)" ]]; then
-            git commit -m "🎬 Yeni Üretim Hazır (Sesli): $(date +'%d-%m-%Y %H:%M')"
+            git commit -m "🎬 Yeni Üretim Hazır (Sesli ve Montajlı): $(date +'%d-%m-%Y %H:%M')"
             git push
           else
             echo "Kaydedilecek yeni bir değişiklik bulunamadı."
