@@ -23,13 +23,15 @@ jobs:
           python -m pip install --upgrade pip
           # Çakışmayı önlemek için eski paketi (varsa) zorla kaldırıyoruz
           pip uninstall -y google-generativeai
-          # Şimdi yepyeni kütüphanemizi temiz bir şekilde kuruyoruz
-          pip install google-genai pyjwt requests
+          # Şimdi yepyeni kütüphanemizi ve SES MOTORUMUZU (edge-tts) kuruyoruz
+          pip install google-genai pyjwt requests edge-tts
 
       - name: 🧹 Eski Videoları ve Limiti Temizle
         run: |
           # 7 günden eski mp4'leri temizle
           find . -name "video_*.mp4" -mtime +7 -exec rm {} \;
+          # Eski ses dosyalarını da temizle
+          find . -name "ses_*.mp3" -mtime +1 -exec rm {} \;
           # 🔓 GÜNLÜK LİMİT KİLİDİNİ AÇ: Yeni gün için sayacı sıfırlıyoruz
           rm -f gunluk_limit.txt || echo "Kilit dosyası zaten yok."
           echo "Üretim hattı temizlendi, yeni gün için kilitler açıldı."
@@ -39,6 +41,9 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python analiz_robotu.py # Beyin katmanını çalıştırıyoruz
 
+      - name: 🎧 Ses Stüdyosunu Çalıştır (MP3 Üretimi)
+        run: python ses_ureteci.py # Yazılan senaryoları Türkçe sese çeviriyoruz
+
       - name: 🎥 Kling ile Video Üret (V2.5-Turbo Pro)
         env:
           KLING_ACCESS_KEY: ${{ secrets.KLING_ACCESS_KEY }}
@@ -46,18 +51,19 @@ jobs:
         # Bakiye biterse süreci bozmasın diye || true
         run: python video_ureteci.py || true
 
-      - name: 💾 Yeni Videoları ve Stratejiyi Depoya Mühürle
+      - name: 💾 Yeni Videoları, Sesleri ve Stratejiyi Depoya Mühürle
         run: |
           git config --global user.name "Autonomous-Bot"
           git config --global user.email "actions@github.com"
           
-          # Üretilen videoları, güncellenen stratejiyi ve silinen limit dosyasını ekle
+          # Üretilen her şeyi depoya ekle
           git add son_strateji.txt
+          git add ses_*.mp3 || true
           git add video_*.mp4 || true
           git add gunluk_limit.txt || true
           
           if [[ -n "$(git status --porcelain)" ]]; then
-            git commit -m "🎬 Yeni Üretim Hazır ve Limitler Açıldı: $(date +'%d-%m-%Y %H:%M')"
+            git commit -m "🎬 Yeni Üretim Hazır (Sesli): $(date +'%d-%m-%Y %H:%M')"
             git push
           else
             echo "Kaydedilecek yeni bir değişiklik bulunamadı."
