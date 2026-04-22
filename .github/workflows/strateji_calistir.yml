@@ -21,13 +21,16 @@ jobs:
       - name: Kutuphaneleri Kur
         run: |
           python -m pip install --upgrade pip
-          # Kling API ve Gemini için gerekli kütüphaneler (pyjwt eklendi)
+          # Kling API ve Gemini için gerekli kütüphaneler
           pip install google-generativeai pyjwt requests
 
-      - name: 🧹 Eski Videoları Temizle (7 Günlük)
+      - name: 🧹 Eski Videoları ve Limiti Temizle
         run: |
+          # 7 günden eski mp4'leri temizle
           find . -name "video_*.mp4" -mtime +7 -exec rm {} \;
-          echo "Eski arşiv temizlendi, yer açıldı."
+          # 🔓 GÜNLÜK LİMİT KİLİDİNİ AÇ: Yeni gün için sayacı sıfırlıyoruz
+          rm -f gunluk_limit.txt || echo "Kilit dosyası zaten yok."
+          echo "Üretim hattı temizlendi, yeni gün için kilitler açıldı."
 
       - name: 🧠 Trend Analizi ve Fikir Üretimi
         env:
@@ -46,13 +49,14 @@ jobs:
           git config --global user.name "Autonomous-Bot"
           git config --global user.email "actions@github.com"
           
-          # Üretilen videoları ve güncellenen strateji dosyasını ekle
+          # Üretilen videoları, güncellenen stratejiyi ve silinen limit dosyasını ekle
           git add son_strateji.txt
           git add video_*.mp4 || true
+          git add gunluk_limit.txt || true
           
           if [[ -n "$(git status --porcelain)" ]]; then
-            git commit -m "🎬 Yeni Üretim Hazır: $(date +'%d-%m-%Y %H:%M')"
+            git commit -m "🎬 Yeni Üretim Hazır ve Limitler Açıldı: $(date +'%d-%m-%Y %H:%M')"
             git push
           else
-            echo "Kaydedilecek yeni bir video bulunamadı."
+            echo "Kaydedilecek yeni bir değişiklik bulunamadı."
           fi
