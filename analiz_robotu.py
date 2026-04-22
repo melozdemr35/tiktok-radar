@@ -7,7 +7,7 @@ from datetime import datetime
 api_key = os.environ.get("GEMINI_API_KEY")
 
 if not api_key:
-    print("Hata: API Anahtarı bulunamadı!")
+    print("❌ Hata: API Anahtarı bulunamadı!")
     exit(1)
 
 # YENİ NESİL GOOGLE GENAI İSTEMCİSİ
@@ -18,7 +18,7 @@ try:
     with open("trend_veritabani.json", "r", encoding="utf-8") as f:
         veriler = json.load(f)
 except FileNotFoundError:
-    print("Veritabanı dosyası bulunamadı!")
+    print("⚠️ Veritabanı dosyası bulunamadı, analiz atlanıyor!")
     exit(1)
 
 # 2. GÜNCEL VERİ SEÇİMİ
@@ -37,7 +37,7 @@ for v in guncel_set:
 # 3. Gemini ile Analiz ve Strateji Oluştur
 bugun_tam_tarih = datetime.now().strftime("%d %B %Y")
 
-# 🎯 KRİTİK PROMPT GÜNCELLEMESİ (Günlük Limite uygun olarak 2 video istiyoruz)
+# 🎯 KRİTİK PROMPT (Günlük Limite uygun olarak 2 video istiyoruz)
 prompt = f"""
 BUGÜNÜN TARİHİ: {bugun_tam_tarih}
 Sen profesyonel bir TikTok Viral Stratejistisin. Türkiye (TR) pazarında uzmanlaşmış bir AI'sın.
@@ -63,13 +63,13 @@ GÖREV:
 try:
     print(f"🧠 {bugun_tam_tarih} verileri analiz ediliyor ve strateji oluşturuluyor...")
     
-    # YENİ SİSTEM API ÇAĞRISI
+    # YENİ SİSTEM API ÇAĞRISI (Preview Modeli)
     response = client.models.generate_content(
         model='gemini-3-flash-preview',
         contents=prompt
     )
     
-    # 4. Sonucu "son_strateji.txt" olarak kaydet (Diğer robotlar bu dosyayı okuyacak)
+    # 4. Sonucu "son_strateji.txt" olarak kaydet
     with open("son_strateji.txt", "w", encoding="utf-8") as f:
         f.write(response.text)
     
@@ -79,4 +79,4 @@ try:
         
     print(f"✅ Strateji ve Fikirler Başarıyla Oluşturuldu! Dosya: son_strateji.txt")
 except Exception as e:
-    print(f"Analiz sırasında hata oluştu: {e}")
+    print(f"❌ Analiz sırasında hata oluştu: {e}")
