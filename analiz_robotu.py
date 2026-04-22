@@ -34,13 +34,13 @@ ozet_metin = ""
 for v in guncel_set:
     ozet_metin += f"- Açıklama: {v.get('desc')} | Etiketler: {v.get('hashtags', [])}\n"
 
-# 3. Gemini ile Analiz ve Strateji Oluştur
+# 3. Gemini ile Analiz ve Senaryo Oluştur
 bugun_tam_tarih = datetime.now().strftime("%d %B %Y")
 
-# 🎯 KRİTİK PROMPT (Günlük Limite uygun olarak 2 video istiyoruz)
+# 🎯 KRİTİK PROMPT (Artık Sadece Fikir Değil, REPLİK ve DUDAK SENKRONU İstiyoruz!)
 prompt = f"""
 BUGÜNÜN TARİHİ: {bugun_tam_tarih}
-Sen profesyonel bir TikTok Viral Stratejistisin. Türkiye (TR) pazarında uzmanlaşmış bir AI'sın.
+Sen profesyonel bir TikTok Viral Stratejisti ve Senaristisin. Türkiye (TR) pazarında uzmanlaşmış bir AI'sın.
 
 TÜRKİYE'DEN GELEN TAZE VERİLER:
 {ozet_metin}
@@ -53,7 +53,8 @@ GÖREV:
 ⏰ PAYLAŞIM SAATİ: [Buraya Saat Yaz]
 
 🎬 Video 1
-🤖 PROMPTU: [Kling AI için detaylı İngilizce görsel komut]
+🤖 PROMPTU: [Kling AI için detaylı İngilizce görsel komut. ÇOK ÖNEMLİ: Karakterin konuştuğunu belirtmek için promptun içine mutlaka 'talking, lips moving, speaking to camera, vertical 9:16 ratio' gibi ifadeler ekle!]
+🗣️ SESLENDİRME: [Karakterin ağzından çıkacak, komik, isyankar veya absürt maksimum 10 saniyelik TÜRKÇE CÜMLE (Örn: 'Beni zart zurt çekme artık vitesim bozuldu!')]
 📝 AÇIKLAMA: [Türkçe ilgi çekici açıklama]
 🏷️ ETİKETLER: [Hashtagler aralarında boşluk bırakılarak yazılmalı]
 
@@ -61,7 +62,7 @@ GÖREV:
 """
 
 try:
-    print(f"🧠 {bugun_tam_tarih} verileri analiz ediliyor ve strateji oluşturuluyor...")
+    print(f"🧠 {bugun_tam_tarih} verileri analiz ediliyor ve SENARYOLAR yazılıyor...")
     
     # YENİ SİSTEM API ÇAĞRISI (Preview Modeli)
     response = client.models.generate_content(
@@ -77,6 +78,6 @@ try:
     with open("son_analiz.txt", "w", encoding="utf-8") as f:
         f.write(response.text)
         
-    print(f"✅ Strateji ve Fikirler Başarıyla Oluşturuldu! Dosya: son_strateji.txt")
+    print(f"✅ Senaryolar ve Fikirler Başarıyla Oluşturuldu! Dosya: son_strateji.txt")
 except Exception as e:
     print(f"❌ Analiz sırasında hata oluştu: {e}")
