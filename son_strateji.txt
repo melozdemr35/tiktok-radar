@@ -1,13 +1,15 @@
+Bugün 23 Nisan Ulusal Egemenlik ve Çocuk Bayramı. Türkiye'de resmi tatil olması nedeniyle kullanıcılar gün boyu aktif ancak en yüksek "ekran başında dinlenme" ve etkileşim pik noktası, bayram etkinliklerinin bitip herkesin eve çekildiği akşam saatleridir.
+
 ⏰ PAYLAŞIM SAATİ: 20:45
 
 🎬 Video 1
-🤖 PROMPTU: Cinematic close-up of a traditional Turkish teapot (çaydanlık) sitting on a stove. The teapot has a realistic human-like mouth and expressive eyes. The teapot is talking directly to the camera, lips moving realistically, looking exhausted with steam occasionally puffing out of its lid like it's angry. High detail, 4k, vertical 9:16 ratio, speaking to camera.
-🗣️ SESLENDİRME: "Yeter artık be! Sabahtan beri fokur fokur içtiniz, alt demliğim kireçten haritaya döndü, bir salın beni artık ya!"
-📝 AÇIKLAMA: Türk milletinin çay sevdası vs. Çaydanlığın tükenmişlik sendromu 😂☕️
-🏷️ ETİKETLER: #çay #absürt #komedi #türkçayı #robotvibes #yapayzeka #funnyvideos #mutfakgram
+🤖 PROMPTU: Cinematic close-up of a fluffy street cat (Sarman) wearing a small red bow tie, sitting on a colorful Turkish sidewalk, looking directly into the lens, talking to camera, expressive human-like lip movements, speaking clearly, 4k, photorealistic, vertical 9:16 ratio.
+🗣️ SESLENDİRME: "Herkes bayram kutluyor, şiirler okuyor... Peki ya benim sosisler? Benim bayram harçlığım nerede kardeşim?!"
+📝 AÇIKLAMA: Mahallenin muhtarı bu duruma çok bozuk! 🐱😂 #23Nisan
+🏷️ ETİKETLER: #23Nisan #konuşankedi #komiktiktok #absürt #kedivideoları #bayram
 
 🎬 Video 2
-🤖 PROMPTU: A cool Istanbul street cat sitting on a colorful cushion in a trendy neighborhood. The cat is wearing tiny pixel sunglasses. The cat is talking to the camera with human-like lip-sync and expressive paw gestures, looking very judgmental. High-quality fur texture, vibrant colors, vertical 9:16 ratio, speaking to camera, magic atmosphere.
-🗣️ SESLENDİRME: "O üstündeki kombin ne kardeşim? Şaka mısın? Şurada iki mama istedik diye bizi brainrot yaptınız, dağılın lan!"
-📝 AÇIKLAMA: İstanbul kedilerinin dili açıldı, hepimize geçmiş olsun... 🐈‍⬛💀
-🏷️ ETİKETLER: #kedivideoları #kedi #istanbul #funnyvideos #tungtungtungsahur #viraltr #magic #foryoupage
+🤖 PROMPTU: A traditional Turkish double-decker teapot (çaydanlık) sitting on a kitchen stove, the spout of the upper teapot is moving like a mouth, talking to the camera, steam coming out, expressive facial features appearing on the metal surface, vertical 9:16 ratio, lips moving, speaking to camera.
+🗣️ SESLENDİRME: "Sabahtan beri fokurdamaktan altım kireç bağladı! Misafiriniz bitmedi mi? Azıcık da kahve için, yeter!"
+📝 AÇIKLAMA: Bugünün gizli kahramanları çok dertli... 🫖😤
+🏷️ ETİKETLER: #çay #çaydanlık #komedi #türkmutfağı #absürtvizyon #viralurkey #trending
