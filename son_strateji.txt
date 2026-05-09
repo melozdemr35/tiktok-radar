@@ -1,16 +1,13 @@
-BUGÜNÜN TARİHİ: 08 May 2026
-Stratejik Analiz: Verilerde "Red Panda" ve "Squishy" (nesne manipülasyonu) gibi görsel tatmini yüksek içeriklerin yükselişte olduğunu görüyoruz. Türkiye pazarında Cuma akşamları (08 Mayıs 2026 bir Cuma gününe denk geliyor), kullanıcıların haftalık yorgunluğu atmak için "absürt mizah" ve "yargılayıcı karakterler"e en çok tepki verdiği zaman dilimidir.
-
 ⏰ PAYLAŞIM SAATİ: 20:30
 
 🎬 Video 1
-🤖 PROMPTU: A hyper-realistic traditional Turkish tea glass (ince belli bardak) sitting on a saucer. The glass has a small, expressive human-like mouth and eyes appearing on its surface. The tea glass is talking, lips moving, speaking to camera, looking very exhausted and annoyed, steam rising from the top, vertical 9:16 ratio, cinematic macro lighting, 4k.
-🗣️ SESLENDİRME: "Günde 40 kere şeker karıştırıp içimi dışıma çıkardınız, başım döndü yemin ederim! Bi' salın da soğuyayım artık!"
-📝 AÇIKLAMA: Çay bardağının da bir sabrı var... ☕️ Karıştırmayın artık şu adamı! 😂
-🏷️ ETİKETLER: #çay #komik #absürt #türkiye #konuşanesyalar #vlog #fyptr
+🤖 PROMPTU: Cinematic close-up of a weathered, vintage wall-mounted air conditioner in a Turkish living room. The AC unit has a grumpy human-like face integrated into its plastic vents. The AC is talking, lips moving expressively, speaking to camera, venting steam occasionally. High detail, realistic textures, vertical 9:16 ratio.
+🗣️ SESLENDİRME: "Açma beni artık kardeşim, daha Mayıs'ın başındayız! Motorum soğumadan vantilatör muamelesi yapıyorsun, vitesim bozuldu ayıp ya!"
+📝 AÇIKLAMA: Klimalar da insan, onlar da yoruluyor... Mayıs sıcağına klimanın isyanı! 😂
+🏷️ ETİKETLER: #klima #yazgeldi #komik #absürt #havadurumu #evhali
 
 🎬 Video 2
-🤖 PROMPTU: A cute red panda standing on its hind legs on a wooden log, looking directly into the lens with a judgmental 'neighborhood auntie' expression. The red panda is talking, lips moving, speaking to camera, vertical 9:16 ratio, realistic fur texture, forest background, expressive hand gestures with its paws.
-🗣️ SESLENDİRME: "Hala mı video kaydırıyorsun sen? Kalk iki kap yemek yap, komşunun kızı mühendis oldu sen hala pandaya bak!"
-📝 AÇIKLAMA: Kızıl panda değil, mahalle teyzesi mübarek... 🐼 Azar yeme saatiniz gelmiş.
-🏷️ ETİKETLER: #redpanda #komik #türkiye #mahalle #viralvideo #absürt #fyp
+🤖 PROMPTU: Extreme close-up of a judgmental tuxedo street cat sitting on a colorful velvet chair in a Kadıköy cafe. The cat is speaking directly to the camera with realistic lip synchronization and human-like facial expressions. It looks cynical and bored. High quality, soft bokeh Istanbul background, vertical 9:16 ratio.
+🗣️ SESLENDİRME: "Şiirsel Nisan bitti, hani mucizeler? Hala bayat mama yiyorum. Story atacağına mama kabını doldur insanoğlu, her şeyimiz mi şov?"
+📝 AÇIKLAMA: Kadıköy kedilerinden hayat dersleri: Şiir karın doyurmuyor kardeşim! 🐱
+🏷️ ETİKETLER: #kediler #istanbul #komikvideolar #şiirsokakta #güncel #foryou #keşfet
