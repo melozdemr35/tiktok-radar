@@ -1,13 +1,13 @@
 ⏰ PAYLAŞIM SAATİ: 20:30
 
 🎬 Video 1
-🤖 PROMPTU: A hyper-realistic Turkish coffee pot (Cezve) with a grumpy human-like mouth and eyes, sitting on a stove, talking, lips moving, speaking to camera, steam rising from its head, expressive face, cinematic lighting, extreme close-up, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Yine mi orta şekerli? Akşama kadar köpük yapmaktan ciğerim soldu, git bir kere de çay iç kardeşim!"
-📝 AÇIKLAMA: Cezve bile isyan etti, artık tadımız kalmadı... ☕️😤
-🏷️ ETİKETLER: #kahve #komedi #absürt #mutfak #ai #viral #türkiye #cezve
+🤖 PROMPTU: A close-up shot of a vintage copper Turkish coffee pot (cezve) sitting on a traditional stove. The cezve has a hyper-realistic human-like mouth and eyes. The cezve is looking directly into the camera, talking aggressively, lips moving realistically, steam is coming out of its top as it speaks. Cinematic lighting, high detail, 9:16 vertical ratio.
+🗣️ SESLENDİRME: "Her gün aynı terane! 'Aman köpüğü kaçmasın, aman kısık ateş olsun.' Kardeşim ben cezveyim, senin stres topun değilim! Taşırıcam valla şimdi, gör gününü!"
+📝 AÇIKLAMA: Türk kahvesi bile artık isyanda... ☕️🔥
+🏷️ ETİKETLER: #kahve #cezve #komedi #absürt #mutfak #viralvideo #türkkahvesi
 
 🎬 Video 2
-🤖 PROMPTU: A cool urban pigeon wearing a tiny leather jacket and a gold chain, standing on a Galata Bridge railing, talking, lips moving, speaking to camera, acting like a neighborhood 'abi', Istanbul cityscape in the background, ultra-realistic, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Hayırdır hemşerim? Her gün bayat simit atıyorsun diye bizi satın mı aldın? Azıcık vizyonun olsun, antep fıstığı at!"
-📝 AÇIKLAMA: İstanbul güvercinlerinin sabrı taşmış... 🕊️😎
-🏷️ ETİKETLER: #istanbul #güvercin #komik #absürt #brainrot #viralvideo #yapayzeka #simit
+🤖 PROMPTU: A close-up of a grumpy, fat street cat with typical Istanbul street background. The cat has a human-like mouth and is speaking directly to the lens with a judgmental and sarcastic expression. Its lips are moving clearly as it talks. High resolution, photorealistic, 9:16 vertical ratio, soft daylight.
+🗣️ SESLENDİRME: "O giydiğin pantolon ne öyle? 2024'te mi kaldın evladım? Biraz vizyon be! Hadi yürü mama kabım boş kalmış, felsefe yapma bana!"
+📝 AÇIKLAMA: Mahallenin ağır abisinden stil tavsiyeleri 🐱💅
+🏷️ ETİKETLER: #kedi #sokakkedisi #komik #eleştiri #moda #istanbul #absürtviral
