@@ -1,13 +1,15 @@
-⏰ PAYLAŞIM SAATİ: 20:30
+Bugünün verileri ve Türkiye pazarının dinamikleri (Pazartesi akşamı sendromu ve görsel doyum arayışı) analiz edildiğinde stratejin aşağıdadır:
+
+⏰ PAYLAŞIM SAATİ: 20:45
 
 🎬 Video 1
-🤖 PROMPTU: A personified smart air conditioner (AC) unit mounted on a modern living room wall. The AC has expressive digital eyes and a human-like mouth on its surface. The AC is looking at the camera and talking, lips moving, speaking to camera, looking annoyed and overheated, high quality, realistic textures, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Daha Mayıs bitmeden düğmeme bastınız ya, valla motoru yakacağım! Git vantilatör bul kendine, ben grevdeyim!"
-📝 AÇIKLAMA: Yaz gelmeden klimalarla barışsak iyi olur, yoksa halimiz harap! 😂🥵
-🏷️ ETİKETLER: #klima #yazgeldi #komik #absürt #havalarısındı #viralvideo #fyp
+🤖 PROMPTU: A realistic Turkish "ince belli" tea glass filled with hot tea, sitting on a wooden table in a traditional cafe. The glass has a small, expressive face. The glass is talking directly to the camera, its lips are moving realistically, speaking to camera, vertical 9:16 ratio, cinematic lighting, steam rising from the tea.
+🗣️ SESLENDİRME: "Beni tabağa çok sert bırakma, belim zaten ince, vallahi çat diye gideceğim bir gün!"
+📝 AÇIKLAMA: Çaylar benden, dertler sizden... İnce bellinin isyanı! 😂☕️
+🏷️ ETİKETLER: #çay #komik #absürt #incebelli #nesnelerkonuşuyor #türkiye #fyp
 
 🎬 Video 2
-🤖 PROMPTU: A majestic Van cat with one blue eye and one green eye sitting on a premium velvet sofa. The cat has a human-like expressive mouth and is talking directly to the viewer. The cat looks judging and sophisticated, lips moving, speaking to camera, cinematic lighting, hyper-realistic fur, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Şu robot kadar aklın yok, gelmişsin karşımda dans ediyorsun. Kapat şu kamerayı da mamamı koy hadi!"
-📝 AÇIKLAMA: Evin gerçek sahibi konuşunca hepimiz susuyoruz... 👑🐈
-🏷️ ETİKETLER: #vankedisi #konuşanhayvanlar #komikvideolar #kedi #kedivideoları #fyp #trend
+🤖 PROMPTU: A fluffy, grumpy-looking Van cat with one blue eye and one green eye, sitting on a balcony overlooking Istanbul. The cat is wearing a tiny headset. The cat is talking, lips moving, speaking to camera, looking like an angry NPC character, vertical 9:16 ratio, high resolution, realistic fur texture.
+🗣️ SESLENDİRME: "Kardeşim mama saati geçti diyorum, sen hala 'ay ne tatlı pisi' diyorsun. Karizmamızı çizdin!"
+📝 AÇIKLAMA: Mahallenin asıl sahibiyle tanışın. NPC değil, mahalle abisi! 🐱👑
+🏷️ ETİKETLER: #vankedisi #konuşanhayvanlar #komikvideolar #istanbul #kedi #npc #viraltr
