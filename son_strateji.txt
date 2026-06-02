@@ -1,15 +1,13 @@
-Bugünün verileri ve Türkiye pazarının dinamikleri (Pazartesi akşamı sendromu ve görsel doyum arayışı) analiz edildiğinde stratejin aşağıdadır:
-
-⏰ PAYLAŞIM SAATİ: 20:45
+⏰ PAYLAŞIM SAATİ: 20:30
 
 🎬 Video 1
-🤖 PROMPTU: A realistic Turkish "ince belli" tea glass filled with hot tea, sitting on a wooden table in a traditional cafe. The glass has a small, expressive face. The glass is talking directly to the camera, its lips are moving realistically, speaking to camera, vertical 9:16 ratio, cinematic lighting, steam rising from the tea.
-🗣️ SESLENDİRME: "Beni tabağa çok sert bırakma, belim zaten ince, vallahi çat diye gideceğim bir gün!"
-📝 AÇIKLAMA: Çaylar benden, dertler sizden... İnce bellinin isyanı! 😂☕️
-🏷️ ETİKETLER: #çay #komik #absürt #incebelli #nesnelerkonuşuyor #türkiye #fyp
+🤖 PROMPTU: A hyper-realistic Turkish Simit (sesame bread ring) with a funny human-like face, eyes, and a moving mouth. The Simit is sitting on a traditional Turkish breakfast table with a glass of tea in the background. The Simit is talking, lips moving, speaking to camera, expressing annoyance, vertical 9:16 ratio, high resolution, cinematic lighting.
+🗣️ SESLENDİRME: "Ya kardeşim her sabah aynı mevzu! Beni çaya batırıp durma, valla billa başım dönüyor artık, bir huzur ver!"
+📝 AÇIKLAMA: Simitlerin de bir gururu, bir onuru var be abi... 🥯☕️
+🏷️ ETİKETLER: #simit #kahvaltı #absürt #komedi #türkiyem #konuşannesneler #fyp
 
 🎬 Video 2
-🤖 PROMPTU: A fluffy, grumpy-looking Van cat with one blue eye and one green eye, sitting on a balcony overlooking Istanbul. The cat is wearing a tiny headset. The cat is talking, lips moving, speaking to camera, looking like an angry NPC character, vertical 9:16 ratio, high resolution, realistic fur texture.
-🗣️ SESLENDİRME: "Kardeşim mama saati geçti diyorum, sen hala 'ay ne tatlı pisi' diyorsun. Karizmamızı çizdin!"
-📝 AÇIKLAMA: Mahallenin asıl sahibiyle tanışın. NPC değil, mahalle abisi! 🐱👑
-🏷️ ETİKETLER: #vankedisi #konuşanhayvanlar #komikvideolar #istanbul #kedi #npc #viraltr
+🤖 PROMPTU: A majestic Van Cat with heterochromia (one blue eye, one green eye) looking directly at the camera with a judgmental expression. The cat is talking, lips moving, speaking to camera, vertical 9:16 ratio, fluffy white fur, high detail, luxury living room background, 4k.
+🗣️ SESLENDİRME: "Bak yine o ucuz mamayı getirmiş... Ben Van asaletinden geliyorum, derhal o somonlu paketi aç köle!"
+📝 AÇIKLAMA: Kedimle ciddi bir konuşma yaptık, pek memnun değil... 🐈👑
+🏷️ ETİKETLER: #vankedisi #kedi #konuşanhayvanlar #komik #aianimals #kedivideoları #absürt #viraltr
