@@ -1,13 +1,15 @@
 ⏰ PAYLAŞIM SAATİ: 20:45
 
+Veriler incelendiğinde; "fruit drama" (meyve draması) ve "brainrot" içeriklerinin yükselişte olduğu, Türkiye'de ise yaz akşamlarında (Temmuz başı) kullanıcıların akşam yemeği sonrası en aktif oldukları görülmektedir.
+
 🎬 Video 1
-🤖 PROMPTU: High-end chrome espresso machine with subtle facial features on its metallic surface, talking directly to the camera, lips moving realistically on the steam wand area, steam puffing out of its top like hair, cinematic indoor cafe lighting, hyper-realistic texture, speaking to camera, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Abicim sabah akşam süt köpürtmekten ciğerim soldu, bir gün de beni tatile götürün be, paslandım burada!"
-📝 AÇIKLAMA: Beyaz yakalıların favori makinesi bile isyan bayrağını çekti... ☕️😫
-🏷️ ETİKETLER: #kahve #isyan #absürt #komedi #işhayatı #pazartesisendromu #klingai
+🤖 PROMPTU: A hyper-realistic Turkish Simit (bagel with sesame seeds) sitting on a blue plastic stool in a busy Istanbul street. The Simit has a human-like mouth and expressive eyes. It is looking directly at the camera, talking, lips moving, speaking to camera, sweat droplets on its 'forehead' due to the heat, photorealistic, cinematic lighting, vertical 9:16 ratio.
+🗣️ SESLENDİRME: "Oğlum dışarısı 45 derece, ben zaten fırından yeni çıkmışım, hala gelmiş beni güneşin alnına koyuyorsun. Susuzluktan susamlarım döküldü, vitesim bozuldu lan!"
+📝 AÇIKLAMA: İstanbul sıcağında simit olmak da zor... 🥨🔥 
+🏷️ ETİKETLER: #simit #istanbul #sıcak #komik #yapayzeka #absürt #viral #trend #2026 #türkiye
 
 🎬 Video 2
-🤖 PROMPTU: A fluffy squirrel wearing tiny stylish sunglasses, holding a hazelnut like a microphone, looking directly into the lens, talking, lips moving perfectly, speaking to camera, lush green park background, bokeh effect, 4k resolution, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Fındık fiyatlarından haberiniz var mı sizin? Artık toprağa gömmüyorum, kasaya koyuyorum kardeşim, ekonomi bizi de vurdu!"
-📝 AÇIKLAMA: Sincaplar bile artık yatırım tavsiyesi veriyor... 🐿️📈
-🏷️ ETİKETLER: #sincap #ekonomi #fındık #hayvanlar #komiktiktok #gündem #absürtvideo
+🤖 PROMPTU: A majestic Van Cat with one blue eye and one green eye, wearing a tiny gold chain and sitting on a luxury velvet sofa. The cat looks very posh and arrogant. Close-up shot, the cat is talking, lips moving, speaking to camera, high-end fashion aesthetic, photorealistic, vertical 9:16 ratio.
+🗣️ SESLENDİRME: "Bana bak, o önüme koyduğun mamanın markası ne? Ben vizyonlu bir kediyim şekerim, o ucuz mamayı git mahallenin tekirine ver, benim asabımı bozma!"
+📝 AÇIKLAMA: Vizyon her şeydir, mama markası bile... 🐈💅
+🏷️ ETİKETLER: #vankedisi #kedi #komikvideolar #ai #konuşankedi #viral #turkiye #lüks #foryou #keşfet
