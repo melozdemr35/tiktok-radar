@@ -1,13 +1,15 @@
+Bugün 30 Ağustos Zafer Bayramı, resmi tatil olması ve insanların evde veya tatil bölgelerinde dinleniyor olması nedeniyle dijital tüketimin en zirve yaptığı noktadayız. Veriler; aile mizahı, nostalji (upcycled CD) ve büyük sızıntıların (Coco 2) ilgi gördüğünü gösteriyor. Bu akşam, kutlamaların ardından herkesin koltuğuna çekildiği saat en verimli an olacak.
+
 ⏰ PAYLAŞIM SAATİ: 20:30
 
 🎬 Video 1
-🤖 PROMPTU: A traditional Turkish copper teapot (çaydanlık) with a stylized grumpy human face, steam coming out of its nose, talking directly to the camera, lips moving realistically, sitting on a kitchen stove, cinematic lighting, hyper-realistic texture, 4k, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Yetti be! Sabahtan beri fokur fokur kaynıyorum, biriniz de gelip 'yorgun musun' demiyor. Kahve içenlerin ocağı sönsün!"
-📝 AÇIKLAMA: Çaydanlığın sabrı kalmadı, artık ocağı o yönetecek... ☕️🔥
-🏷️ ETİKETLER: #çay #komik #absürt #mutfakgram #türkiye #viralvideo
+🤖 PROMPTU: A hyper-realistic close-up of a traditional Turkish Simit (sesame bagel) lying on a breakfast plate. The simit has a small, realistic human-like mouth in its center hole. The simit is talking, lips moving, speaking to camera, vertical 9:16 ratio, crumbs vibrating as it speaks, cinematic lighting, 4k.
+🗣️ SESLENDİRME: "Her bayram sabahı aynı tantana! Beni peynire banıp banıp durmayın kardeşim, susamlarım döküldü stresten, ben de bir can taşıyorum!"
+📝 AÇIKLAMA: Simit deyip geçmeyin, onun da bir kalbi (ve çokça susamı) var... 🥨 Karşınızda dertli simit!
+🏷️ #simit #kahvaltı #absürt #komedi #konuşannesneler #türkiye #viral
 
 🎬 Video 2
-🤖 PROMPTU: A street pigeon in Istanbul wearing a tiny gold chain, looking tough and charismatic, talking directly to the camera with its beak moving clearly, Taksim Square blurred in the background, hyper-realistic feathers, wide eyes, 4k, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Bak aslanım, o attığın bayat simitlerle beni kandıramazsın. Ya tam buğdaylı atarsın ya da tepene iniş yaparım!"
-📝 AÇIKLAMA: İstanbul kuşları bile artık gurme olmuş... 🐦🕶️
-🏷️ ETİKETLER: #istanbul #güvercin #komedi #keşfet #trend #absürtvideo
+🤖 PROMPTU: A realistic grey pigeon wearing a tiny, stylish aviator hat, perched on a historical fountain in a busy Turkish square. The pigeon is looking directly at the camera, talking, lips moving, speaking to camera, vertical 9:16 ratio, expressive eyes, shallow depth of field, high quality.
+🗣️ SESLENDİRME: "30 Ağustos diye herkes meydanlarda, fotoğraf çekilen çekilene... Bir kişi de demiyor ki 'Al şu çekirdeği, bayram harçlığın olsun'. Ayıp ya!"
+📝 AÇIKLAMA: Taksim meydanındaki o meşhur güvercin sonunda sessizliğini bozdu! 🐦🎤
+🏷️ #güvercin #30ağustos #meydan #komikvideolar #konuşanhayvanlar #trend #keşfet
