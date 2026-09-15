@@ -1,15 +1,13 @@
-Bugünün verileri ve Türkiye pazarının dinamiklerini (özellikle Cumartesi akşamı etkileşim yüksekliğini) analiz ederek hazırladığım strateji aşağıdadır:
-
-⏰ PAYLAŞIM SAATİ: 21:15
+⏰ PAYLAŞIM SAATİ: 20:30
 
 🎬 Video 1
-🤖 PROMPTU: A hyper-realistic Turkish Simit (bagel with sesame seeds) sitting on a breakfast table. The Simit has a tiny, expressive mouth and eyes. It is looking directly at the camera, talking angrily, with realistic lip movements. High-quality textures, cinematic morning light, 4k, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Hayırdır kardeşim? Kruvasan görünce bizi unuttun! Susamım dökülse kıyamet koparırsın ama!"
-📝 AÇIKLAMA: Yerli ve milli simitimizin sitemi... 🥨😂 Sosyal mesafe lütfen! 
-🏷️ ETİKETLER: #simit #kahvaltı #komik #absürt #eşyalarakarakter #turkey #viral
+🤖 PROMPTU: A realistic Turkish Simit (sesame bagel) with human-like eyes and a moving mouth, sitting on a wooden bakery tray. The Simit looks annoyed and is talking directly to the camera, lips moving realistically, 4k resolution, cinematic lighting, vertical 9:16 ratio.
+🗣️ SESLENDİRME: "Yeter ya! Her gelen üzerimdeki susamları tek tek ayıklıyor. Ben simidim kardeşim, konfeti değilim! Alacaksan al, gıdıklama beni artık!"
+📝 AÇIKLAMA: Simitlerin de bir sabrı var, lütfen saygı duyalım... 🥨😂
+🏷️ ETİKETLER: #simit #fırın #absürt #komedi #konuşanesyalar #viraltr #sokaklezzetleri
 
 🎬 Video 2
-🤖 PROMPTU: A close-up of a charismatic, fluffy Turkish Van cat with one blue eye and one yellow eye. The cat is wearing a tiny tie and sitting in a miniature office. It is speaking to the camera with realistic lip-syncing and human-like facial expressions, looking very serious. High detail fur, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Bak evlat, neden onu seçtin diyorlar... Kuru mamayı o alıyor, faturayı o ödüyor. Tabii ki onu seçicem!"
-📝 AÇIKLAMA: Mahallenin ağır abisinden hayat dersleri 🐱☕ Sizce haksız mı?
-🏷️ ETİKETLER: #kedi #catsoftiktok #ilişkiler #komedi #absürt #keşfet #van kedisi
+🤖 PROMPTU: A charismatic Istanbul street cat (ginger tabby) sitting on a café table, wearing tiny sunglasses. The cat is talking to the camera, lips moving, speaking with a cool attitude, urban Istanbul background with blurred lights, vertical 9:16 ratio, realistic fur.
+🗣️ SESLENDİRME: "Sabahtan beri koşuyorsun, hayırdır Barbie misin? Git iki kilo mama al da gel, kondisyonun yerine gelsin. Hadi canım, naş naş!"
+📝 AÇIKLAMA: Mahallenin abisinden hayat dersleri... 🐱☕
+🏷️ ETİKETLER: #kedi #istanbul #running #barbie #absürt #konuşanhayvanlar #kedivideoları #komik
