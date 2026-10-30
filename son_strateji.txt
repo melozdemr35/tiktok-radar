@@ -1,17 +1,16 @@
-BUGÜNÜN TARİHİ: 29 Ekim 2026 (Cumhuriyet Bayramı - Resmi Tatil)
-
-Stratejik Not: Bugün Türkiye'de resmi tatil olduğu için kullanıcılar gün boyu aktif ancak akşam saatlerinde (kutlamalar sonrası eve dönüş ve dinlenme vakti) ekran süresi zirve yapacaktır.
+BUGÜNÜN TARİHİ: 30 Ekim 2026 (Cuma)
 
 ⏰ PAYLAŞIM SAATİ: 20:30
+(Cuma akşamı olması ve hafta sonu moduna giriş sebebiyle, Türkiye'deki etkileşimin zirve yaptığı saattir.)
 
 🎬 Video 1
-🤖 PROMPTU: Cinematic close-up shot of a grumpy Istanbul seagull wearing a tiny red bowtie, perched on a ferry railing with the Bosphorus background. The seagull is talking directly to the camera, human-like lip movements, expressive eyes, speaking to camera, high detail, realistic textures, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Kardeşim her gün aynı bayat simit, her gün aynı unlu mamul! Vizyonunuz bu kadar mı? Yarın buraya suşi bekliyorum, yoksa vapuru fena karıştırırım!"
-📝 AÇIKLAMA: Martı bile lüks tüketim peşine düşmüş, biz hala simit hesabı... 😂 Sizce martı haklı mı?
-🏷️ ETİKETLER: #martı #istanbul #komik #absürt #vapur #konuşanhayvanlar #viraltr
+🤖 PROMPTU: A hyper-realistic Turkish street cat (tuxedo cat) sitting on a colorful handmade Turkish rug. The cat is wearing small, trendy reading glasses. The cat is looking directly at the lens, talking, lips moving perfectly, speaking to camera with expressive facial movements. Cinematic lighting, high detail, 4k, vertical 9:16 ratio.
+🗣️ SESLENDİRME: "Ya kardeşim her gün aynı kuru mama, her gün aynı kuru mama... Bir gün de şuraya bir parça bonfile koyun be, vallahi ciğerimiz soldu!"
+📝 AÇIKLAMA: Bizim mahallenin reisi sonunda sessizliğini bozdu... 🐈‍⬛💸 
+🏷️ ETİKETLER: #komik #kedi #viral #turkiye #konusanhayvanlar #absurt #sokakkedisi #klingai
 
 🎬 Video 2
-🤖 PROMPTU: A traditional copper Turkish coffee pot (cezve) on a vintage stove. The spout of the pot is moving like a human mouth, talking and complaining, steam rising elegantly, warm kitchen lighting, cinematic style, talking to camera, lips moving, highly detailed copper texture, vertical 9:16 ratio.
-🗣️ SESLENDİRME: "Altımı açtın açtın, beni burada unuttun! Köpüğüm söndü, karizmam çizildi resmen. Ben bu mutfağın divasıyım be, biraz saygı!"
-📝 AÇIKLAMA: Mutfağın gizli patronu sonunda sessizliğini bozdu! ☕️🔥 Kahvenizi nasıl alırdınız?
-🏷️ ETİKETLER: #türkkahvesi #cezve #mutfaksırları #absürt #komedi #yapayzeka #viralvideo
+🤖 PROMPTU: An anthropomorphic espresso machine in a modern office kitchen. The machine has a grumpy human-like face formed by its steam wand and buttons. The machine is talking to the camera, lips moving, speaking to camera, looking exhausted with steam coming out of its ears. Photorealistic 3D render, expressive, vertical 9:16 ratio.
+🗣️ SESLENDİRME: "Günde 40 tane latte bastım, hala 'ayılmadım' diyorsun. Ben yoruldum hayat, gelme üstüme, fişimi çekin gidin!"
+📝 AÇIKLAMA: Ofisteki o kahve makinesinin dili olsa da konuşsa demiştiniz... Buyrun konuştu. ☕️😫
+🏷️ ETİKETLER: #kahve #ofishayati #komikvideolar #viraltr #yapayzeka #absurt #pazartesisendromu #kahvekeyfi
